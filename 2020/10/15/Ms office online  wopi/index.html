@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>office wopi - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                office wopi
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2020-10-15 14:19">
+      2020年10月15日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      17
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h3 id="PHP实现-MS-WOPI-host-简单实现office文档查看-编辑"><a class="header-anchor" href="#PHP实现-MS-WOPI-host-简单实现office文档查看-编辑"></a>PHP实现 MS-WOPI host 简单实现office文档查看/编辑</h3>
+<p>最近调研一款在线office预览、编辑的方案，看了毕升office、卓正office、冰蓝office这些收费的方案，整体上可以满足需求，不过各有优缺点。最后找到微软官方出品的office online server（原来叫 office web apps），最重要的一点是它完全免费 🤣。</p>
+<h4 id="office-online-server-部署"><a class="header-anchor" href="#office-online-server-部署"></a>office online server 部署</h4>
+<p>office online server 的部署还算比较繁琐，主要原因也是它支持windows服务器，平常大家用的最多的还是Linux，所以多windows的熟悉程度就没有这么得心应手了。</p>
+<h5 id="准备工作"><a class="header-anchor" href="#准备工作"></a>准备工作</h5>
+<ol>
+<li>必须准备2台服务器，因为OfficeOnline不会在包含 Active Directory 域服务 (AD DS) 的服务器上运行。</li>
+<li>域控服务可以使用Windows Server 2016 核心版(无GUI版)，但是Office Online Server 2017 仅支持 Windows Server 2016 的“含桌面体验的服务器”安装选项(如果自行安装的话)。</li>
+<li>Office Server 2017的服务器尽可能干净，最好是给一台全新的服务器。</li>
+<li>为保证安全性，生产环境中请固定暴露需要使用到的端口。</li>
+<li><strong>请勿在运行 Office Online Server</strong> 的服务器上安装任何其他服务器应用程序。包括 Exchange Server、SharePoint Server、Skype for Business Server 和 SQL Server。如果服务器不足，则可以在这些服务器的其中一台的虚拟机上运行 Office Online Server。</li>
+<li><strong>不要在端口 80、443 或 809 上安装依赖 Web 服务器 (IIS) 角色的任何服务或角色</strong>，因为 Office Online Server 会定期删除这些端口上的 Web 应用程序。</li>
+<li><strong>不要安装任何版本的 Office</strong>。如果已经安装，在安装 Office Online Server 之前必须将其卸载。</li>
+<li><strong>Office Online不会加载IP地址的Doc源, 读取的地址必须是带域名的</strong>. 例如<a target="_blank" rel="noopener" href="http://1.2.3.4/t.docx%E6%98%AF%E4%BC%9A%E6%8A%A5Error%E7%9A%84">http://1.2.3.4/t.docx是会报Error的</a></li>
+</ol>
+<p>具体的安装步骤这边就不做赘述了，网上的案例很多。例如：<a target="_blank" rel="noopener" href="https://blog.csdn.net/q386815991/article/details/81705128">https://blog.csdn.net/q386815991/article/details/81705128</a></p>
+<p><strong>注意：</strong></p>
+<p>安装往成后在浏览器中输入地址 <code>http://servername/hosting/discovery</code> ，显示如下则说明安装成功</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/BkjDOS"><img src="https://s1.ax1x.com/2020/10/23/BkjDOS.md.png" srcset="/img/loading.gif" alt="BkjDOS.md.png"></a></p>
+<pre><code class="hljs shell">不过有可能会报错显示error，可能是在部署场的时候没有设置-OpenFromUrlEnabled:$true，在powershell中执行：
+Set-OfficeWebAppsFarm -OpenFromUrlEnabled:$true
+
+部署场的命令可以改为：New-OfficeWebAppsFarm -InternalURL &quot;http://servername&quot; -AllowHttp -EditingEnabled -OpenFromUrlEnabled:$true</code></pre>
+<h5 id="测试结果"><a class="header-anchor" href="#测试结果"></a>测试结果</h5>
+<p>然后输入 <code>http://servername/op/generate.aspx</code><br>
+<a target="_blank" rel="noopener" href="https://imgchr.com/i/Bkz3LT"><img src="https://s1.ax1x.com/2020/10/23/Bkz3LT.md.png" srcset="/img/loading.gif" alt="Bkz3LT.md.png"></a></p>
+<p>输入一个文档链接，生成create link，用浏览器打开即可预览你的文档了。</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/BkzT0S"><img src="https://s1.ax1x.com/2020/10/23/BkzT0S.md.png" srcset="/img/loading.gif" alt="BkzT0S.md.png"></a></p>
+<h4 id="wopi-host-实现"><a class="header-anchor" href="#wopi-host-实现"></a>wopi host 实现</h4>
+<blockquote>
+<p>Web Application Open Platform Interface (WOPI). WOPI为基于Web的服务提供了一种查看和编辑OfficeWebApps中文档的方法，您可以从Office文档中获得所有高保真和丰富的文档。</p>
+</blockquote>
+<p>客户端如何使用WOPI的一个例子是为特定类型的文件提供基于浏览器的查看器。该客户端使用WOPI获取文件的内容，以便将该内容以浏览器中的网页形式呈现给用户。下图显示了如何工作的示例。</p>
+<p><img src="https://oscimg.oschina.net/oscnet/badbe607395f32d1ca972769269c562d6b0.jpg" srcset="/img/loading.gif" alt=""></p>
+<p>图1 使用WOPI为特定类型的文件提供基于浏览器的查看器</p>
+<p>上图中交互过程中一个值得注意的细节是，WOPI服务器提供了“调用WOPI客户端所需的信息”。WOPI客户端提供了一种机制，通过该机制，WOPI服务器可以发现WOPI客户端的能力，以及调用这些功能的方法。(正如<a target="_blank" rel="noopener" href="https://my.oschina.net/tita/blog/2963590">部署 Office Online Server</a>中所讲到的…/hosting/discovery)下图描述了这种交互：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/ac043e78db209eb5e0aa385dcfd0477ebce.jpg" srcset="/img/loading.gif" alt=""></p>
+<p>图2 WOPI 发现</p>
+<blockquote>
+<p>简单的说我们要实现文件的编辑需要实现三个接口：</p>
+</blockquote>
+<p>GET api/wopi/files/{name} <br><br>
+GET api/wopi/files/{name}/contents<br><br>
+POST api/wopi/files/{name}/contents</p>
+<h5 id="接口实现"><a class="header-anchor" href="#接口实现"></a>接口实现</h5>
+<ul>
+<li>获取文件信息 CheckFileInfo</li>
+</ul>
+<pre><code class="hljs oxygene">http:<span class="hljs-comment">//server/&lt;...&gt;/wopi*/files/&lt;id&gt;?access_token=&lt;token&gt; </span>
+get <span class="hljs-function"><span class="hljs-keyword">method</span></span></code></pre>
+<p>php code：</p>
+<pre><code class="hljs php"><span class="hljs-built_in">static</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">CheckFileInfo</span>(<span class="hljs-params">$fileName, $GUID</span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">if</span>(<span class="hljs-keyword">isset</span>($_SERVER[<span class="hljs-string">&#x27;DOCUMENT_ROOT&#x27;</span>])) &#123;
+            $FileInfoDto = <span class="hljs-keyword">array</span>(
+                <span class="hljs-string">&#x27;BaseFileName&#x27;</span> =&gt; $fileName,
+                <span class="hljs-string">&#x27;OwnerId&#x27;</span> =&gt; <span class="hljs-string">&#x27;admin&#x27;</span>,
+                <span class="hljs-comment">// &#x27;ReadOnly&#x27; =&gt; true,</span>
+                <span class="hljs-string">&#x27;SHA256&#x27;</span> =&gt; base64_encode(hash_file(<span class="hljs-string">&#x27;sha256&#x27;</span>, $_SERVER[<span class="hljs-string">&#x27;DOCUMENT_ROOT&#x27;</span>] . <span class="hljs-string">&#x27;/&#x27;</span> . $fileName, <span class="hljs-literal">true</span>)),
+                <span class="hljs-string">&#x27;Size&#x27;</span> =&gt; filesize($_SERVER[<span class="hljs-string">&#x27;DOCUMENT_ROOT&#x27;</span>] . <span class="hljs-string">&#x27;/&#x27;</span> . $fileName),
+                <span class="hljs-string">&#x27;Version&#x27;</span> =&gt; <span class="hljs-number">1</span>,
+                <span class="hljs-string">&#x27;UserCanWrite&#x27;</span> =&gt; <span class="hljs-literal">true</span> <span class="hljs-comment">//注意这个参数，为true时才有编辑当前文档的权限</span>
+            );
+
+            $jsonString = json_encode($FileInfoDto);
+            header(<span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span>);
+            <span class="hljs-keyword">echo</span> $jsonString;
+        &#125;
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">die</span>();
+    &#125;</code></pre>
+<ul>
+<li>获取文件流  GetFile</li>
+</ul>
+<pre><code class="hljs oxygene">http:<span class="hljs-comment">//server/&lt;...&gt;/wopi*/files/&lt;id&gt;/contents?access_token=&lt;token&gt;</span>
+get <span class="hljs-function"><span class="hljs-keyword">method</span></span></code></pre>
+<p>php code：</p>
+<pre><code class="hljs php"><span class="hljs-built_in">static</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">GetFile</span>(<span class="hljs-params">$fileName</span>)</span>
+<span class="hljs-function">  </span>&#123;
+      <span class="hljs-keyword">if</span> (file_exists($_SERVER[<span class="hljs-string">&#x27;DOCUMENT_ROOT&#x27;</span>] . <span class="hljs-string">&#x27;/&#x27;</span> . $fileName)) &#123;
+          header(<span class="hljs-string">&#x27;Content-Description: File Transfer&#x27;</span>);
+          header(<span class="hljs-string">&#x27;Content-Type: application/octet-stream&#x27;</span>);
+          header(<span class="hljs-string">&#x27;Content-Disposition: attachment; filename=&#x27;</span> . basename($_SERVER[<span class="hljs-string">&#x27;DOCUMENT_ROOT&#x27;</span>] . <span class="hljs-string">&#x27;/&#x27;</span> . $fileName));
+          header(<span class="hljs-string">&#x27;Expires: 0&#x27;</span>);
+          header(<span class="hljs-string">&#x27;Cache-Control: must-revalidate&#x27;</span>);
+          header(<span class="hljs-string">&#x27;Pragma: public&#x27;</span>);
+          header(<span class="hljs-string">&#x27;Content-Length: &#x27;</span> . filesize($_SERVER[<span class="hljs-string">&#x27;DOCUMENT_ROOT&#x27;</span>] . <span class="hljs-string">&#x27;/&#x27;</span> . $fileName));
+          readfile($_SERVER[<span class="hljs-string">&#x27;DOCUMENT_ROOT&#x27;</span>] . <span class="hljs-string">&#x27;/&#x27;</span> . $fileName);
+          <span class="hljs-keyword">exit</span>;
+      &#125;
+  &#125;
+</code></pre>
+<ul>
+<li>保存文件 PutFile url和GetFile一样，但是请求方法（request method）不同</li>
+</ul>
+<pre><code class="hljs oxygene">http:<span class="hljs-comment">//server/&lt;...&gt;/wopi*/files/&lt;id&gt;/contents?access_token=&lt;token&gt;</span>
+post <span class="hljs-function"><span class="hljs-keyword">method</span></span>
+<span class="hljs-function"></span>
+<span class="hljs-function"><span class="hljs-title">wopi</span> <span class="hljs-title">client</span> 获取浏览器编辑的文档的内容，将二进制流发送给该<span class="hljs-title">PutFile</span>服务，因此实现的时候，保存该二进制流就行了</span></code></pre>
+<p>实现思路大致如上，这样就可以对office文档进行在线编辑和预览了。</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/BA95Ox"><img src="https://s1.ax1x.com/2020/10/23/BA95Ox.md.png" srcset="/img/loading.gif" alt="BA95Ox.md.png"></a></p>
+<p>最后安全方面，可以做限制白名单，指定office online server 能够访问的域名</p>
+<pre><code class="hljs css"><span class="hljs-selector-tag">New-OfficeWebAppsHost</span> <span class="hljs-selector-tag">-domain</span> &quot;<span class="hljs-selector-tag">test</span><span class="hljs-selector-class">.wopi</span><span class="hljs-selector-class">.com</span>&quot;  
+
+限制只能访问<span class="hljs-selector-tag">test</span><span class="hljs-selector-class">.wopi</span><span class="hljs-selector-class">.com</span> 这个域名实现的<span class="hljs-selector-tag">wopi</span>服务</code></pre>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/php/">php</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%9C%A8%E7%BA%BFoffice/">在线office</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/10/30/laf%20cloud%20%E4%BA%91%E5%BC%80%E5%8F%91%20yyds/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">laf cloud 云开发 yyds</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/07/07/php-%E7%9A%84%E5%87%A0%E7%A7%8D%E5%BC%82%E6%AD%A5%E6%89%A7%E8%A1%8C%E6%96%B9%E5%BC%8F/">
+                        <span class="hidden-mobile">PHP 的几种异步执行方式</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
