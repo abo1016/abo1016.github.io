@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>golang微服务框架选型与实践 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                golang微服务框架选型与实践
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2024-02-15 11:20">
+      2024年2月15日 上午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      47
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="golang微服务框架选型与实践"><a class="header-anchor" href="#golang微服务框架选型与实践"></a>golang微服务框架选型与实践</h2>
+<h3 id="🔍-微服务架构的价值与挑战"><a class="header-anchor" href="#🔍-微服务架构的价值与挑战"></a>🔍 微服务架构的价值与挑战</h3>
+<p>微服务架构作为现代应用开发的主流范式，通过将复杂系统拆分为一系列小型、松耦合、可独立部署的服务，带来了显著的敏捷性和可伸缩性提升。Go语言凭借其出色的并发处理能力、低资源占用和高性能特性，成为实现微服务的理想选择。</p>
+<p>然而，微服务架构也带来了诸多挑战，包括服务发现、负载均衡、熔断降级、分布式跟踪等。为了应对这些挑战，多种Go微服务框架应运而生。本文将对主流框架进行分析比较，并提供选型建议和实践案例。</p>
+<h3 id="🛠️-主流Go微服务框架对比"><a class="header-anchor" href="#🛠️-主流Go微服务框架对比"></a>🛠️ 主流Go微服务框架对比</h3>
+<h4 id="1-Go-kit"><a class="header-anchor" href="#1-Go-kit"></a>1. Go-kit</h4>
+<p><strong>优势：</strong></p>
+<ul>
+<li>模块化设计，提供了中间件、日志、指标等组件</li>
+<li>不限制底层传输协议，支持HTTP、gRPC等</li>
+<li>具有良好的可测试性</li>
+<li>提供了服务发现、负载均衡、熔断器等功能</li>
+</ul>
+<p><strong>劣势：</strong></p>
+<ul>
+<li>学习曲线较陡峭</li>
+<li>需要编写较多样板代码</li>
+<li>对新手不够友好</li>
+<li>较为底层，需要开发者自行组装各种组件</li>
+</ul>
+<p><strong>适用场景：</strong></p>
+<ul>
+<li>大型复杂企业级应用</li>
+<li>需要高度定制化的场景</li>
+<li>已有经验丰富的Go开发团队</li>
+</ul>
+<pre><code class="hljs go"><span class="hljs-comment">// Go-kit 服务定义示例</span>
+<span class="hljs-keyword">type</span> Service <span class="hljs-keyword">interface</span> &#123;
+    GetUser(ctx context.Context, id <span class="hljs-keyword">string</span>) (User, error)
+&#125;
+
+<span class="hljs-comment">// 端点定义</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeGetUserEndpoint</span><span class="hljs-params">(svc Service)</span> <span class="hljs-title">endpoint</span>.<span class="hljs-title">Endpoint</span></span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(ctx context.Context, request <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-params">(<span class="hljs-keyword">interface</span>&#123;&#125;, error)</span></span> &#123;
+        req := request.(getUserRequest)
+        user, err := svc.GetUser(ctx, req.ID)
+        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+            <span class="hljs-keyword">return</span> getUserResponse&#123;&#125;, err
+        &#125;
+        <span class="hljs-keyword">return</span> getUserResponse&#123;User: user&#125;, <span class="hljs-literal">nil</span>
+    &#125;
+&#125;</code></pre>
+<h4 id="2-go-micro"><a class="header-anchor" href="#2-go-micro"></a>2. go-micro</h4>
+<p><strong>优势：</strong></p>
+<ul>
+<li>提供了完整的微服务生态系统</li>
+<li>内置服务发现、消息编码、负载均衡等功能</li>
+<li>插件化架构，可扩展性强</li>
+<li>更简洁的API和较少的样板代码</li>
+</ul>
+<p><strong>劣势：</strong></p>
+<ul>
+<li>文档相对不够完善</li>
+<li>社区活跃度近期有所下降</li>
+<li>v2版本改动较大，迁移成本高</li>
+</ul>
+<p><strong>适用场景：</strong></p>
+<ul>
+<li>中小型微服务项目</li>
+<li>需要快速开发和部署的场景</li>
+<li>需要完整微服务功能集的项目</li>
+</ul>
+<pre><code class="hljs go"><span class="hljs-comment">// go-micro 服务定义示例</span>
+<span class="hljs-keyword">type</span> UserService <span class="hljs-keyword">struct</span>&#123;&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *UserService)</span> <span class="hljs-title">GetUser</span><span class="hljs-params">(ctx context.Context, req *proto.GetUserRequest, rsp *proto.GetUserResponse)</span> <span class="hljs-title">error</span></span> &#123;
+    user, err := repository.GetUser(req.Id)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> err
+    &#125;
+    rsp.User = &amp;proto.User&#123;
+        Id:   user.ID,
+        Name: user.Name,
+    &#125;
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    service := micro.NewService(
+        micro.Name(<span class="hljs-string">&quot;user.service&quot;</span>),
+        micro.Version(<span class="hljs-string">&quot;latest&quot;</span>),
+    )
+    service.Init()
+    
+    proto.RegisterUserServiceHandler(service.Server(), <span class="hljs-built_in">new</span>(UserService))
+    
+    <span class="hljs-keyword">if</span> err := service.Run(); err != <span class="hljs-literal">nil</span> &#123;
+        log.Fatal(err)
+    &#125;
+&#125;</code></pre>
+<h4 id="3-Gin-gRPC"><a class="header-anchor" href="#3-Gin-gRPC"></a>3. Gin + gRPC</h4>
+<p><strong>优势：</strong></p>
+<ul>
+<li>Gin提供高性能的HTTP API处理</li>
+<li>gRPC提供高效的服务间通信</li>
+<li>组合使用灵活性高</li>
+<li>Gin的易用性和gRPC的性能优势互补</li>
+</ul>
+<p><strong>劣势：</strong></p>
+<ul>
+<li>需要自行整合多个组件</li>
+<li>缺乏统一的微服务治理功能</li>
+<li>需要更多手动配置</li>
+</ul>
+<p><strong>适用场景：</strong></p>
+<ul>
+<li>需要同时提供REST API和RPC服务的场景</li>
+<li>对性能要求高的服务</li>
+<li>希望保持技术栈简单的团队</li>
+</ul>
+<pre><code class="hljs go"><span class="hljs-comment">// gRPC 服务定义</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *userServer)</span> <span class="hljs-title">GetUser</span><span class="hljs-params">(ctx context.Context, req *pb.GetUserRequest)</span> <span class="hljs-params">(*pb.GetUserResponse, error)</span></span> &#123;
+    user, err := s.repo.GetUser(req.Id)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, status.Errorf(codes.NotFound, <span class="hljs-string">&quot;用户未找到: %v&quot;</span>, err)
+    &#125;
+    <span class="hljs-keyword">return</span> &amp;pb.GetUserResponse&#123;
+        User: &amp;pb.User&#123;
+            Id:   user.ID,
+            Name: user.Name,
+        &#125;,
+    &#125;, <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-comment">// Gin HTTP API</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">setupRouter</span><span class="hljs-params">()</span> *<span class="hljs-title">gin</span>.<span class="hljs-title">Engine</span></span> &#123;
+    r := gin.Default()
+    r.GET(<span class="hljs-string">&quot;/users/:id&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(c *gin.Context)</span></span> &#123;
+        id := c.Param(<span class="hljs-string">&quot;id&quot;</span>)
+        user, err := userService.GetUser(id)
+        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+            c.JSON(http.StatusNotFound, gin.H&#123;<span class="hljs-string">&quot;error&quot;</span>: <span class="hljs-string">&quot;用户未找到&quot;</span>&#125;)
+            <span class="hljs-keyword">return</span>
+        &#125;
+        c.JSON(http.StatusOK, user)
+    &#125;)
+    <span class="hljs-keyword">return</span> r
+&#125;</code></pre>
+<h4 id="4-Kratos"><a class="header-anchor" href="#4-Kratos"></a>4. Kratos</h4>
+<p><strong>优势：</strong></p>
+<ul>
+<li>哔哩哔哩开源的完整微服务框架</li>
+<li>集成了gRPC和HTTP双协议支持</li>
+<li>内置微服务治理功能（熔断、限流、追踪等）</li>
+<li>提供了丰富的中间件和工具链</li>
+</ul>
+<p><strong>劣势：</strong></p>
+<ul>
+<li>中文文档为主，国际化程度不高</li>
+<li>学习曲线相对较高</li>
+<li>框架较为重量级</li>
+</ul>
+<p><strong>适用场景：</strong></p>
+<ul>
+<li>需要完整微服务治理能力的中大型项目</li>
+<li>国内团队更容易上手</li>
+<li>需要双协议支持的场景</li>
+</ul>
+<pre><code class="hljs go"><span class="hljs-comment">// Kratos 服务定义示例</span>
+<span class="hljs-keyword">type</span> UserService <span class="hljs-keyword">struct</span> &#123;
+    pb.UnimplementedUserServer
+    uc *biz.UserUsecase
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewUserService</span><span class="hljs-params">(uc *biz.UserUsecase)</span> *<span class="hljs-title">UserService</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;UserService&#123;uc: uc&#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *UserService)</span> <span class="hljs-title">GetUser</span><span class="hljs-params">(ctx context.Context, req *pb.GetUserRequest)</span> <span class="hljs-params">(*pb.GetUserResponse, error)</span></span> &#123;
+    user, err := s.uc.GetUser(ctx, req.Id)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+    &#125;
+    <span class="hljs-keyword">return</span> &amp;pb.GetUserResponse&#123;
+        User: &amp;pb.User&#123;
+            Id:   user.ID,
+            Name: user.Name,
+        &#125;,
+    &#125;, <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-comment">// 启动服务</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    app, err := kratos.New(
+        kratos.Name(<span class="hljs-string">&quot;user.service&quot;</span>),
+        kratos.Version(<span class="hljs-string">&quot;1.0.0&quot;</span>),
+        kratos.Server(
+            grpcSrv,
+            httpSrv,
+        ),
+    )
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        log.Fatal(err)
+    &#125;
+    
+    <span class="hljs-keyword">if</span> err := app.Run(); err != <span class="hljs-literal">nil</span> &#123;
+        log.Fatal(err)
+    &#125;
+&#125;</code></pre>
+<h4 id="5-Kitex"><a class="header-anchor" href="#5-Kitex"></a>5. Kitex</h4>
+<p><strong>优势：</strong></p>
+<ul>
+<li>字节跳动开源的高性能RPC框架</li>
+<li>专注于极致性能，适合大规模服务</li>
+<li>内置负载均衡、熔断、限流等功能</li>
+<li>与 Thrift 协议无缝集成</li>
+</ul>
+<p><strong>劣势：</strong></p>
+<ul>
+<li>主要聚焦于RPC层面，不是完整的微服务框架</li>
+<li>需要与其他组件结合使用</li>
+<li>生态相对较新</li>
+</ul>
+<p><strong>适用场景：</strong></p>
+<ul>
+<li>对性能要求极高的场景</li>
+<li>大规模微服务集群</li>
+<li>已有 Thrift 使用经验的团队</li>
+</ul>
+<pre><code class="hljs go"><span class="hljs-comment">// Kitex 服务定义示例</span>
+<span class="hljs-keyword">type</span> UserServiceImpl <span class="hljs-keyword">struct</span>&#123;&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *UserServiceImpl)</span> <span class="hljs-title">GetUser</span><span class="hljs-params">(ctx context.Context, req *api.GetUserRequest)</span> <span class="hljs-params">(*api.GetUserResponse, error)</span></span> &#123;
+    <span class="hljs-comment">// 实现获取用户逻辑</span>
+    <span class="hljs-keyword">return</span> &amp;api.GetUserResponse&#123;
+        User: &amp;api.User&#123;
+            Id:   req.Id,
+            Name: <span class="hljs-string">&quot;测试用户&quot;</span>,
+        &#125;,
+    &#125;, <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    svr := userservice.NewServer(<span class="hljs-built_in">new</span>(UserServiceImpl))
+    
+    err := svr.Run()
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        log.Fatal(err)
+    &#125;
+&#125;</code></pre>
+<h3 id="🧪-选型考虑因素"><a class="header-anchor" href="#🧪-选型考虑因素"></a>🧪 选型考虑因素</h3>
+<p>在选择Go微服务框架时，应考虑以下因素：</p>
+<ol>
+<li>
+<p><strong>团队技术栈和经验</strong>：选择与团队技术栈相符、学习成本适中的框架。</p>
+</li>
+<li>
+<p><strong>性能需求</strong>：如果性能是首要考虑因素，Kitex或gRPC是更好的选择。</p>
+</li>
+<li>
+<p><strong>功能完整性</strong>：如果需要完整的微服务治理功能，Go-kit或Kratos更适合。</p>
+</li>
+<li>
+<p><strong>社区活跃度和生态</strong>：考虑框架的社区支持和长期维护能力。</p>
+</li>
+<li>
+<p><strong>项目规模和复杂度</strong>：大型复杂项目可能需要功能更完整的框架，而小型项目可能选择更轻量级的解决方案。</p>
+</li>
+<li>
+<p><strong>可扩展性</strong>：考虑框架是否支持插件化和自定义扩展。</p>
+</li>
+<li>
+<p><strong>部署环境</strong>：如果采用Kubernetes等容器编排平台，可能需要考虑框架对这些环境的支持程度。</p>
+</li>
+</ol>
+<h3 id="📊-选型决策表"><a class="header-anchor" href="#📊-选型决策表"></a>📊 选型决策表</h3>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>性能</th>
+<th>易用性</th>
+<th>功能完整性</th>
+<th>社区活跃度</th>
+<th>学习曲线</th>
+<th>最适合场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Go-kit</td>
+<td>⭐⭐⭐⭐</td>
+<td>⭐⭐</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐⭐⭐</td>
+<td>高</td>
+<td>大型企业级应用</td>
+</tr>
+<tr>
+<td>go-micro</td>
+<td>⭐⭐⭐</td>
+<td>⭐⭐⭐⭐</td>
+<td>⭐⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+<td>中</td>
+<td>中小型项目</td>
+</tr>
+<tr>
+<td>Gin+gRPC</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>低</td>
+<td>灵活性要求高的项目</td>
+</tr>
+<tr>
+<td>Kratos</td>
+<td>⭐⭐⭐⭐</td>
+<td>⭐⭐⭐⭐</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+<td>中高</td>
+<td>完整微服务治理需求</td>
+</tr>
+<tr>
+<td>Kitex</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+<td>中</td>
+<td>高性能RPC场景</td>
+</tr>
+</tbody>
+</table>
+<h3 id="💡-实践案例：构建用户服务微服务"><a class="header-anchor" href="#💡-实践案例：构建用户服务微服务"></a>💡 实践案例：构建用户服务微服务</h3>
+<p>下面以构建一个简单的用户服务为例，展示使用gRPC + Gin的微服务实践。</p>
+<h4 id="1-项目结构"><a class="header-anchor" href="#1-项目结构"></a>1. 项目结构</h4>
+<pre><code class="hljs routeros">/user-service
+  /api
+    /proto          # Proto文件定义
+  /cmd              # 入口点
+  /internal
+    /handler        # HTTP处理器
+    /repository     # 数据访问层
+    <span class="hljs-built_in">/service </span>       # 业务逻辑层
+  /pkg
+    <span class="hljs-built_in">/config </span>        # 配置管理
+    <span class="hljs-built_in">/discovery </span>     # 服务发现
+    /middleware     # 中间件
+    /logger         # 日志组件
+  go.mod
+  Dockerfile</code></pre>
+<h4 id="2-Proto定义"><a class="header-anchor" href="#2-Proto定义"></a>2. Proto定义</h4>
+<pre><code class="hljs protobuf">syntax = <span class="hljs-string">&quot;proto3&quot;</span>;
+
+<span class="hljs-keyword">package</span> user;
+<span class="hljs-keyword">option</span> go_package = <span class="hljs-string">&quot;userservice/api/proto&quot;</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">service</span> <span class="hljs-title">UserService</span> </span>&#123;
+  <span class="hljs-function"><span class="hljs-keyword">rpc</span> GetUser(GetUserRequest) <span class="hljs-keyword">returns</span> (GetUserResponse)</span>;
+  <span class="hljs-function"><span class="hljs-keyword">rpc</span> CreateUser(CreateUserRequest) <span class="hljs-keyword">returns</span> (CreateUserResponse)</span>;
+  <span class="hljs-function"><span class="hljs-keyword">rpc</span> ListUsers(ListUsersRequest) <span class="hljs-keyword">returns</span> (ListUsersResponse)</span>;
+&#125;
+
+<span class="hljs-class"><span class="hljs-keyword">message</span> <span class="hljs-title">User</span> </span>&#123;
+  <span class="hljs-built_in">string</span> id = <span class="hljs-number">1</span>;
+  <span class="hljs-built_in">string</span> name = <span class="hljs-number">2</span>;
+  <span class="hljs-built_in">string</span> email = <span class="hljs-number">3</span>;
+  <span class="hljs-built_in">int32</span> age = <span class="hljs-number">4</span>;
+&#125;
+
+<span class="hljs-class"><span class="hljs-keyword">message</span> <span class="hljs-title">GetUserRequest</span> </span>&#123;
+  <span class="hljs-built_in">string</span> id = <span class="hljs-number">1</span>;
+&#125;
+
+<span class="hljs-class"><span class="hljs-keyword">message</span> <span class="hljs-title">GetUserResponse</span> </span>&#123;
+  User user = <span class="hljs-number">1</span>;
+&#125;
+
+<span class="hljs-class"><span class="hljs-keyword">message</span> <span class="hljs-title">CreateUserRequest</span> </span>&#123;
+  <span class="hljs-built_in">string</span> name = <span class="hljs-number">1</span>;
+  <span class="hljs-built_in">string</span> email = <span class="hljs-number">2</span>;
+  <span class="hljs-built_in">int32</span> age = <span class="hljs-number">3</span>;
+&#125;
+
+<span class="hljs-class"><span class="hljs-keyword">message</span> <span class="hljs-title">CreateUserResponse</span> </span>&#123;
+  User user = <span class="hljs-number">1</span>;
+&#125;
+
+<span class="hljs-class"><span class="hljs-keyword">message</span> <span class="hljs-title">ListUsersRequest</span> </span>&#123;
+  <span class="hljs-built_in">int32</span> page = <span class="hljs-number">1</span>;
+  <span class="hljs-built_in">int32</span> page_size = <span class="hljs-number">2</span>;
+&#125;
+
+<span class="hljs-class"><span class="hljs-keyword">message</span> <span class="hljs-title">ListUsersResponse</span> </span>&#123;
+  <span class="hljs-keyword">repeated</span> User users = <span class="hljs-number">1</span>;
+  <span class="hljs-built_in">int32</span> total = <span class="hljs-number">2</span>;
+&#125;</code></pre>
+<h4 id="3-服务实现"><a class="header-anchor" href="#3-服务实现"></a>3. 服务实现</h4>
+<pre><code class="hljs go"><span class="hljs-comment">// internal/service/user.go</span>
+<span class="hljs-keyword">package</span> service
+
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">&quot;context&quot;</span>
+    <span class="hljs-string">&quot;github.com/google/uuid&quot;</span>
+    <span class="hljs-string">&quot;userservice/api/proto&quot;</span>
+    <span class="hljs-string">&quot;userservice/internal/repository&quot;</span>
+)
+
+<span class="hljs-keyword">type</span> UserService <span class="hljs-keyword">struct</span> &#123;
+    proto.UnimplementedUserServiceServer
+    repo repository.UserRepository
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewUserService</span><span class="hljs-params">(repo repository.UserRepository)</span> *<span class="hljs-title">UserService</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;UserService&#123;repo: repo&#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *UserService)</span> <span class="hljs-title">GetUser</span><span class="hljs-params">(ctx context.Context, req *proto.GetUserRequest)</span> <span class="hljs-params">(*proto.GetUserResponse, error)</span></span> &#123;
+    user, err := s.repo.GetByID(ctx, req.Id)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+    &#125;
+    <span class="hljs-keyword">return</span> &amp;proto.GetUserResponse&#123;
+        User: &amp;proto.User&#123;
+            Id:    user.ID,
+            Name:  user.Name,
+            Email: user.Email,
+            Age:   user.Age,
+        &#125;,
+    &#125;, <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *UserService)</span> <span class="hljs-title">CreateUser</span><span class="hljs-params">(ctx context.Context, req *proto.CreateUserRequest)</span> <span class="hljs-params">(*proto.CreateUserResponse, error)</span></span> &#123;
+    user := &amp;repository.User&#123;
+        ID:    uuid.New().String(),
+        Name:  req.Name,
+        Email: req.Email,
+        Age:   req.Age,
+    &#125;
+    
+    err := s.repo.Create(ctx, user)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+    &#125;
+    
+    <span class="hljs-keyword">return</span> &amp;proto.CreateUserResponse&#123;
+        User: &amp;proto.User&#123;
+            Id:    user.ID,
+            Name:  user.Name,
+            Email: user.Email,
+            Age:   user.Age,
+        &#125;,
+    &#125;, <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *UserService)</span> <span class="hljs-title">ListUsers</span><span class="hljs-params">(ctx context.Context, req *proto.ListUsersRequest)</span> <span class="hljs-params">(*proto.ListUsersResponse, error)</span></span> &#123;
+    users, total, err := s.repo.List(ctx, req.Page, req.PageSize)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+    &#125;
+    
+    <span class="hljs-keyword">var</span> protoUsers []*proto.User
+    <span class="hljs-keyword">for</span> _, user := <span class="hljs-keyword">range</span> users &#123;
+        protoUsers = <span class="hljs-built_in">append</span>(protoUsers, &amp;proto.User&#123;
+            Id:    user.ID,
+            Name:  user.Name,
+            Email: user.Email,
+            Age:   user.Age,
+        &#125;)
+    &#125;
+    
+    <span class="hljs-keyword">return</span> &amp;proto.ListUsersResponse&#123;
+        Users: protoUsers,
+        Total: total,
+    &#125;, <span class="hljs-literal">nil</span>
+&#125;</code></pre>
+<h4 id="4-HTTP处理器"><a class="header-anchor" href="#4-HTTP处理器"></a>4. HTTP处理器</h4>
+<pre><code class="hljs go"><span class="hljs-comment">// internal/handler/user.go</span>
+<span class="hljs-keyword">package</span> handler
+
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">&quot;github.com/gin-gonic/gin&quot;</span>
+    <span class="hljs-string">&quot;net/http&quot;</span>
+    <span class="hljs-string">&quot;strconv&quot;</span>
+    <span class="hljs-string">&quot;userservice/internal/service&quot;</span>
+)
+
+<span class="hljs-keyword">type</span> UserHandler <span class="hljs-keyword">struct</span> &#123;
+    userService *service.UserService
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewUserHandler</span><span class="hljs-params">(userService *service.UserService)</span> *<span class="hljs-title">UserHandler</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;UserHandler&#123;userService: userService&#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(h *UserHandler)</span> <span class="hljs-title">GetUser</span><span class="hljs-params">(c *gin.Context)</span></span> &#123;
+    id := c.Param(<span class="hljs-string">&quot;id&quot;</span>)
+    req := &amp;proto.GetUserRequest&#123;Id: id&#125;
+    
+    resp, err := h.userService.GetUser(c, req)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        c.JSON(http.StatusInternalServerError, gin.H&#123;<span class="hljs-string">&quot;error&quot;</span>: err.Error()&#125;)
+        <span class="hljs-keyword">return</span>
+    &#125;
+    
+    c.JSON(http.StatusOK, resp.User)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(h *UserHandler)</span> <span class="hljs-title">CreateUser</span><span class="hljs-params">(c *gin.Context)</span></span> &#123;
+    <span class="hljs-keyword">var</span> req <span class="hljs-keyword">struct</span> &#123;
+        Name  <span class="hljs-keyword">string</span> <span class="hljs-string">`json:&quot;name&quot; binding:&quot;required&quot;`</span>
+        Email <span class="hljs-keyword">string</span> <span class="hljs-string">`json:&quot;email&quot; binding:&quot;required,email&quot;`</span>
+        Age   <span class="hljs-keyword">int32</span>  <span class="hljs-string">`json:&quot;age&quot; binding:&quot;required,min=0&quot;`</span>
+    &#125;
+    
+    <span class="hljs-keyword">if</span> err := c.ShouldBindJSON(&amp;req); err != <span class="hljs-literal">nil</span> &#123;
+        c.JSON(http.StatusBadRequest, gin.H&#123;<span class="hljs-string">&quot;error&quot;</span>: err.Error()&#125;)
+        <span class="hljs-keyword">return</span>
+    &#125;
+    
+    protoReq := &amp;proto.CreateUserRequest&#123;
+        Name:  req.Name,
+        Email: req.Email,
+        Age:   req.Age,
+    &#125;
+    
+    resp, err := h.userService.CreateUser(c, protoReq)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        c.JSON(http.StatusInternalServerError, gin.H&#123;<span class="hljs-string">&quot;error&quot;</span>: err.Error()&#125;)
+        <span class="hljs-keyword">return</span>
+    &#125;
+    
+    c.JSON(http.StatusCreated, resp.User)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(h *UserHandler)</span> <span class="hljs-title">ListUsers</span><span class="hljs-params">(c *gin.Context)</span></span> &#123;
+    pageStr := c.DefaultQuery(<span class="hljs-string">&quot;page&quot;</span>, <span class="hljs-string">&quot;1&quot;</span>)
+    pageSizeStr := c.DefaultQuery(<span class="hljs-string">&quot;page_size&quot;</span>, <span class="hljs-string">&quot;10&quot;</span>)
+    
+    page, _ := strconv.Atoi(pageStr)
+    pageSize, _ := strconv.Atoi(pageSizeStr)
+    
+    req := &amp;proto.ListUsersRequest&#123;
+        Page:     <span class="hljs-keyword">int32</span>(page),
+        PageSize: <span class="hljs-keyword">int32</span>(pageSize),
+    &#125;
+    
+    resp, err := h.userService.ListUsers(c, req)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        c.JSON(http.StatusInternalServerError, gin.H&#123;<span class="hljs-string">&quot;error&quot;</span>: err.Error()&#125;)
+        <span class="hljs-keyword">return</span>
+    &#125;
+    
+    c.JSON(http.StatusOK, gin.H&#123;
+        <span class="hljs-string">&quot;users&quot;</span>: resp.Users,
+        <span class="hljs-string">&quot;total&quot;</span>: resp.Total,
+    &#125;)
+&#125;</code></pre>
+<h4 id="5-主函数"><a class="header-anchor" href="#5-主函数"></a>5. 主函数</h4>
+<pre><code class="hljs go"><span class="hljs-comment">// cmd/main.go</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">&quot;context&quot;</span>
+    <span class="hljs-string">&quot;log&quot;</span>
+    <span class="hljs-string">&quot;net&quot;</span>
+    <span class="hljs-string">&quot;net/http&quot;</span>
+    <span class="hljs-string">&quot;os&quot;</span>
+    <span class="hljs-string">&quot;os/signal&quot;</span>
+    <span class="hljs-string">&quot;syscall&quot;</span>
+    <span class="hljs-string">&quot;time&quot;</span>
+    
+    <span class="hljs-string">&quot;github.com/gin-gonic/gin&quot;</span>
+    <span class="hljs-string">&quot;google.golang.org/grpc&quot;</span>
+    <span class="hljs-string">&quot;userservice/api/proto&quot;</span>
+    <span class="hljs-string">&quot;userservice/internal/handler&quot;</span>
+    <span class="hljs-string">&quot;userservice/internal/repository&quot;</span>
+    <span class="hljs-string">&quot;userservice/internal/service&quot;</span>
+    <span class="hljs-string">&quot;userservice/pkg/config&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 加载配置</span>
+    cfg, err := config.Load()
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        log.Fatalf(<span class="hljs-string">&quot;无法加载配置: %v&quot;</span>, err)
+    &#125;
+    
+    <span class="hljs-comment">// 初始化仓库</span>
+    repo := repository.NewUserRepository()
+    
+    <span class="hljs-comment">// 创建服务</span>
+    userService := service.NewUserService(repo)
+    
+    <span class="hljs-comment">// 启动gRPC服务</span>
+    <span class="hljs-keyword">go</span> startGRPCServer(cfg.GRPCPort, userService)
+    
+    <span class="hljs-comment">// 启动HTTP服务</span>
+    startHTTPServer(cfg.HTTPPort, userService)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">startGRPCServer</span><span class="hljs-params">(port <span class="hljs-keyword">string</span>, userService *service.UserService)</span></span> &#123;
+    lis, err := net.Listen(<span class="hljs-string">&quot;tcp&quot;</span>, <span class="hljs-string">&quot;:&quot;</span>+port)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        log.Fatalf(<span class="hljs-string">&quot;无法监听端口 %s: %v&quot;</span>, port, err)
+    &#125;
+    
+    grpcServer := grpc.NewServer()
+    proto.RegisterUserServiceServer(grpcServer, userService)
+    
+    log.Printf(<span class="hljs-string">&quot;gRPC服务启动在端口 %s&quot;</span>, port)
+    <span class="hljs-keyword">if</span> err := grpcServer.Serve(lis); err != <span class="hljs-literal">nil</span> &#123;
+        log.Fatalf(<span class="hljs-string">&quot;无法启动gRPC服务: %v&quot;</span>, err)
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">startHTTPServer</span><span class="hljs-params">(port <span class="hljs-keyword">string</span>, userService *service.UserService)</span></span> &#123;
+    router := gin.Default()
+    
+    <span class="hljs-comment">// 添加中间件</span>
+    router.Use(gin.Recovery())
+    router.Use(gin.Logger())
+    
+    <span class="hljs-comment">// 初始化处理器</span>
+    userHandler := handler.NewUserHandler(userService)
+    
+    <span class="hljs-comment">// 注册路由</span>
+    v1 := router.Group(<span class="hljs-string">&quot;/api/v1&quot;</span>)
+    &#123;
+        users := v1.Group(<span class="hljs-string">&quot;/users&quot;</span>)
+        &#123;
+            users.GET(<span class="hljs-string">&quot;/:id&quot;</span>, userHandler.GetUser)
+            users.POST(<span class="hljs-string">&quot;/&quot;</span>, userHandler.CreateUser)
+            users.GET(<span class="hljs-string">&quot;/&quot;</span>, userHandler.ListUsers)
+        &#125;
+    &#125;
+    
+    <span class="hljs-comment">// 创建HTTP服务器</span>
+    srv := &amp;http.Server&#123;
+        Addr:    <span class="hljs-string">&quot;:&quot;</span> + port,
+        Handler: router,
+    &#125;
+    
+    <span class="hljs-comment">// 优雅关闭</span>
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        log.Printf(<span class="hljs-string">&quot;HTTP服务启动在端口 %s&quot;</span>, port)
+        <span class="hljs-keyword">if</span> err := srv.ListenAndServe(); err != <span class="hljs-literal">nil</span> &amp;&amp; err != http.ErrServerClosed &#123;
+            log.Fatalf(<span class="hljs-string">&quot;HTTP服务启动失败: %v&quot;</span>, err)
+        &#125;
+    &#125;()
+    
+    <span class="hljs-comment">// 等待中断信号</span>
+    quit := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> os.Signal, <span class="hljs-number">1</span>)
+    signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+    &lt;-quit
+    log.Println(<span class="hljs-string">&quot;正在关闭服务器...&quot;</span>)
+    
+    ctx, cancel := context.WithTimeout(context.Background(), <span class="hljs-number">5</span>*time.Second)
+    <span class="hljs-keyword">defer</span> cancel()
+    
+    <span class="hljs-keyword">if</span> err := srv.Shutdown(ctx); err != <span class="hljs-literal">nil</span> &#123;
+        log.Fatalf(<span class="hljs-string">&quot;服务器关闭: %v&quot;</span>, err)
+    &#125;
+    
+    log.Println(<span class="hljs-string">&quot;服务器已优雅关闭&quot;</span>)
+&#125;</code></pre>
+<h3 id="🧩-微服务架构中的常见组件"><a class="header-anchor" href="#🧩-微服务架构中的常见组件"></a>🧩 微服务架构中的常见组件</h3>
+<p>在实际微服务架构中，除了核心服务框架外，还需要考虑以下组件：</p>
+<ol>
+<li><strong>API网关</strong>：Kong, Traefik, APISIX</li>
+<li><strong>服务发现</strong>：Consul, etcd, Nacos</li>
+<li><strong>配置中心</strong>：Apollo, Nacos, etcd</li>
+<li><strong>分布式跟踪</strong>：Jaeger, Zipkin, SkyWalking</li>
+<li><strong>消息队列</strong>：Kafka, RabbitMQ, NATS</li>
+<li><strong>熔断限流</strong>：Sentinel, Hystrix, Resilience4j</li>
+<li><strong>监控告警</strong>：Prometheus, Grafana, AlertManager</li>
+</ol>
+<h3 id="🏁-总结"><a class="header-anchor" href="#🏁-总结"></a>🏁 总结</h3>
+<p>选择适合的Go微服务框架需要考虑团队技术栈、项目需求、性能要求等多方面因素。对于大多数项目而言，没有完美的框架，只有最适合的选择。</p>
+<ul>
+<li>对于追求极致性能的场景，可以考虑Kitex或纯gRPC方案</li>
+<li>对于需要完整微服务治理功能的复杂系统，可以选择Go-kit或Kratos</li>
+<li>对于快速开发和简单项目，可以采用Gin+gRPC或go-micro</li>
+</ul>
+<p>无论选择哪种框架，微服务架构的成功实施还需要注重服务边界的合理划分、团队协作流程的优化、以及DevOps文化的建设。在实践中持续演进和优化，才能真正发挥微服务架构的优势。</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/">Golang</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/golang/">golang</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%A1%86%E6%9E%B6/">框架</a>
+                    
+                      <a class="hover-with-bg" href="/tags/gRPC/">gRPC</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/02/15/golang-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E9%80%89%E5%9E%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">golang 微服务框架选型与实践</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2024/02/08/kubernetes-pod%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E4%B8%8E%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5/">
+                        <span class="hidden-mobile">kubernetes pod资源管理与调度策略</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2024/02/15/golang微服务框架选型与实践/';
+          this.page.identifier = '/2024/02/15/golang微服务框架选型与实践/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

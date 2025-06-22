@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>Go实现高性能分布式定时任务系统 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                Go实现高性能分布式定时任务系统
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2024-09-05 08:50">
+      2024年9月5日 早上
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.8k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      59
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="⏰-Go实现高性能分布式定时任务系统"><a class="header-anchor" href="#⏰-Go实现高性能分布式定时任务系统"></a>⏰ Go实现高性能分布式定时任务系统</h2>
+<p>在现代应用架构中，定时任务系统是不可或缺的组件。从日志轮转、数据同步到定期报告生成，各种场景都需要可靠的定时任务支持。当系统规模扩大，单机定时任务系统面临诸多挑战，如单点故障、任务堆积、资源瓶颈等。本文将详细介绍如何使用Go语言实现一个高性能的分布式定时任务系统。</p>
+<h3 id="🌐-系统设计概述"><a class="header-anchor" href="#🌐-系统设计概述"></a>🌐 系统设计概述</h3>
+<h4 id="核心需求"><a class="header-anchor" href="#核心需求"></a>核心需求</h4>
+<p>一个优秀的分布式定时任务系统应满足以下核心需求：</p>
+<ol>
+<li><strong>高可用性</strong>：无单点故障，节点故障不影响整体系统运行</li>
+<li><strong>可扩展性</strong>：支持动态水平扩展，应对业务增长</li>
+<li><strong>任务准确性</strong>：确保任务按时执行且不会重复执行</li>
+<li><strong>负载均衡</strong>：任务在集群节点间合理分配</li>
+<li><strong>故障恢复</strong>：节点故障后任务能自动转移</li>
+<li><strong>可观测性</strong>：完善的监控和日志机制</li>
+</ol>
+<h4 id="系统架构"><a class="header-anchor" href="#系统架构"></a>系统架构</h4>
+<p>我们的分布式定时任务系统采用主从架构，由调度器和执行器两部分组成：</p>
+<pre><code class="hljs angelscript">                ┌──────────────┐
+                │   任务管理UI  │
+                └───────┬──────┘
+                        │
+                        ▼
+┌───────────┐      ┌─────────────┐      ┌────────────┐
+│  任务存储  │◄────►│   调度器集群  │◄────►│  服务注册   │
+└───────────┘      └──────┬──────┘      └────────────┘
+                          │
+                          ▼
+                ┌─────────────────────┐
+                │                     │
+        ┌───────▼───────┐     ┌───────▼───────┐
+        │   执行器节点<span class="hljs-number">1</span>  │     │   执行器节点<span class="hljs-number">2</span>  │
+        └───────────────┘     └───────────────┘</code></pre>
+<p>核心组件：</p>
+<ol>
+<li><strong>调度器（Scheduler）</strong>：负责任务调度、分发和生命周期管理</li>
+<li><strong>执行器（Executor）</strong>：负责实际执行任务的工作节点</li>
+<li><strong>任务存储（Task Store）</strong>：持久化存储任务配置和执行状态</li>
+<li><strong>服务注册（Registry）</strong>：管理执行器节点的注册和发现</li>
+<li><strong>任务管理UI</strong>：提供任务配置和监控的Web界面</li>
+</ol>
+<h3 id="🏗️-核心组件实现"><a class="header-anchor" href="#🏗️-核心组件实现"></a>🏗️ 核心组件实现</h3>
+<h4 id="任务模型设计"><a class="header-anchor" href="#任务模型设计"></a>任务模型设计</h4>
+<p>首先定义任务模型，包含任务的基本信息和调度规则：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Task <span class="hljs-keyword">struct</span> &#123;
+    ID          <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;id&quot;`</span>
+    Name        <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;name&quot;`</span>
+    Cron        <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;cron&quot;`</span>        <span class="hljs-comment">// Cron表达式</span>
+    Command     <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;command&quot;`</span>     <span class="hljs-comment">// 要执行的命令</span>
+    Timeout     <span class="hljs-keyword">int</span>       <span class="hljs-string">`json:&quot;timeout&quot;`</span>     <span class="hljs-comment">// 超时时间(秒)</span>
+    RetryTimes  <span class="hljs-keyword">int</span>       <span class="hljs-string">`json:&quot;retryTimes&quot;`</span>  <span class="hljs-comment">// 重试次数</span>
+    RetryDelay  <span class="hljs-keyword">int</span>       <span class="hljs-string">`json:&quot;retryDelay&quot;`</span>  <span class="hljs-comment">// 重试延迟(秒)</span>
+    CreatedAt   time.Time <span class="hljs-string">`json:&quot;createdAt&quot;`</span>
+    UpdatedAt   time.Time <span class="hljs-string">`json:&quot;updatedAt&quot;`</span>
+    
+    <span class="hljs-comment">// 分布式相关字段</span>
+    ShardingKey <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;shardingKey&quot;`</span> <span class="hljs-comment">// 分片键</span>
+    NodeID      <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;nodeId&quot;`</span>      <span class="hljs-comment">// 指定执行节点，为空则自动选择</span>
+&#125;
+
+<span class="hljs-keyword">type</span> TaskExecution <span class="hljs-keyword">struct</span> &#123;
+    ID          <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;id&quot;`</span>
+    TaskID      <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;taskId&quot;`</span>
+    Status      <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;status&quot;`</span>      <span class="hljs-comment">// pending, running, success, failed</span>
+    NodeID      <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;nodeId&quot;`</span>      <span class="hljs-comment">// 执行节点ID</span>
+    StartTime   time.Time <span class="hljs-string">`json:&quot;startTime&quot;`</span>   <span class="hljs-comment">// 开始时间</span>
+    EndTime     time.Time <span class="hljs-string">`json:&quot;endTime&quot;`</span>     <span class="hljs-comment">// 结束时间</span>
+    Output      <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;output&quot;`</span>      <span class="hljs-comment">// 执行输出</span>
+    Error       <span class="hljs-keyword">string</span>    <span class="hljs-string">`json:&quot;error&quot;`</span>       <span class="hljs-comment">// 错误信息</span>
+    RetryCount  <span class="hljs-keyword">int</span>       <span class="hljs-string">`json:&quot;retryCount&quot;`</span>  <span class="hljs-comment">// 重试计数</span>
+&#125;</code></pre>
+<h4 id="调度器实现"><a class="header-anchor" href="#调度器实现"></a>调度器实现</h4>
+<p>调度器是系统的核心组件，负责解析Cron表达式并确定任务的调度时间：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Scheduler <span class="hljs-keyword">struct</span> &#123;
+    store         TaskStore
+    registry      ServiceRegistry
+    cronParser    *cron.Parser
+    taskQueue     <span class="hljs-keyword">chan</span> *Task
+    executionLock DistributedLock
+    metrics       *SchedulerMetrics
+    logger        *zap.Logger
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewScheduler</span><span class="hljs-params">(store TaskStore, registry ServiceRegistry)</span> *<span class="hljs-title">Scheduler</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;Scheduler&#123;
+        store:      store,
+        registry:   registry,
+        cronParser: cron.NewParser(
+            cron.Second | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow,
+        ),
+        taskQueue:     <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> *Task, <span class="hljs-number">10000</span>),
+        executionLock: NewRedisLock(<span class="hljs-string">&quot;task_execution_lock&quot;</span>),
+        metrics:       NewSchedulerMetrics(),
+        logger:        zap.NewProduction(),
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">Start</span><span class="hljs-params">(ctx context.Context)</span> <span class="hljs-title">error</span></span> &#123;
+    <span class="hljs-comment">// 定期扫描任务表，计算下次执行时间</span>
+    <span class="hljs-keyword">go</span> s.scanTasks(ctx)
+    
+    <span class="hljs-comment">// 处理待执行的任务</span>
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; runtime.NumCPU(); i++ &#123;
+        <span class="hljs-keyword">go</span> s.processTaskQueue(ctx)
+    &#125;
+    
+    <span class="hljs-comment">// 启动leader选举</span>
+    <span class="hljs-keyword">go</span> s.leaderElection(ctx)
+    
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">scanTasks</span><span class="hljs-params">(ctx context.Context)</span></span> &#123;
+    ticker := time.NewTicker(<span class="hljs-number">1</span> * time.Second)
+    <span class="hljs-keyword">defer</span> ticker.Stop()
+    
+    <span class="hljs-keyword">for</span> &#123;
+        <span class="hljs-keyword">select</span> &#123;
+        <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+            <span class="hljs-keyword">return</span>
+        <span class="hljs-keyword">case</span> now := &lt;-ticker.C:
+            tasks, err := s.store.GetDueTasks(now)
+            <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+                s.logger.Error(<span class="hljs-string">&quot;Failed to get due tasks&quot;</span>, zap.Error(err))
+                <span class="hljs-keyword">continue</span>
+            &#125;
+            
+            <span class="hljs-keyword">for</span> _, task := <span class="hljs-keyword">range</span> tasks &#123;
+                s.taskQueue &lt;- task
+                s.metrics.TaskScheduled.Inc()
+            &#125;
+        &#125;
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">processTaskQueue</span><span class="hljs-params">(ctx context.Context)</span></span> &#123;
+    <span class="hljs-keyword">for</span> &#123;
+        <span class="hljs-keyword">select</span> &#123;
+        <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+            <span class="hljs-keyword">return</span>
+        <span class="hljs-keyword">case</span> task := &lt;-s.taskQueue:
+            <span class="hljs-comment">// 获取分布式锁，防止任务重复执行</span>
+            lockKey := fmt.Sprintf(<span class="hljs-string">&quot;task_lock:%s:%s&quot;</span>, task.ID, time.Now().Format(<span class="hljs-string">&quot;2006-01-02T15:04:05Z&quot;</span>))
+            acquired, err := s.executionLock.Acquire(lockKey, <span class="hljs-number">10</span>*time.Second)
+            <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> || !acquired &#123;
+                s.logger.Warn(<span class="hljs-string">&quot;Failed to acquire execution lock&quot;</span>, zap.String(<span class="hljs-string">&quot;taskId&quot;</span>, task.ID))
+                <span class="hljs-keyword">continue</span>
+            &#125;
+            
+            <span class="hljs-comment">// 分配执行节点</span>
+            node, err := s.allocateExecutionNode(task)
+            <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+                s.logger.Error(<span class="hljs-string">&quot;Failed to allocate execution node&quot;</span>, zap.Error(err))
+                s.executionLock.Release(lockKey)
+                <span class="hljs-keyword">continue</span>
+            &#125;
+            
+            <span class="hljs-comment">// 创建执行记录</span>
+            execution := &amp;TaskExecution&#123;
+                ID:        uuid.New().String(),
+                TaskID:    task.ID,
+                Status:    <span class="hljs-string">&quot;pending&quot;</span>,
+                NodeID:    node.ID,
+                StartTime: time.Now(),
+            &#125;
+            
+            <span class="hljs-keyword">if</span> err := s.store.CreateExecution(execution); err != <span class="hljs-literal">nil</span> &#123;
+                s.logger.Error(<span class="hljs-string">&quot;Failed to create execution record&quot;</span>, zap.Error(err))
+                s.executionLock.Release(lockKey)
+                <span class="hljs-keyword">continue</span>
+            &#125;
+            
+            <span class="hljs-comment">// 将任务推送到执行节点</span>
+            <span class="hljs-keyword">if</span> err := s.dispatchTaskToNode(node, task, execution); err != <span class="hljs-literal">nil</span> &#123;
+                s.logger.Error(<span class="hljs-string">&quot;Failed to dispatch task&quot;</span>, zap.Error(err))
+                
+                <span class="hljs-comment">// 更新执行状态为失败</span>
+                execution.Status = <span class="hljs-string">&quot;failed&quot;</span>
+                execution.Error = err.Error()
+                execution.EndTime = time.Now()
+                s.store.UpdateExecution(execution)
+            &#125;
+            
+            <span class="hljs-comment">// 计算下一次执行时间并更新任务</span>
+            nextTime, err := s.calculateNextExecutionTime(task)
+            <span class="hljs-keyword">if</span> err == <span class="hljs-literal">nil</span> &#123;
+                s.store.UpdateTaskNextExecutionTime(task.ID, nextTime)
+            &#125;
+            
+            s.executionLock.Release(lockKey)
+        &#125;
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">allocateExecutionNode</span><span class="hljs-params">(task *Task)</span> <span class="hljs-params">(*Node, error)</span></span> &#123;
+    <span class="hljs-comment">// 如果指定了节点，则使用指定节点</span>
+    <span class="hljs-keyword">if</span> task.NodeID != <span class="hljs-string">&quot;&quot;</span> &#123;
+        node, err := s.registry.GetNode(task.NodeID)
+        <span class="hljs-keyword">if</span> err == <span class="hljs-literal">nil</span> &amp;&amp; node.Status == <span class="hljs-string">&quot;online&quot;</span> &#123;
+            <span class="hljs-keyword">return</span> node, <span class="hljs-literal">nil</span>
+        &#125;
+        <span class="hljs-comment">// 指定节点不可用，降级为自动选择</span>
+        s.logger.Warn(<span class="hljs-string">&quot;Specified node unavailable&quot;</span>, zap.String(<span class="hljs-string">&quot;nodeId&quot;</span>, task.NodeID))
+    &#125;
+    
+    <span class="hljs-comment">// 获取可用节点列表</span>
+    nodes, err := s.registry.GetAvailableNodes()
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> || <span class="hljs-built_in">len</span>(nodes) == <span class="hljs-number">0</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, errors.New(<span class="hljs-string">&quot;no available execution nodes&quot;</span>)
+    &#125;
+    
+    <span class="hljs-comment">// 一致性哈希选择节点（根据分片键）</span>
+    <span class="hljs-keyword">if</span> task.ShardingKey != <span class="hljs-string">&quot;&quot;</span> &#123;
+        <span class="hljs-keyword">return</span> s.consistentHashNode(task.ShardingKey, nodes)
+    &#125;
+    
+    <span class="hljs-comment">// 负载均衡选择节点</span>
+    <span class="hljs-keyword">return</span> s.selectNodeByLoad(nodes)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">consistentHashNode</span><span class="hljs-params">(key <span class="hljs-keyword">string</span>, nodes []*Node)</span> <span class="hljs-params">(*Node, error)</span></span> &#123;
+    <span class="hljs-comment">// 实现一致性哈希算法</span>
+    hasher := consistenthash.New(<span class="hljs-number">100</span>, <span class="hljs-literal">nil</span>)
+    <span class="hljs-keyword">for</span> _, node := <span class="hljs-keyword">range</span> nodes &#123;
+        hasher.Add(node.ID)
+    &#125;
+    
+    selectedNodeID := hasher.Get(key)
+    <span class="hljs-keyword">for</span> _, node := <span class="hljs-keyword">range</span> nodes &#123;
+        <span class="hljs-keyword">if</span> node.ID == selectedNodeID &#123;
+            <span class="hljs-keyword">return</span> node, <span class="hljs-literal">nil</span>
+        &#125;
+    &#125;
+    
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, errors.New(<span class="hljs-string">&quot;failed to select node by consistent hash&quot;</span>)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">selectNodeByLoad</span><span class="hljs-params">(nodes []*Node)</span> <span class="hljs-params">(*Node, error)</span></span> &#123;
+    <span class="hljs-comment">// 简单的负载均衡：选择活跃任务数最少的节点</span>
+    <span class="hljs-keyword">var</span> selectedNode *Node
+    minActiveTasks := math.MaxInt32
+    
+    <span class="hljs-keyword">for</span> _, node := <span class="hljs-keyword">range</span> nodes &#123;
+        <span class="hljs-keyword">if</span> node.ActiveTasks &lt; minActiveTasks &#123;
+            minActiveTasks = node.ActiveTasks
+            selectedNode = node
+        &#125;
+    &#125;
+    
+    <span class="hljs-keyword">if</span> selectedNode == <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, errors.New(<span class="hljs-string">&quot;failed to select node by load&quot;</span>)
+    &#125;
+    
+    <span class="hljs-keyword">return</span> selectedNode, <span class="hljs-literal">nil</span>
+&#125;</code></pre>
+<h4 id="执行器实现"><a class="header-anchor" href="#执行器实现"></a>执行器实现</h4>
+<p>执行器负责实际运行任务，并报告执行结果：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Executor <span class="hljs-keyword">struct</span> &#123;
+    nodeID      <span class="hljs-keyword">string</span>
+    registry    ServiceRegistry
+    taskClient  TaskClient
+    workerPool  *WorkerPool
+    metrics     *ExecutorMetrics
+    logger      *zap.Logger
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewExecutor</span><span class="hljs-params">(nodeID <span class="hljs-keyword">string</span>, registry ServiceRegistry)</span> *<span class="hljs-title">Executor</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;Executor&#123;
+        nodeID:     nodeID,
+        registry:   registry,
+        taskClient: NewTaskClient(),
+        workerPool: NewWorkerPool(<span class="hljs-number">100</span>), <span class="hljs-comment">// 最多100个并发任务</span>
+        metrics:    NewExecutorMetrics(),
+        logger:     zap.NewProduction(),
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Executor)</span> <span class="hljs-title">Start</span><span class="hljs-params">(ctx context.Context)</span> <span class="hljs-title">error</span></span> &#123;
+    <span class="hljs-comment">// 向服务注册中心注册本节点</span>
+    <span class="hljs-keyword">if</span> err := e.registry.RegisterNode(&amp;Node&#123;
+        ID:          e.nodeID,
+        Address:     getLocalAddress(),
+        Status:      <span class="hljs-string">&quot;online&quot;</span>,
+        ActiveTasks: <span class="hljs-number">0</span>,
+        Tags:        <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span>),
+    &#125;); err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> err
+    &#125;
+    
+    <span class="hljs-comment">// 定期发送心跳</span>
+    <span class="hljs-keyword">go</span> e.heartbeat(ctx)
+    
+    <span class="hljs-comment">// 启动任务监听器</span>
+    <span class="hljs-keyword">go</span> e.listenForTasks(ctx)
+    
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Executor)</span> <span class="hljs-title">executeTask</span><span class="hljs-params">(task *Task, execution *TaskExecution)</span></span> &#123;
+    <span class="hljs-comment">// 增加活跃任务计数</span>
+    e.metrics.ActiveTasks.Inc()
+    e.registry.UpdateNodeActiveTaskCount(e.nodeID, <span class="hljs-number">1</span>)
+    
+    <span class="hljs-comment">// 完成后减少计数</span>
+    <span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        e.metrics.ActiveTasks.Dec()
+        e.registry.UpdateNodeActiveTaskCount(e.nodeID, <span class="hljs-number">-1</span>)
+    &#125;()
+    
+    <span class="hljs-comment">// 更新执行状态为运行中</span>
+    execution.Status = <span class="hljs-string">&quot;running&quot;</span>
+    e.taskClient.UpdateExecution(execution)
+    
+    <span class="hljs-comment">// 创建上下文，支持超时控制</span>
+    ctx := context.Background()
+    <span class="hljs-keyword">if</span> task.Timeout &gt; <span class="hljs-number">0</span> &#123;
+        <span class="hljs-keyword">var</span> cancel context.CancelFunc
+        ctx, cancel = context.WithTimeout(ctx, time.Duration(task.Timeout)*time.Second)
+        <span class="hljs-keyword">defer</span> cancel()
+    &#125;
+    
+    <span class="hljs-comment">// 执行命令</span>
+    <span class="hljs-keyword">var</span> output bytes.Buffer
+    <span class="hljs-keyword">var</span> stderr bytes.Buffer
+    cmd := exec.CommandContext(ctx, <span class="hljs-string">&quot;sh&quot;</span>, <span class="hljs-string">&quot;-c&quot;</span>, task.Command)
+    cmd.Stdout = &amp;output
+    cmd.Stderr = &amp;stderr
+    
+    startTime := time.Now()
+    err := cmd.Run()
+    duration := time.Since(startTime)
+    
+    <span class="hljs-comment">// 记录执行指标</span>
+    e.metrics.TaskExecutionTime.Observe(duration.Seconds())
+    
+    <span class="hljs-comment">// 更新执行结果</span>
+    execution.EndTime = time.Now()
+    execution.Output = output.String()
+    
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        execution.Status = <span class="hljs-string">&quot;failed&quot;</span>
+        execution.Error = fmt.Sprintf(<span class="hljs-string">&quot;%v: %s&quot;</span>, err, stderr.String())
+        e.metrics.TaskExecutionFailures.Inc()
+        
+        <span class="hljs-comment">// 处理重试逻辑</span>
+        <span class="hljs-keyword">if</span> execution.RetryCount &lt; task.RetryTimes &#123;
+            execution.RetryCount++
+            execution.Status = <span class="hljs-string">&quot;pending&quot;</span>
+            
+            <span class="hljs-comment">// 延迟重试</span>
+            time.AfterFunc(time.Duration(task.RetryDelay)*time.Second, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+                e.executeTask(task, execution)
+            &#125;)
+            <span class="hljs-keyword">return</span>
+        &#125;
+    &#125; <span class="hljs-keyword">else</span> &#123;
+        execution.Status = <span class="hljs-string">&quot;success&quot;</span>
+        e.metrics.TaskExecutionSuccess.Inc()
+    &#125;
+    
+    <span class="hljs-comment">// 更新执行记录</span>
+    e.taskClient.UpdateExecution(execution)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *Executor)</span> <span class="hljs-title">heartbeat</span><span class="hljs-params">(ctx context.Context)</span></span> &#123;
+    ticker := time.NewTicker(<span class="hljs-number">5</span> * time.Second)
+    <span class="hljs-keyword">defer</span> ticker.Stop()
+    
+    <span class="hljs-keyword">for</span> &#123;
+        <span class="hljs-keyword">select</span> &#123;
+        <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+            <span class="hljs-comment">// 注销节点</span>
+            e.registry.DeregisterNode(e.nodeID)
+            <span class="hljs-keyword">return</span>
+        <span class="hljs-keyword">case</span> &lt;-ticker.C:
+            <span class="hljs-comment">// 发送心跳</span>
+            <span class="hljs-keyword">if</span> err := e.registry.Heartbeat(e.nodeID); err != <span class="hljs-literal">nil</span> &#123;
+                e.logger.Error(<span class="hljs-string">&quot;Failed to send heartbeat&quot;</span>, zap.Error(err))
+            &#125;
+        &#125;
+    &#125;
+&#125;</code></pre>
+<h4 id="分布式协调与服务发现"><a class="header-anchor" href="#分布式协调与服务发现"></a>分布式协调与服务发现</h4>
+<p>使用etcd实现服务注册发现和分布式协调：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> EtcdRegistry <span class="hljs-keyword">struct</span> &#123;
+    client *clientv3.Client
+    ttl    <span class="hljs-keyword">int64</span>
+    logger *zap.Logger
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewEtcdRegistry</span><span class="hljs-params">(endpoints []<span class="hljs-keyword">string</span>)</span> <span class="hljs-params">(*EtcdRegistry, error)</span></span> &#123;
+    client, err := clientv3.New(clientv3.Config&#123;
+        Endpoints:   endpoints,
+        DialTimeout: <span class="hljs-number">5</span> * time.Second,
+    &#125;)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+    &#125;
+    
+    <span class="hljs-keyword">return</span> &amp;EtcdRegistry&#123;
+        client: client,
+        ttl:    <span class="hljs-number">30</span>, <span class="hljs-comment">// 30秒</span>
+        logger: zap.NewProduction(),
+    &#125;, <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(r *EtcdRegistry)</span> <span class="hljs-title">RegisterNode</span><span class="hljs-params">(node *Node)</span> <span class="hljs-title">error</span></span> &#123;
+    <span class="hljs-comment">// 创建租约</span>
+    lease, err := r.client.Grant(context.Background(), r.ttl)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> err
+    &#125;
+    
+    <span class="hljs-comment">// 将节点信息序列化</span>
+    nodeData, err := json.Marshal(node)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> err
+    &#125;
+    
+    <span class="hljs-comment">// 注册节点</span>
+    key := fmt.Sprintf(<span class="hljs-string">&quot;/cronex/nodes/%s&quot;</span>, node.ID)
+    _, err = r.client.Put(context.Background(), key, <span class="hljs-keyword">string</span>(nodeData), clientv3.WithLease(lease.ID))
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> err
+    &#125;
+    
+    <span class="hljs-comment">// 保持租约</span>
+    ch, err := r.client.KeepAlive(context.Background(), lease.ID)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> err
+    &#125;
+    
+    <span class="hljs-comment">// 消费keepalive通道</span>
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">for</span> <span class="hljs-keyword">range</span> ch &#123;
+            <span class="hljs-comment">// 仅用于消费通道，避免通道满</span>
+        &#125;
+    &#125;()
+    
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(r *EtcdRegistry)</span> <span class="hljs-title">GetAvailableNodes</span><span class="hljs-params">()</span> <span class="hljs-params">([]*Node, error)</span></span> &#123;
+    resp, err := r.client.Get(context.Background(), <span class="hljs-string">&quot;/cronex/nodes/&quot;</span>, clientv3.WithPrefix())
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+    &#125;
+    
+    nodes := <span class="hljs-built_in">make</span>([]*Node, <span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(resp.Kvs))
+    <span class="hljs-keyword">for</span> _, kv := <span class="hljs-keyword">range</span> resp.Kvs &#123;
+        <span class="hljs-keyword">var</span> node Node
+        <span class="hljs-keyword">if</span> err := json.Unmarshal(kv.Value, &amp;node); err != <span class="hljs-literal">nil</span> &#123;
+            r.logger.Error(<span class="hljs-string">&quot;Failed to unmarshal node data&quot;</span>, zap.Error(err))
+            <span class="hljs-keyword">continue</span>
+        &#125;
+        
+        <span class="hljs-keyword">if</span> node.Status == <span class="hljs-string">&quot;online&quot;</span> &#123;
+            nodes = <span class="hljs-built_in">append</span>(nodes, &amp;node)
+        &#125;
+    &#125;
+    
+    <span class="hljs-keyword">return</span> nodes, <span class="hljs-literal">nil</span>
+&#125;</code></pre>
+<h3 id="🔍-高可用与故障转移"><a class="header-anchor" href="#🔍-高可用与故障转移"></a>🔍 高可用与故障转移</h3>
+<h4 id="Leader选举"><a class="header-anchor" href="#Leader选举"></a>Leader选举</h4>
+<p>在多调度器场景下，需要通过Leader选举确保某些操作只被一个节点执行：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">leaderElection</span><span class="hljs-params">(ctx context.Context)</span></span> &#123;
+    session, err := concurrency.NewSession(s.registry.(*EtcdRegistry).client)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        s.logger.Error(<span class="hljs-string">&quot;Failed to create etcd session&quot;</span>, zap.Error(err))
+        <span class="hljs-keyword">return</span>
+    &#125;
+    <span class="hljs-keyword">defer</span> session.Close()
+    
+    election := concurrency.NewElection(session, <span class="hljs-string">&quot;/cronex/leader&quot;</span>)
+    
+    <span class="hljs-comment">// 竞选Leader</span>
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">if</span> err := election.Campaign(ctx, s.nodeID); err != <span class="hljs-literal">nil</span> &#123;
+            s.logger.Error(<span class="hljs-string">&quot;Failed to campaign for leadership&quot;</span>, zap.Error(err))
+            <span class="hljs-keyword">return</span>
+        &#125;
+        
+        s.logger.Info(<span class="hljs-string">&quot;Became leader&quot;</span>)
+        s.becameLeader()
+    &#125;()
+    
+    <span class="hljs-comment">// 监听Leader变化</span>
+    ch := election.Observe(ctx)
+    <span class="hljs-keyword">for</span> resp := <span class="hljs-keyword">range</span> ch &#123;
+        <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(resp.Kvs) &gt; <span class="hljs-number">0</span> &#123;
+            leader := <span class="hljs-keyword">string</span>(resp.Kvs[<span class="hljs-number">0</span>].Value)
+            s.logger.Info(<span class="hljs-string">&quot;Leader changed&quot;</span>, zap.String(<span class="hljs-string">&quot;leader&quot;</span>, leader))
+            
+            <span class="hljs-keyword">if</span> leader == s.nodeID &#123;
+                s.isLeader = <span class="hljs-literal">true</span>
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                s.isLeader = <span class="hljs-literal">false</span>
+            &#125;
+        &#125;
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">becameLeader</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 只在Leader节点上执行的任务</span>
+    <span class="hljs-comment">// 例如：故障检测与任务重新分配</span>
+    <span class="hljs-keyword">go</span> s.detectFailedNodes()
+    <span class="hljs-keyword">go</span> s.rebalanceTasks()
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">detectFailedNodes</span><span class="hljs-params">()</span></span> &#123;
+    ticker := time.NewTicker(<span class="hljs-number">10</span> * time.Second)
+    <span class="hljs-keyword">defer</span> ticker.Stop()
+    
+    <span class="hljs-keyword">for</span> <span class="hljs-keyword">range</span> ticker.C &#123;
+        <span class="hljs-keyword">if</span> !s.isLeader &#123;
+            <span class="hljs-keyword">return</span>
+        &#125;
+        
+        <span class="hljs-comment">// 获取所有节点</span>
+        nodes, err := s.registry.GetAllNodes()
+        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+            s.logger.Error(<span class="hljs-string">&quot;Failed to get all nodes&quot;</span>, zap.Error(err))
+            <span class="hljs-keyword">continue</span>
+        &#125;
+        
+        <span class="hljs-comment">// 检测离线节点</span>
+        <span class="hljs-keyword">for</span> _, node := <span class="hljs-keyword">range</span> nodes &#123;
+            <span class="hljs-keyword">if</span> node.Status == <span class="hljs-string">&quot;offline&quot;</span> || time.Since(node.LastHeartbeat) &gt; <span class="hljs-number">30</span>*time.Second &#123;
+                s.handleNodeFailure(node)
+            &#125;
+        &#125;
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">handleNodeFailure</span><span class="hljs-params">(node *Node)</span></span> &#123;
+    <span class="hljs-comment">// 将节点标记为下线</span>
+    s.registry.UpdateNodeStatus(node.ID, <span class="hljs-string">&quot;offline&quot;</span>)
+    
+    <span class="hljs-comment">// 获取该节点上运行的任务</span>
+    executions, err := s.store.GetRunningExecutionsByNodeID(node.ID)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        s.logger.Error(<span class="hljs-string">&quot;Failed to get running executions&quot;</span>, zap.Error(err))
+        <span class="hljs-keyword">return</span>
+    &#125;
+    
+    <span class="hljs-comment">// 重新调度失败节点上的任务</span>
+    <span class="hljs-keyword">for</span> _, execution := <span class="hljs-keyword">range</span> executions &#123;
+        task, err := s.store.GetTask(execution.TaskID)
+        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+            <span class="hljs-keyword">continue</span>
+        &#125;
+        
+        <span class="hljs-comment">// 将任务状态更新为失败</span>
+        execution.Status = <span class="hljs-string">&quot;failed&quot;</span>
+        execution.Error = <span class="hljs-string">&quot;Node failure&quot;</span>
+        execution.EndTime = time.Now()
+        s.store.UpdateExecution(execution)
+        
+        <span class="hljs-comment">// 重新入队进行调度</span>
+        s.taskQueue &lt;- task
+    &#125;
+    
+    s.logger.Info(<span class="hljs-string">&quot;Completed handling node failure&quot;</span>, zap.String(<span class="hljs-string">&quot;nodeId&quot;</span>, node.ID))
+&#125;</code></pre>
+<h3 id="📊-可观测性与监控"><a class="header-anchor" href="#📊-可观测性与监控"></a>📊 可观测性与监控</h3>
+<h4 id="监控指标设计"><a class="header-anchor" href="#监控指标设计"></a>监控指标设计</h4>
+<p>使用Prometheus监控关键指标：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> SchedulerMetrics <span class="hljs-keyword">struct</span> &#123;
+    TaskScheduled   prometheus.Counter
+    TaskDispatched  prometheus.Counter
+    DispatchFailed  prometheus.Counter
+    ActiveLeaders   prometheus.Gauge
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewSchedulerMetrics</span><span class="hljs-params">()</span> *<span class="hljs-title">SchedulerMetrics</span></span> &#123;
+    m := &amp;SchedulerMetrics&#123;
+        TaskScheduled: prometheus.NewCounter(prometheus.CounterOpts&#123;
+            Name: <span class="hljs-string">&quot;cronex_tasks_scheduled_total&quot;</span>,
+            Help: <span class="hljs-string">&quot;Total number of tasks scheduled&quot;</span>,
+        &#125;),
+        TaskDispatched: prometheus.NewCounter(prometheus.CounterOpts&#123;
+            Name: <span class="hljs-string">&quot;cronex_tasks_dispatched_total&quot;</span>,
+            Help: <span class="hljs-string">&quot;Total number of tasks dispatched to executors&quot;</span>,
+        &#125;),
+        DispatchFailed: prometheus.NewCounter(prometheus.CounterOpts&#123;
+            Name: <span class="hljs-string">&quot;cronex_dispatch_failures_total&quot;</span>,
+            Help: <span class="hljs-string">&quot;Total number of task dispatch failures&quot;</span>,
+        &#125;),
+        ActiveLeaders: prometheus.NewGauge(prometheus.GaugeOpts&#123;
+            Name: <span class="hljs-string">&quot;cronex_active_leaders&quot;</span>,
+            Help: <span class="hljs-string">&quot;Number of active leaders (should be 1 or 0)&quot;</span>,
+        &#125;),
+    &#125;
+    
+    <span class="hljs-comment">// 注册指标</span>
+    prometheus.MustRegister(
+        m.TaskScheduled,
+        m.TaskDispatched,
+        m.DispatchFailed,
+        m.ActiveLeaders,
+    )
+    
+    <span class="hljs-keyword">return</span> m
+&#125;
+
+<span class="hljs-keyword">type</span> ExecutorMetrics <span class="hljs-keyword">struct</span> &#123;
+    ActiveTasks           prometheus.Gauge
+    TaskExecutionTime     prometheus.Histogram
+    TaskExecutionSuccess  prometheus.Counter
+    TaskExecutionFailures prometheus.Counter
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewExecutorMetrics</span><span class="hljs-params">()</span> *<span class="hljs-title">ExecutorMetrics</span></span> &#123;
+    m := &amp;ExecutorMetrics&#123;
+        ActiveTasks: prometheus.NewGauge(prometheus.GaugeOpts&#123;
+            Name: <span class="hljs-string">&quot;cronex_executor_active_tasks&quot;</span>,
+            Help: <span class="hljs-string">&quot;Number of active tasks currently being executed&quot;</span>,
+        &#125;),
+        TaskExecutionTime: prometheus.NewHistogram(prometheus.HistogramOpts&#123;
+            Name:    <span class="hljs-string">&quot;cronex_task_execution_time_seconds&quot;</span>,
+            Help:    <span class="hljs-string">&quot;Distribution of task execution time in seconds&quot;</span>,
+            Buckets: prometheus.DefBuckets,
+        &#125;),
+        TaskExecutionSuccess: prometheus.NewCounter(prometheus.CounterOpts&#123;
+            Name: <span class="hljs-string">&quot;cronex_task_execution_success_total&quot;</span>,
+            Help: <span class="hljs-string">&quot;Total number of successful task executions&quot;</span>,
+        &#125;),
+        TaskExecutionFailures: prometheus.NewCounter(prometheus.CounterOpts&#123;
+            Name: <span class="hljs-string">&quot;cronex_task_execution_failures_total&quot;</span>,
+            Help: <span class="hljs-string">&quot;Total number of failed task executions&quot;</span>,
+        &#125;),
+    &#125;
+    
+    <span class="hljs-comment">// 注册指标</span>
+    prometheus.MustRegister(
+        m.ActiveTasks,
+        m.TaskExecutionTime,
+        m.TaskExecutionSuccess,
+        m.TaskExecutionFailures,
+    )
+    
+    <span class="hljs-keyword">return</span> m
+&#125;</code></pre>
+<h3 id="📝-性能优化与扩展"><a class="header-anchor" href="#📝-性能优化与扩展"></a>📝 性能优化与扩展</h3>
+<h4 id="批量任务调度"><a class="header-anchor" href="#批量任务调度"></a>批量任务调度</h4>
+<p>对于高频定时任务，可以采用批量处理方式提高效率：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">batchProcessTasks</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 使用时间窗口收集任务</span>
+    window := <span class="hljs-number">500</span> * time.Millisecond
+    batchSize := <span class="hljs-number">1000</span>
+    
+    <span class="hljs-keyword">var</span> tasks []*Task
+    timer := time.NewTimer(window)
+    
+    <span class="hljs-keyword">for</span> &#123;
+        <span class="hljs-keyword">select</span> &#123;
+        <span class="hljs-keyword">case</span> task := &lt;-s.taskQueue:
+            tasks = <span class="hljs-built_in">append</span>(tasks, task)
+            <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(tasks) &gt;= batchSize &#123;
+                s.processBatch(tasks)
+                tasks = tasks[:<span class="hljs-number">0</span>] <span class="hljs-comment">// 清空</span>
+                timer.Reset(window)
+            &#125;
+        <span class="hljs-keyword">case</span> &lt;-timer.C:
+            <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(tasks) &gt; <span class="hljs-number">0</span> &#123;
+                s.processBatch(tasks)
+                tasks = tasks[:<span class="hljs-number">0</span>] <span class="hljs-comment">// 清空</span>
+            &#125;
+            timer.Reset(window)
+        &#125;
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *Scheduler)</span> <span class="hljs-title">processBatch</span><span class="hljs-params">(tasks []*Task)</span></span> &#123;
+    <span class="hljs-comment">// 按执行节点分组</span>
+    nodeGroups := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>][]*Task)
+    <span class="hljs-keyword">for</span> _, task := <span class="hljs-keyword">range</span> tasks &#123;
+        node, err := s.allocateExecutionNode(task)
+        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+            s.logger.Error(<span class="hljs-string">&quot;Failed to allocate node for task&quot;</span>, zap.Error(err))
+            <span class="hljs-keyword">continue</span>
+        &#125;
+        
+        nodeGroups[node.ID] = <span class="hljs-built_in">append</span>(nodeGroups[node.ID], task)
+    &#125;
+    
+    <span class="hljs-comment">// 并行分发任务到各节点</span>
+    <span class="hljs-keyword">var</span> wg sync.WaitGroup
+    <span class="hljs-keyword">for</span> nodeID, nodeTasks := <span class="hljs-keyword">range</span> nodeGroups &#123;
+        wg.Add(<span class="hljs-number">1</span>)
+        <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(nodeID <span class="hljs-keyword">string</span>, tasks []*Task)</span></span> &#123;
+            <span class="hljs-keyword">defer</span> wg.Done()
+            s.batchDispatchToNode(nodeID, tasks)
+        &#125;(nodeID, nodeTasks)
+    &#125;
+    wg.Wait()
+&#125;</code></pre>
+<h4 id="多级任务队列"><a class="header-anchor" href="#多级任务队列"></a>多级任务队列</h4>
+<p>为任务设置优先级，确保重要任务优先执行：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> PriorityQueue <span class="hljs-keyword">struct</span> &#123;
+    highPriority    <span class="hljs-keyword">chan</span> *Task
+    normalPriority  <span class="hljs-keyword">chan</span> *Task
+    lowPriority     <span class="hljs-keyword">chan</span> *Task
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewPriorityQueue</span><span class="hljs-params">()</span> *<span class="hljs-title">PriorityQueue</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;PriorityQueue&#123;
+        highPriority:   <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> *Task, <span class="hljs-number">1000</span>),
+        normalPriority: <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> *Task, <span class="hljs-number">5000</span>),
+        lowPriority:    <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> *Task, <span class="hljs-number">10000</span>),
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(q *PriorityQueue)</span> <span class="hljs-title">Push</span><span class="hljs-params">(task *Task, priority <span class="hljs-keyword">string</span>)</span></span> &#123;
+    <span class="hljs-keyword">switch</span> priority &#123;
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;high&quot;</span>:
+        q.highPriority &lt;- task
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;low&quot;</span>:
+        q.lowPriority &lt;- task
+    <span class="hljs-keyword">default</span>:
+        q.normalPriority &lt;- task
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(q *PriorityQueue)</span> <span class="hljs-title">Pop</span><span class="hljs-params">()</span> *<span class="hljs-title">Task</span></span> &#123;
+    <span class="hljs-comment">// 优先从高优先级队列取任务</span>
+    <span class="hljs-keyword">select</span> &#123;
+    <span class="hljs-keyword">case</span> task := &lt;-q.highPriority:
+        <span class="hljs-keyword">return</span> task
+    <span class="hljs-keyword">default</span>:
+    &#125;
+    
+    <span class="hljs-comment">// 其次从普通优先级队列取任务</span>
+    <span class="hljs-keyword">select</span> &#123;
+    <span class="hljs-keyword">case</span> task := &lt;-q.normalPriority:
+        <span class="hljs-keyword">return</span> task
+    <span class="hljs-keyword">default</span>:
+    &#125;
+    
+    <span class="hljs-comment">// 最后从低优先级队列取任务</span>
+    <span class="hljs-keyword">select</span> &#123;
+    <span class="hljs-keyword">case</span> task := &lt;-q.lowPriority:
+        <span class="hljs-keyword">return</span> task
+    <span class="hljs-keyword">default</span>:
+    &#125;
+    
+    <span class="hljs-comment">// 所有队列都空，阻塞等待任务</span>
+    <span class="hljs-keyword">select</span> &#123;
+    <span class="hljs-keyword">case</span> task := &lt;-q.highPriority:
+        <span class="hljs-keyword">return</span> task
+    <span class="hljs-keyword">case</span> task := &lt;-q.normalPriority:
+        <span class="hljs-keyword">return</span> task
+    <span class="hljs-keyword">case</span> task := &lt;-q.lowPriority:
+        <span class="hljs-keyword">return</span> task
+    &#125;
+&#125;</code></pre>
+<h3 id="📋-总结与最佳实践"><a class="header-anchor" href="#📋-总结与最佳实践"></a>📋 总结与最佳实践</h3>
+<p>通过本文的实现，我们构建了一个具有以下特点的分布式任务系统：</p>
+<ol>
+<li><strong>高可用</strong>：多调度器设计，Leader选举机制</li>
+<li><strong>水平扩展</strong>：动态节点发现，任务均衡分配</li>
+<li><strong>任务精确性</strong>：分布式锁防止任务重复执行</li>
+<li><strong>故障恢复</strong>：节点故障自动检测与任务重新分配</li>
+<li><strong>可观测性</strong>：完善的监控指标和日志系统</li>
+</ol>
+<p>在实际应用中，还应注意以下最佳实践：</p>
+<ul>
+<li><strong>任务幂等性</strong>：设计任务时确保多次执行产生相同结果</li>
+<li><strong>隔离环境</strong>：为任务提供隔离的执行环境，防止相互影响</li>
+<li><strong>资源限制</strong>：对任务使用的CPU、内存等资源进行限制</li>
+<li><strong>灰度发布</strong>：新任务先在少量节点上运行，验证无误后再全面部署</li>
+<li><strong>安全性</strong>：实现访问控制和敏感数据加密</li>
+</ul>
+<p>分布式定时任务系统是现代微服务架构中不可或缺的基础组件。通过Go语言的并发优势和丰富的生态系统，我们可以构建出高性能、可靠的解决方案，为各种场景提供稳定的调度服务。</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/">Golang</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/">分布式系统</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/golang/">golang</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/">分布式系统</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">定时任务</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%AB%98%E6%80%A7%E8%83%BD/">高性能</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/09/12/%E6%9E%84%E5%BB%BA%E9%AB%98%E6%80%A7%E8%83%BDGo%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%BD%91%E5%85%B3-%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E8%B7%B5/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">构建高性能Go微服务网关-设计与实践</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/27/goroutine-%E5%8D%8F%E7%A8%8B%E6%B1%A0/">
+                        <span class="hidden-mobile">goroutine 协程池</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2024/09/05/Go实现高性能分布式定时任务系统/';
+          this.page.identifier = '/2024/09/05/Go实现高性能分布式定时任务系统/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

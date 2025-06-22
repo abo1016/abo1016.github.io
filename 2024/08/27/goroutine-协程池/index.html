@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>goroutine 协程池 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                goroutine 协程池
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2024-08-27 16:26">
+      2024年8月27日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      20
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="Go-语言实现协程池"><a class="header-anchor" href="#Go-语言实现协程池"></a>Go 语言实现协程池</h2>
+<h3 id="🎈核心思路"><a class="header-anchor" href="#🎈核心思路"></a>🎈核心思路</h3>
+<ul>
+<li>生产者消费者模型</li>
+<li>通过 <code>channel</code> 作为任务投递渠道</li>
+<li>异步执行闭包 <code>handler</code></li>
+<li>通过 <code>context</code>  做任务执行实体的超时控制</li>
+<li>协程池优雅退出机制，避免异步函数执行被暴力终止</li>
+</ul>
+<h3 id="📄Talk-is-cheap-Show-me-code"><a class="header-anchor" href="#📄Talk-is-cheap-Show-me-code"></a>📄Talk is cheap, Show me code</h3>
+<h4 id="实现代码"><a class="header-anchor" href="#实现代码"></a>实现代码</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> pool
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;context&quot;</span>
+	<span class="hljs-string">&quot;errors&quot;</span>
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;sync&quot;</span>
+	<span class="hljs-string">&quot;sync/atomic&quot;</span>
+	<span class="hljs-string">&quot;time&quot;</span>
+
+	<span class="hljs-string">&quot;gitlab.com/bopop/log&quot;</span>
+)
+
+<span class="hljs-comment">// Worker 任务工作接口</span>
+<span class="hljs-keyword">type</span> Worker <span class="hljs-keyword">interface</span> &#123;
+	<span class="hljs-comment">// Task 任务</span>
+	Task() error
+&#125;
+
+<span class="hljs-comment">// TaskHandler 任务实体,避免造成 goroutine 泄露请勿作为一个长期（常驻）的工作任务</span>
+<span class="hljs-keyword">type</span> TaskHandler <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(ctx context.Context, params any)</span> <span class="hljs-title">error</span></span>
+
+<span class="hljs-comment">// Process 任务实体</span>
+<span class="hljs-keyword">type</span> Process <span class="hljs-keyword">struct</span> &#123;
+	<span class="hljs-comment">// Ctx 任务上下文</span>
+	ctx context.Context
+	<span class="hljs-comment">// Cancel 任务上下文取消函数</span>
+	cancel context.CancelFunc
+	<span class="hljs-comment">// Params 任务处理数据</span>
+	Params any
+	<span class="hljs-comment">// TaskFunc 任务实体</span>
+	TaskFunc TaskHandler
+	<span class="hljs-comment">// Timeout 任务超时时间</span>
+	Timeout time.Duration
+&#125;
+
+<span class="hljs-comment">// DefaultTimeout 默认超时时间</span>
+<span class="hljs-keyword">const</span> DefaultTimeout = <span class="hljs-number">5</span> * time.Second
+
+<span class="hljs-comment">// WithTimeout 设置任务超时时间 (秒)</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">WithTimeout</span><span class="hljs-params">(timeout time.Duration)</span> <span class="hljs-title">func</span><span class="hljs-params">(*Process)</span></span> &#123;
+	<span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w *Process)</span></span> &#123;
+		w.Timeout = timeout * time.Second
+	&#125;
+&#125;
+
+<span class="hljs-comment">// WithParams 设置任务处理数据</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">WithParams</span><span class="hljs-params">(params any)</span> <span class="hljs-title">func</span><span class="hljs-params">(*Process)</span></span> &#123;
+	<span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w *Process)</span></span> &#123;
+		w.Params = params
+	&#125;
+&#125;
+
+<span class="hljs-comment">// Task 执行任务</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(p *Process)</span> <span class="hljs-title">Task</span><span class="hljs-params">()</span> <span class="hljs-title">error</span></span> &#123;
+	<span class="hljs-keyword">return</span> p.TaskFunc(p.ctx, p.Params)
+&#125;
+
+<span class="hljs-comment">// NewProcess 创建任务</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewProcess</span><span class="hljs-params">(taskFunc TaskHandler, opts ...<span class="hljs-keyword">func</span>(*Process)</span>) *<span class="hljs-title">Process</span></span> &#123;
+	<span class="hljs-keyword">if</span> taskFunc == <span class="hljs-literal">nil</span> &#123;
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+	&#125;
+
+	p := &amp;Process&#123;
+		TaskFunc: taskFunc,
+		Timeout:  DefaultTimeout,
+	&#125;
+	<span class="hljs-keyword">for</span> _, opt := <span class="hljs-keyword">range</span> opts &#123;
+		opt(p)
+	&#125;
+
+	<span class="hljs-keyword">return</span> p
+&#125;
+
+<span class="hljs-comment">// WorkerPool 工作池</span>
+<span class="hljs-keyword">type</span> WorkerPool <span class="hljs-keyword">struct</span> &#123;
+	work <span class="hljs-keyword">chan</span> Worker
+	wg   sync.WaitGroup
+	sync.Once
+	runNum <span class="hljs-keyword">uint32</span>
+&#125;
+
+<span class="hljs-keyword">var</span> pools []*WorkerPool
+
+<span class="hljs-comment">// NewPool 创建工作池</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewPool</span><span class="hljs-params">(<span class="hljs-built_in">cap</span> <span class="hljs-keyword">int</span>)</span> *<span class="hljs-title">WorkerPool</span></span> &#123;
+	p := &amp;WorkerPool&#123;
+		work: <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> Worker),
+	&#125;
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-built_in">cap</span>; i++ &#123;
+		p.wg.Add(<span class="hljs-number">1</span>)
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+			<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+				p.wg.Done()
+				atomic.AddUint32(&amp;p.runNum, ^<span class="hljs-keyword">uint32</span>(<span class="hljs-number">0</span>))
+			&#125;()
+			<span class="hljs-keyword">for</span> w := <span class="hljs-keyword">range</span> p.work &#123;
+				process := w.(*Process) <span class="hljs-comment">//nolint:errcheck</span>
+				process.ctx, process.cancel = context.WithTimeout(context.Background(), process.Timeout)
+				execTask(process)
+			&#125;
+		&#125;()
+		atomic.AddUint32(&amp;p.runNum, <span class="hljs-number">1</span>)
+	&#125;
+	add(p)
+	<span class="hljs-keyword">return</span> p
+&#125;
+
+<span class="hljs-comment">// execTask 执行任务</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">execTask</span><span class="hljs-params">(w *Process)</span></span> &#123;
+	<span class="hljs-keyword">defer</span> w.cancel()
+	done := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">struct</span>&#123;&#125;)
+	<span class="hljs-keyword">var</span> err error
+	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+		err = w.Task()
+		<span class="hljs-built_in">close</span>(done)
+	&#125;()
+
+	<span class="hljs-keyword">select</span> &#123;
+	<span class="hljs-keyword">case</span> &lt;-w.ctx.Done():
+		log.Error(fmt.Sprintf(<span class="hljs-string">&quot;任务执行超时: %v&quot;</span>, w.ctx.Err()))
+		<span class="hljs-keyword">return</span>
+	<span class="hljs-keyword">case</span> &lt;-done:
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+			log.Error(fmt.Sprintf(<span class="hljs-string">&quot;任务执行失败: %v&quot;</span>, err))
+		&#125;
+		<span class="hljs-keyword">return</span>
+	&#125;
+&#125;
+
+<span class="hljs-comment">// Delivery 投递任务</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(p *WorkerPool)</span> <span class="hljs-title">Delivery</span><span class="hljs-params">(w Worker)</span> <span class="hljs-title">error</span></span> &#123;
+	<span class="hljs-keyword">if</span> w == <span class="hljs-literal">nil</span> &#123;
+		<span class="hljs-keyword">return</span> errors.New(<span class="hljs-string">&quot;delivery task is nil&quot;</span>)
+	&#125;
+	p.work &lt;- w
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-comment">// Close 关闭工作池</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(p *WorkerPool)</span> <span class="hljs-title">Close</span><span class="hljs-params">()</span></span> &#123;
+	p.Once.Do(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+		<span class="hljs-built_in">close</span>(p.work)
+		p.wg.Wait()
+	&#125;)
+&#125;
+
+<span class="hljs-comment">// Add 记录新增的工作池</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">add</span><span class="hljs-params">(p *WorkerPool)</span></span> &#123;
+	pools = <span class="hljs-built_in">append</span>(pools, p)
+&#125;
+
+<span class="hljs-comment">// PoolsShutdown 关闭所有的工作池</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">PoolsShutdown</span><span class="hljs-params">()</span></span> &#123;
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(pools) &gt; <span class="hljs-number">0</span> &#123;
+		<span class="hljs-keyword">for</span> _, p := <span class="hljs-keyword">range</span> pools &#123;
+			p.Close()
+		&#125;
+	&#125;
+&#125;
+
+</code></pre>
+<p><strong>注意：<code>gitlab.com/bopop/log</code> 为私有组件，若要测试本代码请注释或使用自用组件</strong></p>
+<h4 id="Testing"><a class="header-anchor" href="#Testing"></a>Testing</h4>
+<pre><code class="hljs go">
+<span class="hljs-keyword">package</span> pool
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;context&quot;</span>
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;math/rand&quot;</span>
+	<span class="hljs-string">&quot;runtime&quot;</span>
+	<span class="hljs-string">&quot;sync&quot;</span>
+	<span class="hljs-string">&quot;testing&quot;</span>
+	<span class="hljs-string">&quot;time&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">random</span><span class="hljs-params">()</span> <span class="hljs-title">int</span></span> &#123;
+	<span class="hljs-comment">// 以当前时间生成种子</span>
+	rand.Seed(time.Now().UnixNano())
+
+	<span class="hljs-comment">// 设定范围</span>
+	min := <span class="hljs-number">1</span>
+	max := <span class="hljs-number">10</span>
+
+	<span class="hljs-comment">// 生成 min 到 max 范围内的随机数</span>
+	<span class="hljs-keyword">return</span> rand.Intn(max-min+<span class="hljs-number">1</span>) + min
+&#125;
+
+<span class="hljs-comment">// Task 定义要执行的任务</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Task</span><span class="hljs-params">(ctx context.Context, extra any)</span> <span class="hljs-title">error</span></span> &#123;
+	randNum := extra.(<span class="hljs-keyword">int</span>) <span class="hljs-comment">//nolint:errcheck</span>
+	time.Sleep(time.Duration(randNum) * time.Second)
+
+	<span class="hljs-keyword">if</span> randNum%<span class="hljs-number">2</span> == <span class="hljs-number">0</span> &#123;
+		<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;randNum = %d, worker failed1&quot;</span>, randNum)
+	&#125;
+
+	<span class="hljs-comment">// 模拟 context deadline 终止</span>
+	<span class="hljs-keyword">if</span> ctx.Err() != <span class="hljs-literal">nil</span> &#123;
+		<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;randNum = %d, worker failed2&quot;</span>, randNum)
+	&#125;
+
+	fmt.Printf(<span class="hljs-string">&quot;randNum = %d, worker finished\n&quot;</span>, randNum)
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-comment">// TestNewPool 测试 NewPool 函数的创建工作池行为是否正常</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestNewPool</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	wg := sync.WaitGroup&#123;&#125;
+	wg.Add(<span class="hljs-number">1</span>)
+	<span class="hljs-keyword">var</span> p *WorkerPool
+	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+		<span class="hljs-keyword">defer</span> wg.Done()
+		p = NewPool(<span class="hljs-number">5</span>)
+	&#125;()
+	wg.Wait()
+	<span class="hljs-keyword">defer</span> p.Close()
+
+	<span class="hljs-keyword">if</span> p.runNum != <span class="hljs-number">5</span> &#123;
+		t.Errorf(<span class="hljs-string">&quot;Expected pool size of %d, but got %d&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-built_in">cap</span>(p.work))
+	&#125;
+&#125;
+
+<span class="hljs-comment">// TestWorkerPool_Run 测试工作池能否正常运行任务</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestWorkerPool_Run</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+
+	p := NewPool(runtime.NumCPU())
+	<span class="hljs-comment">// 保证 pool 初始化</span>
+	time.Sleep(<span class="hljs-number">300</span> * time.Millisecond)
+	<span class="hljs-keyword">defer</span> p.Close()
+
+	<span class="hljs-keyword">var</span> wg sync.WaitGroup
+	taskCount := <span class="hljs-number">5</span>
+	wg.Add(taskCount)
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; taskCount; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n <span class="hljs-keyword">int</span>)</span></span> &#123;
+			<span class="hljs-keyword">defer</span> wg.Done()
+			randNum := random()
+			fmt.Println(<span class="hljs-string">&quot;randNum = &quot;</span>, randNum)
+			process := NewProcess(Task, WithParams(randNum), WithTimeout(<span class="hljs-number">5</span>))
+			p.Delivery(process)
+		&#125;(i)
+		time.Sleep(<span class="hljs-number">300</span> * time.Millisecond)
+	&#125;
+
+	wg.Wait()
+&#125;
+
+<span class="hljs-comment">// TestWorkerPool_Close 测试 Close 函数能否正确关闭并完成所有任务</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestWorkerPool_Close</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	p := NewPool(<span class="hljs-number">2</span>)
+	time.Sleep(<span class="hljs-number">300</span> * time.Millisecond)
+	<span class="hljs-keyword">defer</span> p.Close() <span class="hljs-comment">// 退出时关闭</span>
+
+	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int</span>
+	<span class="hljs-keyword">var</span> wg sync.WaitGroup
+	wg.Add(<span class="hljs-number">1</span>)
+
+	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+		<span class="hljs-keyword">defer</span> wg.Done()
+		<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">5</span>; i++ &#123;
+			process := NewProcess(Task, WithParams(counter))
+			p.Delivery(process)
+		&#125;
+	&#125;()
+
+	wg.Wait()
+
+	p.Close() <span class="hljs-comment">// 第一次显示关闭，测试多次关闭</span>
+
+	finalCount := counter
+	<span class="hljs-keyword">if</span> finalCount != <span class="hljs-number">0</span> &#123;
+		t.Errorf(<span class="hljs-string">&quot;expected counter to be 0, got %d&quot;</span>, finalCount)
+	&#125;
+&#125;
+
+<span class="hljs-comment">// TestPoolsShutdown 测试 PoolsShutdown 函数能否关闭所有工作池</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestPoolsShutdown</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-comment">// 创建并添加几个工作池</span>
+	<span class="hljs-keyword">var</span> wg sync.WaitGroup
+	wg.Add(<span class="hljs-number">3</span>)
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">3</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+			<span class="hljs-keyword">defer</span> wg.Done()
+			NewPool(<span class="hljs-number">3</span>)
+		&#125;()
+	&#125;
+	wg.Wait()
+
+	PoolsShutdown()
+
+	<span class="hljs-comment">// 验证工作池是否全部关闭</span>
+	<span class="hljs-keyword">for</span> _, p := <span class="hljs-keyword">range</span> pools &#123;
+		<span class="hljs-keyword">select</span> &#123;
+		<span class="hljs-keyword">case</span> _, ok := &lt;-p.work:
+			<span class="hljs-keyword">if</span> ok &#123;
+				t.Errorf(<span class="hljs-string">&quot;work channel should be closed&quot;</span>)
+			&#125;
+		<span class="hljs-keyword">default</span>:
+			t.Errorf(<span class="hljs-string">&quot;work channel should be closed and empty&quot;</span>)
+		&#125;
+	&#125;
+&#125;
+
+</code></pre>
+<p><em>注释比较全了应该很容易看懂了哈😁</em></p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/golang%E3%80%81channel%E3%80%81goroutine%E3%80%81context/">golang、channel、goroutine、context</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/09/05/Go%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%B3%BB%E7%BB%9F/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Go实现高性能分布式定时任务系统</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/25/%E5%9F%BA%E4%BA%8EGitOps%E7%9A%84%E4%BA%91%E5%8E%9F%E7%94%9FDevOps%E5%AE%9E%E8%B7%B5%E6%8C%87%E5%8D%97/">
+                        <span class="hidden-mobile">基于GitOps的云原生DevOps实践指南</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2024/08/27/goroutine-协程池/';
+          this.page.identifier = '/2024/08/27/goroutine-协程池/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

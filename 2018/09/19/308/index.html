@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>百度doueros 智能家居技能开发总结 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                百度doueros 智能家居技能开发总结
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2018-09-19 16:10">
+      2018年9月19日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      859 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      9
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h3 id="百度doueros-智能家居技能开发总结"><a class="header-anchor" href="#百度doueros-智能家居技能开发总结"></a>百度doueros 智能家居技能开发总结</h3>
+<ul>
+<li><strong><a target="_blank" rel="noopener" href="https://dueros.baidu.com/didp/doc/overall/open-platform-intro_markdown">dueros官方文档</a></strong></li>
+</ul>
+<blockquote>
+<p>开发准备工作</p>
+</blockquote>
+<ol>
+<li>oauth2.0 授权</li>
+</ol>
+<p>此次开发搭建的oauth2.0 server 使用的是github作者 <strong>bshaffer</strong> 提供的 OAuth2 Server PHP框架。<a target="_blank" rel="noopener" href="http://bshaffer.github.io/oauth2-server-php-docs/">官方文档地址</a></p>
+<blockquote>
+<p>oauth2.0 工作原理简要图解</p>
+</blockquote>
+<p><img src="https://s1.ax1x.com/2018/09/19/ie6Rds.gif" srcset="/img/loading.gif" alt="ie6Rds.gif"> 授权目的：授权DuerOS将识别后的控制指令，发给开发者的服务器或设备云。 授权内容说明 授权地址：开发者授权DuerOS访问的服务器或设备云地址，需遵守OAuth 2.0标准（打通百度账号和自有账号）。 Client_Id：开发者分配给DuerOS SH的Client_ID ClientSecret：开发者分配给DuerOS SH的密钥 Scope：获取的用户数据的权限列表(名称，头像，年龄，性别…)，多个权限之间请使用空格进行分开,暂未做细分。 回调地址：每个技能创建时，在开放平台上生成的唯一URL地址，该地址不能修改。 Token地址：用于获取开发者的Access Token，以便DuerOS访问他们的服务器。需要遵守OAuth 2.0标准协议。 请求方式：Access Token的请求方式。 WebService：智能家居设备的设备云服务部署地址。</p>
+<blockquote>
+<p>实现结果授权登录图</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/iecieH"><img src="https://s1.ax1x.com/2018/09/19/iecieH.md.jpg" srcset="/img/loading.gif" alt="iecieH.md.jpg"></a> 登录界面为html5生成，每当用户在点击授权时由亿联服务器返回给百度音响app，由百度音响app内嵌显示。 当用户正确输入用户名和密码（和智能看家宝共用）点击确定即可授权成功，此时服务器生成和保存access token、refresh token并发放access token给到dueros平台，dueros将用户信息和access token对应保存。 当用户触发语音如：“小度小度，打开灯”指令时，dueros将自然语言通过处理，然后通过智能家居协议发送响应的指令到亿联设备云。</p>
+<blockquote>
+<p>智能家居协议</p>
+</blockquote>
+<p><img src="https://developer-bos.cdn.bcebos.com/c6e4889f-d268-4ce4-b223-9a4f6c808f3f.png" srcset="/img/loading.gif" alt="image"></p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://dueros.baidu.com/didp/doc/dueros-bot-platform/dbp-smart-home/smart-home-skill/create-smart-skill_markdown">智能家居协议文档地址</a></p>
+</blockquote>
+<p><strong>服务器交互流程</strong> <img src="https://s1.ax1x.com/2018/09/19/ieRkTJ.gif" srcset="/img/loading.gif" alt="ieRkTJ.gif"> 服务端授权校验：</p>
+<pre><code class="hljs php"><span class="hljs-keyword">if</span> (!<span class="hljs-keyword">$this</span>-&gt;server-&gt;verifyResourceRequest(Request::createFromGlobals())) &#123;
+            <span class="hljs-comment">//access_token失效则使用刷新令牌获取新的access_token和refresh_token</span>
+            $refresh = Directives::RefreshToken($payload[<span class="hljs-string">&#x27;accessToken&#x27;</span>]);
+
+            $refresh = json_decode($refresh,JSON_UNESCAPED_UNICODE);
+
+            <span class="hljs-comment">//刷新令牌失效</span>
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">isset</span>($refresh[<span class="hljs-string">&#x27;error&#x27;</span>]))&#123;
+                <span class="hljs-comment">//返回令牌失效到dueros</span>
+                Directives::ExpiredAccessTokenError();
+
+                <span class="hljs-keyword">die</span>;
+
+            &#125;</code></pre>
+<pre><code class="hljs php"><span class="hljs-comment">//access token过期</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-built_in">static</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">expiredAccessTokenError</span>(<span class="hljs-params"></span>)</span>
+<span class="hljs-function">    </span>&#123;
+        $jsonArr = [
+            <span class="hljs-string">&#x27;header&#x27;</span> =&gt; [
+                <span class="hljs-string">&#x27;namespace&#x27;</span> =&gt; <span class="hljs-string">&#x27;DuerOS.ConnectedHome.Discovery&#x27;</span>,
+                <span class="hljs-string">&#x27;name&#x27;</span> =&gt; <span class="hljs-string">&#x27;ExpiredAccessTokenError&#x27;</span>,
+                <span class="hljs-string">&#x27;messageId&#x27;</span> =&gt; md5(time()),
+                <span class="hljs-string">&#x27;payloadVersion&#x27;</span> =&gt; <span class="hljs-string">&#x27;1&#x27;</span>
+            ],
+            <span class="hljs-string">&#x27;payload&#x27;</span> =&gt; []
+        ];
+
+        <span class="hljs-built_in">self</span>::duerosJsonResponse($jsonArr);
+    &#125;</code></pre>
+<p>百度云和亿联设备云交互图简介 <a target="_blank" rel="noopener" href="https://imgchr.com/i/iefMIH"><img src="https://s1.ax1x.com/2018/09/19/iefMIH.md.png" srcset="/img/loading.gif" alt="iefMIH.md.png"></a> 对于用户而言</p>
+<ul>
+<li>用户对于设备的使用无其他改变，同样通过亿联app将设备绑定在网关。</li>
+<li>用户要将智能音箱和网关或设备进行关联的工作只有一步，在小度音箱app找到“亿联智能家居”技能进行授权即可。</li>
+<li>亿联子账号通过授权后也可对设备进行操作</li>
+<li>设备的新增、删除重命名等操作在亿联app中设备完成后会自动同步到dueros平台，无需做其他附加操作。</li>
+<li>由于亿联控制云端架构特殊性（子主帐号），被踢网的用户将会需要重新到小度音箱app进行授权登录（假如他是子账号也是主账号也是同样的）。</li>
+</ul>
+<p>登录小度音箱app后，能够可视化看到自己的设备信息。 <a target="_blank" rel="noopener" href="https://imgchr.com/i/ie4Fjx"><img src="https://s1.ax1x.com/2018/09/19/ie4Fjx.md.jpg" srcset="/img/loading.gif" alt="ie4Fjx.md.jpg"></a></p>
+<blockquote>
+<p>更多 <a target="_blank" rel="noopener" href="https://dueros.baidu.com/forum/topic/show/290891">【 开发指南 】智能家居技能</a></p>
+</blockquote>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%99%BA%E8%83%BD%E8%AF%AD%E9%9F%B3/">智能语音</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E7%99%BE%E5%BA%A6/">百度</a>
+                    
+                      <a class="hover-with-bg" href="/tags/dueros/">dueros</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85/">智能家居</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/09/28/php%E4%B8%AD%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E7%B3%BB%E7%BB%9F%E5%B8%B8%E9%87%8F/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">php中最常用的系统常量</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2018/09/14/%E8%BD%AC%EF%BC%9Aphp%E5%8D%8F%E7%A8%8B%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B%E8%AF%A6%E8%A7%A3/">
+                        <span class="hidden-mobile">PHP并发IO编程之路</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2018/09/19/308/';
+          this.page.identifier = '/2018/09/19/308/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

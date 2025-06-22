@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>php socket C/S IO阻塞方式 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                php socket C/S IO阻塞方式
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2019-02-16 13:59">
+      2019年2月16日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      850 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      12
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h4 id="网络编程阻塞模式"><a class="header-anchor" href="#网络编程阻塞模式"></a>网络编程阻塞模式</h4>
+<p><strong>在网网络编程中通常有以下几种调用方式：</strong></p>
+<ul>
+<li>同步调用（Sync）</li>
+<li>异步调用（Async）</li>
+<li>阻塞(Block)</li>
+<li>非阻塞(Unblock)</li>
+</ul>
+<p><strong>这几种调用方式可以进行组合：</strong></p>
+<ul>
+<li>同步阻塞</li>
+<li>同步非阻塞</li>
+<li>异步阻塞</li>
+<li>异步非阻塞</li>
+</ul>
+<p>我们在通过php进行网络编程时会发现，php的会有IO阻塞的现象。在多个客户端同时连接服务器端时，服务器端会以客户端连接的先后顺序来处理客户端发送的请求，形成一个顺序队列的方式。当服务端在处理一个客户端连接时，其他的客户端是与服务器进行交互的，只有等待前一个连接处理结束。 <strong>server/client php代码示例</strong> 服务端</p>
+<pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+set_time_limit(<span class="hljs-number">0</span>);<span class="hljs-comment">//确保连接客户端不会超时</span>
+
+$ip = <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>;
+$port = <span class="hljs-number">4321</span>;
+
+<span class="hljs-comment">//创建socket</span>
+<span class="hljs-keyword">if</span>(($socket = socket_create(AF_INET, STREAM_SOCK_STREAM, SOL_TCP)) &lt; <span class="hljs-number">0</span>)&#123;
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;socket_create() 失败的原因是:&quot;</span>.socket_strerror(socket_last_error()).<span class="hljs-string">&quot;\n&quot;</span>;
+&#125;
+
+<span class="hljs-comment">//阻塞模式</span>
+socket_set_block($socket) <span class="hljs-keyword">or</span> <span class="hljs-keyword">die</span>(<span class="hljs-string">&quot;socket_set_block() 失败的原因是:&quot;</span> . socket_strerror(socket_last_error()) . <span class="hljs-string">&quot;\n&quot;</span>);
+
+<span class="hljs-comment">//绑定ip和端口</span>
+<span class="hljs-keyword">if</span>(($ret = socket_bind($socket, $ip, $port)) &lt; <span class="hljs-number">0</span>)&#123;
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;socket_bind() 失败的原因是:&quot;</span>.socket_strerror($ret).<span class="hljs-string">&quot;\n&quot;</span>;
+&#125;
+
+<span class="hljs-comment">//监听</span>
+<span class="hljs-keyword">if</span>(($ret = socket_listen($socket)) &lt; <span class="hljs-number">0</span>)&#123;
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;socket_listen() 失败的原因是:&quot;</span>.socket_strerror($ret).<span class="hljs-string">&quot;\n&quot;</span>;
+&#125;
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;PHP Socket Server create success!\n&quot;</span>;
+$buf = <span class="hljs-literal">null</span>;
+<span class="hljs-keyword">do</span>&#123;
+    <span class="hljs-comment">// 接受一个Socket客户端连接</span>
+    <span class="hljs-keyword">if</span>(($client = socket_accept($socket)) &lt; <span class="hljs-number">0</span>)&#123;
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;socket_accept() failed: reason: &quot;</span> . socket_strerror(socket_last_error($client)) . <span class="hljs-string">&quot;\n&quot;</span>;
+    &#125;<span class="hljs-keyword">else</span>&#123;
+        socket_getpeername($client, $client_addr, $client_port);
+        <span class="hljs-comment">//告知客户端连接成功</span>
+        $msg = <span class="hljs-string">&quot;connect success!&quot;</span>;
+        socket_write($client, $msg, strlen($msg));
+        <span class="hljs-keyword">do</span>&#123;
+            <span class="hljs-comment">//打印客户端发送来的信息</span>
+            <span class="hljs-keyword">if</span>(($buf = @socket_read($client, <span class="hljs-number">8192</span>)) === <span class="hljs-literal">false</span>)&#123;
+                <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;socket_read() failed: reason: &quot;</span> . socket_strerror(socket_last_error($client)) . <span class="hljs-string">&quot;\n&quot;</span>;
+                socket_close($client);
+                <span class="hljs-keyword">break</span>;
+            &#125;
+            <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;rev client[&#123;$client_addr&#125;]:&quot;</span>.$buf.<span class="hljs-string">&quot;\n&quot;</span>;
+            <span class="hljs-keyword">if</span>(<span class="hljs-string">&#x27;exit&#x27;</span> == $buf)&#123;
+                <span class="hljs-keyword">break</span>;
+            &#125;
+            <span class="hljs-comment">//服务器发送给客户端</span>
+            $buf = <span class="hljs-string">&quot;server send: ($buf)&quot;</span>;
+            socket_write($client, $buf, strlen($buf));
+
+        &#125;<span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>);
+    &#125;
+&#125;<span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>);
+<span class="hljs-comment">//关闭socket</span>
+socket_close($socket);</code></pre>
+<p>客户端</p>
+<pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+
+error_reporting(E_ALL);
+set_time_limit(<span class="hljs-number">0</span>);
+
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;start connect server\n&quot;</span>;
+
+$ip = <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>;
+$port = <span class="hljs-number">4321</span>;
+
+<span class="hljs-comment">//创建socket</span>
+<span class="hljs-keyword">if</span>(($socket = socket_create(AF_INET, STREAM_SOCK_STREAM, SOL_TCP)) &lt; <span class="hljs-number">0</span>)&#123;
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;socket_create() failed: reason: &quot;</span> . socket_strerror(socket_last_error()) . <span class="hljs-string">&quot;\n&quot;</span>;
+&#125;
+
+<span class="hljs-comment">/***设置socket连接选项，这两个步骤可以省略***/</span>
+<span class="hljs-comment">//接收套接流的最大超时时间1秒，后面是微秒单位超时时间，设置为零，表示不管它</span>
+socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, <span class="hljs-keyword">array</span>(<span class="hljs-string">&quot;sec&quot;</span> =&gt; <span class="hljs-number">1</span>, <span class="hljs-string">&quot;usec&quot;</span> =&gt; <span class="hljs-number">0</span>));
+<span class="hljs-comment">//发送套接流的最大超时时间为6秒</span>
+socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, <span class="hljs-keyword">array</span>(<span class="hljs-string">&quot;sec&quot;</span> =&gt; <span class="hljs-number">6</span>, <span class="hljs-string">&quot;usec&quot;</span> =&gt; <span class="hljs-number">0</span>));
+<span class="hljs-comment">/***设置socket连接选项，这两个步骤可以省略***/</span>
+
+$info = <span class="hljs-string">&quot;connect $ip:$port...\n&quot;</span>;
+<span class="hljs-keyword">echo</span> $info;
+
+<span class="hljs-comment">//连接到127.0.0.1:4321这个socket server上面</span>
+<span class="hljs-keyword">if</span>(($ret = socket_connect($socket, $ip, $port)) &lt; <span class="hljs-number">0</span>)&#123;
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;socket_connect() failed.\nReason: ($ret) &quot;</span> . socket_strerror($ret) . <span class="hljs-string">&quot;\n&quot;</span>;
+&#125;
+
+<span class="hljs-keyword">do</span>&#123;
+    <span class="hljs-comment">//读取服务器发送信息</span>
+    $out = socket_read($socket, <span class="hljs-number">8192</span>);
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;client 接收:&quot;</span>,$out.<span class="hljs-string">&quot;\n&quot;</span>;
+
+    <span class="hljs-comment">//读取键盘输入并发送给服务器</span>
+    $in = trim(fgets(STDIN));
+
+    <span class="hljs-keyword">if</span>(! socket_write($socket, $in, strlen($in)))&#123;
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;socket_write() failed: reason: &quot;</span> . socket_strerror(socket_last_error($socket)) . <span class="hljs-string">&quot;\n&quot;</span>;
+    &#125;
+
+    <span class="hljs-comment">//判断是否退出命令</span>
+    <span class="hljs-keyword">if</span>(<span class="hljs-string">&#x27;exit&#x27;</span> == $in)&#123;
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;client quit\n&quot;</span>;
+        <span class="hljs-keyword">break</span>;
+    &#125;
+
+&#125;<span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>);
+<span class="hljs-comment">//关闭socket</span>
+socket_close($socket);</code></pre>
+<p>运行server： <img src="https://blog.wenboo.top/wp-content/uploads/2019/02/9765cc61c56df054f7d81d678964e3b3.png" srcset="/img/loading.gif" alt=""> 运行client 1 <img src="https://blog.wenboo.top/wp-content/uploads/2019/02/bd6dcdf1a6fd7eb42b012f0489f82ff0.png" srcset="/img/loading.gif" alt=""> 服务端响应 <img src="https://blog.wenboo.top/wp-content/uploads/2019/02/b37117313704f3a854f249f73b089c0f.png" srcset="/img/loading.gif" alt=""> 保持Client 1不断开 运行Client 2 程序 <img src="https://blog.wenboo.top/wp-content/uploads/2019/02/11d7577a91fdfb2ebc04d1be10362779.png" srcset="/img/loading.gif" alt=""> 服务端没有任何响应，说明此时Client2客户端是阻塞状态 断开Client1后，服务端接收到了Client2的数据 <img src="https://blog.wenboo.top/wp-content/uploads/2019/02/017634ef64e7701619bafa4a0a872001.png" srcset="/img/loading.gif" alt=""></p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/PHP/">PHP</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/php-socket/">php socket</a>
+                    
+                      <a class="hover-with-bg" href="/tags/socket/">socket</a>
+                    
+                      <a class="hover-with-bg" href="/tags/I-O/">I/O</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/02/20/docker-%E5%91%BD%E4%BB%A4/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">docker 命令</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2019/01/12/linux-cron%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E5%9D%91/">
+                        <span class="hidden-mobile">linux cron定时任务 环境变量坑</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2019/02/16/php-socket-c-s-io阻塞方式/';
+          this.page.identifier = '/2019/02/16/php-socket-c-s-io阻塞方式/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

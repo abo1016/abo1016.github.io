@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>golang 深入理解sync包的并发原语 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                golang 深入理解sync包的并发原语
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2024-05-05 11:30">
+      2024年5月5日 中午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      52
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="🔄-golang-深入理解sync包的并发原语"><a class="header-anchor" href="#🔄-golang-深入理解sync包的并发原语"></a>🔄 golang 深入理解sync包的并发原语</h2>
+<p>Go语言的并发模型以goroutine和channel为核心，但在某些场景下，我们需要更底层的并发原语来解决特定问题。<code>sync</code>包提供了这些基础构建块，让我们能够精确控制并发行为。本文将深入探讨<code>sync</code>包中的各种并发原语，分析其内部实现原理，并通过实例展示其最佳实践。</p>
+<h3 id="📚-sync包概览"><a class="header-anchor" href="#📚-sync包概览"></a>📚 sync包概览</h3>
+<p><code>sync</code>包提供了以下核心并发原语：</p>
+<ol>
+<li><strong>Mutex</strong>：互斥锁，用于保护共享资源</li>
+<li><strong>RWMutex</strong>：读写锁，允许多个读操作并发进行</li>
+<li><strong>WaitGroup</strong>：等待一组goroutine完成</li>
+<li><strong>Once</strong>：确保某个操作只执行一次</li>
+<li><strong>Cond</strong>：条件变量，用于goroutine之间的通知</li>
+<li><strong>Pool</strong>：对象池，用于缓存临时对象</li>
+<li><strong>Map</strong>：并发安全的map</li>
+<li><strong>atomic</strong>：原子操作（虽然在<code>sync/atomic</code>包中）</li>
+</ol>
+<p>让我们逐一深入了解这些并发原语的工作原理和使用场景。</p>
+<h3 id="🔒-Mutex：互斥锁"><a class="header-anchor" href="#🔒-Mutex：互斥锁"></a>🔒 Mutex：互斥锁</h3>
+<p><code>Mutex</code>（互斥锁）是最基本的同步原语，用于保护共享资源不被并发访问。</p>
+<h4 id="基本用法"><a class="header-anchor" href="#基本用法"></a>基本用法</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">var</span> mu sync.Mutex
+<span class="hljs-keyword">var</span> count <span class="hljs-keyword">int</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">increment</span><span class="hljs-params">()</span></span> &#123;
+    mu.Lock()
+    <span class="hljs-keyword">defer</span> mu.Unlock()
+    count++
+&#125;</code></pre>
+<h4 id="内部实现原理"><a class="header-anchor" href="#内部实现原理"></a>内部实现原理</h4>
+<p>Go 1.9之后，<code>Mutex</code>采用了一种混合锁的实现，结合了自旋锁和阻塞锁的优点：</p>
+<ol>
+<li><strong>快路径</strong>：如果锁没有竞争，直接获取锁</li>
+<li><strong>慢路径</strong>：如果有竞争，先尝试自旋等待，然后再阻塞</li>
+</ol>
+<p><code>Mutex</code>的内部结构大致如下：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Mutex <span class="hljs-keyword">struct</span> &#123;
+    state <span class="hljs-keyword">int32</span>  <span class="hljs-comment">// 锁的状态</span>
+    sema  <span class="hljs-keyword">uint32</span> <span class="hljs-comment">// 信号量，用于阻塞/唤醒goroutine</span>
+&#125;</code></pre>
+<p>其中<code>state</code>字段包含以下信息：</p>
+<ul>
+<li>锁是否被持有（最低位）</li>
+<li>唤醒标志（第2位）</li>
+<li>等待队列中的waiter数量（剩余位）</li>
+</ul>
+<h4 id="性能考量"><a class="header-anchor" href="#性能考量"></a>性能考量</h4>
+<ol>
+<li><strong>临界区大小</strong>：临界区（加锁和解锁之间的代码）应尽可能小</li>
+<li><strong>锁粒度</strong>：根据需要选择适当的锁粒度</li>
+<li><strong>锁竞争</strong>：避免高频率的锁竞争</li>
+</ol>
+<h4 id="常见陷阱"><a class="header-anchor" href="#常见陷阱"></a>常见陷阱</h4>
+<ol>
+<li><strong>死锁</strong>：两个或多个goroutine相互等待对方持有的锁</li>
+<li><strong>忘记解锁</strong>：导致其他goroutine永远等待</li>
+<li><strong>重复解锁</strong>：会导致panic</li>
+<li><strong>复制包含锁的结构体</strong>：锁的状态会被复制，导致异常行为</li>
+</ol>
+<pre><code class="hljs go"><span class="hljs-comment">// 错误示例：复制包含锁的结构体</span>
+<span class="hljs-keyword">type</span> Counter <span class="hljs-keyword">struct</span> &#123;
+    mu    sync.Mutex
+    count <span class="hljs-keyword">int</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    c := Counter&#123;&#125;
+    c.mu.Lock()
+    
+    <span class="hljs-comment">// 复制了锁的状态</span>
+    c2 := c
+    
+    <span class="hljs-comment">// 这里会死锁，因为c2的锁已经被锁定（复制自c）</span>
+    c2.mu.Lock()
+&#125;</code></pre>
+<h3 id="📖-RWMutex：读写锁"><a class="header-anchor" href="#📖-RWMutex：读写锁"></a>📖 RWMutex：读写锁</h3>
+<p><code>RWMutex</code>是<code>Mutex</code>的一个变种，它允许多个读操作并发进行，但写操作是互斥的。</p>
+<h4 id="基本用法-2"><a class="header-anchor" href="#基本用法-2"></a>基本用法</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">var</span> rwmu sync.RWMutex
+<span class="hljs-keyword">var</span> data <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">readData</span><span class="hljs-params">(key <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">string</span></span> &#123;
+    rwmu.RLock() <span class="hljs-comment">// 读锁</span>
+    <span class="hljs-keyword">defer</span> rwmu.RUnlock()
+    <span class="hljs-keyword">return</span> data[key]
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">writeData</span><span class="hljs-params">(key, value <span class="hljs-keyword">string</span>)</span></span> &#123;
+    rwmu.Lock() <span class="hljs-comment">// 写锁</span>
+    <span class="hljs-keyword">defer</span> rwmu.Unlock()
+    data[key] = value
+&#125;</code></pre>
+<h4 id="内部实现原理-2"><a class="header-anchor" href="#内部实现原理-2"></a>内部实现原理</h4>
+<p><code>RWMutex</code>内部维护了一个<code>Mutex</code>和多个计数器：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> RWMutex <span class="hljs-keyword">struct</span> &#123;
+    w           Mutex  <span class="hljs-comment">// 用于写锁</span>
+    writerSem   <span class="hljs-keyword">uint32</span> <span class="hljs-comment">// 写等待信号量</span>
+    readerSem   <span class="hljs-keyword">uint32</span> <span class="hljs-comment">// 读等待信号量</span>
+    readerCount <span class="hljs-keyword">int32</span>  <span class="hljs-comment">// 读锁计数器</span>
+    readerWait  <span class="hljs-keyword">int32</span>  <span class="hljs-comment">// 等待释放的读锁数量</span>
+&#125;</code></pre>
+<p>工作流程：</p>
+<ol>
+<li>获取读锁时，<code>readerCount</code>增加</li>
+<li>获取写锁时，先获取内部的<code>Mutex</code>，然后等待所有读操作完成</li>
+<li>释放写锁时，唤醒所有等待的读操作</li>
+</ol>
+<h4 id="使用场景"><a class="header-anchor" href="#使用场景"></a>使用场景</h4>
+<p><code>RWMutex</code>适用于读多写少的场景。如果读写比例接近1:1，或者临界区很小，普通的<code>Mutex</code>可能更高效。</p>
+<h4 id="性能比较"><a class="header-anchor" href="#性能比较"></a>性能比较</h4>
+<p>以下是一个简单的基准测试，比较在不同读写比例下<code>Mutex</code>和<code>RWMutex</code>的性能：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkMutex</span><span class="hljs-params">(b *testing.B)</span></span> &#123;
+    <span class="hljs-keyword">var</span> mu sync.Mutex
+    b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> &#123;
+        <span class="hljs-keyword">for</span> pb.Next() &#123;
+            mu.Lock()
+            <span class="hljs-comment">// 临界区</span>
+            mu.Unlock()
+        &#125;
+    &#125;)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkRWMutex</span><span class="hljs-params">(b *testing.B)</span></span> &#123;
+    <span class="hljs-keyword">var</span> mu sync.RWMutex
+    b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> &#123;
+        <span class="hljs-keyword">for</span> pb.Next() &#123;
+            <span class="hljs-comment">// 90%的概率执行读操作</span>
+            <span class="hljs-keyword">if</span> rand.Intn(<span class="hljs-number">10</span>) != <span class="hljs-number">0</span> &#123;
+                mu.RLock()
+                <span class="hljs-comment">// 读临界区</span>
+                mu.RUnlock()
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                mu.Lock()
+                <span class="hljs-comment">// 写临界区</span>
+                mu.Unlock()
+            &#125;
+        &#125;
+    &#125;)
+&#125;</code></pre>
+<p>在读多写少（如90%读，10%写）的场景下，<code>RWMutex</code>通常能提供更好的性能。</p>
+<h3 id="⏱️-WaitGroup：等待组"><a class="header-anchor" href="#⏱️-WaitGroup：等待组"></a>⏱️ WaitGroup：等待组</h3>
+<p><code>WaitGroup</code>用于等待一组goroutine完成。当你有多个并发任务，需要等待所有任务完成后再继续执行时，<code>WaitGroup</code>非常有用。</p>
+<h4 id="基本用法-3"><a class="header-anchor" href="#基本用法-3"></a>基本用法</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">var</span> wg sync.WaitGroup
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">worker</span><span class="hljs-params">(id <span class="hljs-keyword">int</span>)</span></span> &#123;
+    <span class="hljs-keyword">defer</span> wg.Done() <span class="hljs-comment">// 完成时减少计数器</span>
+    fmt.Printf(<span class="hljs-string">&quot;Worker %d starting\n&quot;</span>, id)
+    time.Sleep(time.Second)
+    fmt.Printf(<span class="hljs-string">&quot;Worker %d done\n&quot;</span>, id)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">5</span>; i++ &#123;
+        wg.Add(<span class="hljs-number">1</span>) <span class="hljs-comment">// 增加计数器</span>
+        <span class="hljs-keyword">go</span> worker(i)
+    &#125;
+    
+    wg.Wait() <span class="hljs-comment">// 等待所有worker完成</span>
+    fmt.Println(<span class="hljs-string">&quot;All workers done&quot;</span>)
+&#125;</code></pre>
+<h4 id="内部实现原理-3"><a class="header-anchor" href="#内部实现原理-3"></a>内部实现原理</h4>
+<p><code>WaitGroup</code>内部使用了一个计数器和一个信号量：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> WaitGroup <span class="hljs-keyword">struct</span> &#123;
+    noCopy noCopy
+    state1 [<span class="hljs-number">3</span>]<span class="hljs-keyword">uint32</span> <span class="hljs-comment">// 包含counter和waiter数量</span>
+&#125;</code></pre>
+<p>其中<code>state1</code>包含：</p>
+<ul>
+<li>计数器：记录未完成的任务数</li>
+<li>等待者计数：记录调用<code>Wait</code>的goroutine数</li>
+<li>信号量：用于阻塞和唤醒等待的goroutine</li>
+</ul>
+<h4 id="常见陷阱-2"><a class="header-anchor" href="#常见陷阱-2"></a>常见陷阱</h4>
+<ol>
+<li><strong>计数器不平衡</strong>：<code>Add</code>和<code>Done</code>调用次数不匹配</li>
+<li><strong>重用WaitGroup</strong>：在<code>Wait</code>返回后重用同一个<code>WaitGroup</code></li>
+<li><strong>负计数</strong>：调用<code>Done</code>的次数超过<code>Add</code></li>
+</ol>
+<pre><code class="hljs go"><span class="hljs-comment">// 错误示例：计数器不平衡</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-keyword">var</span> wg sync.WaitGroup
+    wg.Add(<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-comment">// 忘记调用wg.Done()</span>
+    &#125;()
+    
+    <span class="hljs-comment">// 这里会永远阻塞</span>
+    wg.Wait()
+&#125;</code></pre>
+<h4 id="最佳实践"><a class="header-anchor" href="#最佳实践"></a>最佳实践</h4>
+<ol>
+<li>确保<code>Add</code>在启动goroutine之前调用</li>
+<li>使用<code>defer wg.Done()</code>确保任务完成时减少计数器</li>
+<li>不要在goroutine内部调用<code>Wait</code></li>
+<li>不要复制<code>WaitGroup</code></li>
+</ol>
+<h3 id="🔄-Once：只执行一次"><a class="header-anchor" href="#🔄-Once：只执行一次"></a>🔄 Once：只执行一次</h3>
+<p><code>Once</code>确保某个函数只执行一次，无论有多少个goroutine并发调用。</p>
+<h4 id="基本用法-4"><a class="header-anchor" href="#基本用法-4"></a>基本用法</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">var</span> once sync.Once
+<span class="hljs-keyword">var</span> instance *Singleton
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">GetInstance</span><span class="hljs-params">()</span> *<span class="hljs-title">Singleton</span></span> &#123;
+    once.Do(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        instance = &amp;Singleton&#123;&#125;
+    &#125;)
+    <span class="hljs-keyword">return</span> instance
+&#125;</code></pre>
+<h4 id="内部实现原理-4"><a class="header-anchor" href="#内部实现原理-4"></a>内部实现原理</h4>
+<p><code>Once</code>内部使用了一个<code>Mutex</code>和一个<code>done</code>标志：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Once <span class="hljs-keyword">struct</span> &#123;
+    done <span class="hljs-keyword">uint32</span>
+    m    Mutex
+&#125;</code></pre>
+<p>工作流程：</p>
+<ol>
+<li>检查<code>done</code>标志，如果已经执行过，直接返回</li>
+<li>否则，获取锁，再次检查<code>done</code>标志（双重检查）</li>
+<li>执行函数，设置<code>done</code>标志，释放锁</li>
+</ol>
+<h4 id="使用场景-2"><a class="header-anchor" href="#使用场景-2"></a>使用场景</h4>
+<ol>
+<li><strong>单例模式</strong>：确保只创建一个实例</li>
+<li><strong>延迟初始化</strong>：只在需要时初始化资源</li>
+<li><strong>一次性设置</strong>：只执行一次的配置或初始化代码</li>
+</ol>
+<h4 id="注意事项"><a class="header-anchor" href="#注意事项"></a>注意事项</h4>
+<ol>
+<li><code>Once</code>只保证函数执行一次，不保证并发安全</li>
+<li>如果<code>Do</code>中的函数panic，<code>Once</code>会认为函数已执行</li>
+<li>不要在<code>Do</code>中调用同一个<code>Once</code>的<code>Do</code>方法，会导致死锁</li>
+</ol>
+<h3 id="🔔-Cond：条件变量"><a class="header-anchor" href="#🔔-Cond：条件变量"></a>🔔 Cond：条件变量</h3>
+<p><code>Cond</code>实现了一个条件变量，它允许goroutine等待或宣布某个事件的发生。</p>
+<h4 id="基本用法-5"><a class="header-anchor" href="#基本用法-5"></a>基本用法</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">var</span> mu sync.Mutex
+<span class="hljs-keyword">var</span> cond = sync.NewCond(&amp;mu)
+<span class="hljs-keyword">var</span> ready <span class="hljs-keyword">bool</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">consumer</span><span class="hljs-params">()</span></span> &#123;
+    mu.Lock()
+    <span class="hljs-keyword">for</span> !ready &#123;
+        cond.Wait() <span class="hljs-comment">// 等待信号，同时释放锁</span>
+    &#125;
+    <span class="hljs-comment">// 使用共享数据</span>
+    mu.Unlock()
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">producer</span><span class="hljs-params">()</span></span> &#123;
+    mu.Lock()
+    <span class="hljs-comment">// 修改共享数据</span>
+    ready = <span class="hljs-literal">true</span>
+    cond.Signal() <span class="hljs-comment">// 或 cond.Broadcast()</span>
+    mu.Unlock()
+&#125;</code></pre>
+<h4 id="内部实现原理-5"><a class="header-anchor" href="#内部实现原理-5"></a>内部实现原理</h4>
+<p><code>Cond</code>内部包含一个<code>Locker</code>（通常是<code>Mutex</code>）和一个等待队列：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Cond <span class="hljs-keyword">struct</span> &#123;
+    noCopy noCopy
+    L Locker          <span class="hljs-comment">// 保护共享数据的锁</span>
+    notify  notifyList <span class="hljs-comment">// 等待队列</span>
+&#125;</code></pre>
+<p>工作流程：</p>
+<ol>
+<li><code>Wait</code>：释放锁，将当前goroutine放入等待队列，阻塞，被唤醒后重新获取锁</li>
+<li><code>Signal</code>：唤醒等待队列中的一个goroutine</li>
+<li><code>Broadcast</code>：唤醒所有等待的goroutine</li>
+</ol>
+<h4 id="Signal-vs-Broadcast"><a class="header-anchor" href="#Signal-vs-Broadcast"></a>Signal vs Broadcast</h4>
+<ul>
+<li><code>Signal</code>：唤醒一个等待的goroutine，适用于资源有限的情况</li>
+<li><code>Broadcast</code>：唤醒所有等待的goroutine，适用于状态变化需要通知所有等待者的情况</li>
+</ul>
+<h4 id="使用场景-3"><a class="header-anchor" href="#使用场景-3"></a>使用场景</h4>
+<ol>
+<li><strong>生产者-消费者模式</strong>：消费者等待生产者产生数据</li>
+<li><strong>资源池</strong>：等待资源可用</li>
+<li><strong>任务队列</strong>：等待新任务或队列非空</li>
+</ol>
+<h4 id="常见陷阱-3"><a class="header-anchor" href="#常见陷阱-3"></a>常见陷阱</h4>
+<ol>
+<li><strong>忘记检查条件</strong>：<code>Wait</code>返回不代表条件满足，需要在循环中检查</li>
+<li><strong>忘记加锁</strong>：调用<code>Wait</code>、<code>Signal</code>或<code>Broadcast</code>前必须持有锁</li>
+<li><strong>死锁</strong>：如果所有goroutine都在等待，没有goroutine发送信号</li>
+</ol>
+<h3 id="🏊-Pool：对象池"><a class="header-anchor" href="#🏊-Pool：对象池"></a>🏊 Pool：对象池</h3>
+<p><code>Pool</code>用于存储和复用临时对象，减少内存分配和GC压力。</p>
+<h4 id="基本用法-6"><a class="header-anchor" href="#基本用法-6"></a>基本用法</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">var</span> bufferPool = sync.Pool&#123;
+    New: <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span>(bytes.Buffer)
+    &#125;,
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">processRequest</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 从池中获取对象</span>
+    buf := bufferPool.Get().(*bytes.Buffer)
+    buf.Reset() <span class="hljs-comment">// 重置状态</span>
+    
+    <span class="hljs-comment">// 使用buf处理请求</span>
+    
+    <span class="hljs-comment">// 将对象放回池中</span>
+    bufferPool.Put(buf)
+&#125;</code></pre>
+<h4 id="内部实现原理-6"><a class="header-anchor" href="#内部实现原理-6"></a>内部实现原理</h4>
+<p><code>Pool</code>为每个P（处理器）维护一个本地对象池，减少并发访问的竞争：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Pool <span class="hljs-keyword">struct</span> &#123;
+    noCopy noCopy
+    local     unsafe.Pointer <span class="hljs-comment">// local fixed-size per-P pool</span>
+    localSize <span class="hljs-keyword">uintptr</span>        <span class="hljs-comment">// size of the local array</span>
+    New <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">interface</span></span>&#123;&#125;   <span class="hljs-comment">// 创建新对象的函数</span>
+&#125;</code></pre>
+<p>工作流程：</p>
+<ol>
+<li><code>Get</code>：先从当前P的本地池获取对象，如果没有，从其他P的池&quot;偷&quot;一个，如果还没有，调用<code>New</code>创建</li>
+<li><code>Put</code>：将对象放入当前P的本地池</li>
+</ol>
+<h4 id="GC行为"><a class="header-anchor" href="#GC行为"></a>GC行为</h4>
+<p>每次GC时，<code>Pool</code>中的所有对象都会被清除。这意味着：</p>
+<ol>
+<li><code>Pool</code>不适合用作缓存，因为对象可能随时被GC回收</li>
+<li><code>Pool</code>主要用于暂时存储在同一个请求周期内复用的对象</li>
+</ol>
+<h4 id="使用场景-4"><a class="header-anchor" href="#使用场景-4"></a>使用场景</h4>
+<ol>
+<li><strong>临时对象</strong>：如<code>bytes.Buffer</code>、<code>[]byte</code>等</li>
+<li><strong>高并发请求</strong>：每个请求需要临时对象</li>
+<li><strong>反复创建和销毁的对象</strong>：如JSON编解码器</li>
+</ol>
+<h4 id="性能考量-2"><a class="header-anchor" href="#性能考量-2"></a>性能考量</h4>
+<p>以下是使用和不使用<code>Pool</code>的性能比较：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkWithoutPool</span><span class="hljs-params">(b *testing.B)</span></span> &#123;
+    b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> &#123;
+        <span class="hljs-keyword">for</span> pb.Next() &#123;
+            buf := <span class="hljs-built_in">new</span>(bytes.Buffer)
+            buf.WriteString(<span class="hljs-string">&quot;hello&quot;</span>)
+        &#125;
+    &#125;)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkWithPool</span><span class="hljs-params">(b *testing.B)</span></span> &#123;
+    pool := sync.Pool&#123;
+        New: <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span>(bytes.Buffer)
+        &#125;,
+    &#125;
+    
+    b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> &#123;
+        <span class="hljs-keyword">for</span> pb.Next() &#123;
+            buf := pool.Get().(*bytes.Buffer)
+            buf.Reset()
+            buf.WriteString(<span class="hljs-string">&quot;hello&quot;</span>)
+            pool.Put(buf)
+        &#125;
+    &#125;)
+&#125;</code></pre>
+<p>在高并发场景下，使用<code>Pool</code>可以显著减少内存分配和GC压力。</p>
+<h3 id="🗺️-Map：并发安全的Map"><a class="header-anchor" href="#🗺️-Map：并发安全的Map"></a>🗺️ Map：并发安全的Map</h3>
+<p><code>sync.Map</code>是一个并发安全的map，专为特定场景设计，如读多写少或键的生命周期与map相同。</p>
+<h4 id="基本用法-7"><a class="header-anchor" href="#基本用法-7"></a>基本用法</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">var</span> m sync.Map
+
+<span class="hljs-comment">// 存储键值对</span>
+m.Store(<span class="hljs-string">&quot;key&quot;</span>, <span class="hljs-string">&quot;value&quot;</span>)
+
+<span class="hljs-comment">// 加载值</span>
+value, ok := m.Load(<span class="hljs-string">&quot;key&quot;</span>)
+<span class="hljs-keyword">if</span> ok &#123;
+    fmt.Println(value.(<span class="hljs-keyword">string</span>))
+&#125;
+
+<span class="hljs-comment">// 加载或存储</span>
+value, loaded := m.LoadOrStore(<span class="hljs-string">&quot;key&quot;</span>, <span class="hljs-string">&quot;new value&quot;</span>)
+fmt.Println(value, loaded)
+
+<span class="hljs-comment">// 删除键</span>
+m.Delete(<span class="hljs-string">&quot;key&quot;</span>)
+
+<span class="hljs-comment">// 遍历</span>
+m.Range(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(key, value <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">bool</span></span> &#123;
+    fmt.Println(key, value)
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-comment">// 继续遍历</span>
+&#125;)</code></pre>
+<h4 id="内部实现原理-7"><a class="header-anchor" href="#内部实现原理-7"></a>内部实现原理</h4>
+<p><code>sync.Map</code>使用了两个内部map和一个互斥锁：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Map <span class="hljs-keyword">struct</span> &#123;
+    mu Mutex
+    read atomic.Value <span class="hljs-comment">// readOnly结构体，包含只读map</span>
+    dirty <span class="hljs-keyword">map</span>[<span class="hljs-keyword">interface</span>&#123;&#125;]*entry <span class="hljs-comment">// 包含最新写入的map</span>
+    misses <span class="hljs-keyword">int</span> <span class="hljs-comment">// 从read中未命中的次数</span>
+&#125;</code></pre>
+<p>工作流程：</p>
+<ol>
+<li>读操作优先从<code>read</code>map读取，无锁</li>
+<li>写操作需要获取锁，写入<code>dirty</code> map</li>
+<li>当<code>misses</code>达到阈值，将<code>dirty</code>提升为<code>read</code></li>
+</ol>
+<h4 id="使用场景-5"><a class="header-anchor" href="#使用场景-5"></a>使用场景</h4>
+<p><code>sync.Map</code>适用于以下场景：</p>
+<ol>
+<li><strong>读多写少</strong>：大部分操作是读取</li>
+<li><strong>键的生命周期长</strong>：键一旦创建很少删除</li>
+<li><strong>只增不减</strong>：主要是添加新键，很少删除</li>
+</ol>
+<h4 id="与加锁map的比较"><a class="header-anchor" href="#与加锁map的比较"></a>与加锁map的比较</h4>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkSyncMap</span><span class="hljs-params">(b *testing.B)</span></span> &#123;
+    <span class="hljs-keyword">var</span> m sync.Map
+    b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> &#123;
+        <span class="hljs-keyword">for</span> pb.Next() &#123;
+            <span class="hljs-comment">// 90%读，10%写</span>
+            <span class="hljs-keyword">if</span> rand.Intn(<span class="hljs-number">10</span>) != <span class="hljs-number">0</span> &#123;
+                m.Load(rand.Intn(<span class="hljs-number">100</span>))
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                m.Store(rand.Intn(<span class="hljs-number">100</span>), <span class="hljs-number">1</span>)
+            &#125;
+        &#125;
+    &#125;)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkMutexMap</span><span class="hljs-params">(b *testing.B)</span></span> &#123;
+    <span class="hljs-keyword">var</span> mu sync.RWMutex
+    m := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">int</span>]<span class="hljs-keyword">int</span>)
+    b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> &#123;
+        <span class="hljs-keyword">for</span> pb.Next() &#123;
+            <span class="hljs-comment">// 90%读，10%写</span>
+            <span class="hljs-keyword">if</span> rand.Intn(<span class="hljs-number">10</span>) != <span class="hljs-number">0</span> &#123;
+                mu.RLock()
+                _ = m[rand.Intn(<span class="hljs-number">100</span>)]
+                mu.RUnlock()
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                mu.Lock()
+                m[rand.Intn(<span class="hljs-number">100</span>)] = <span class="hljs-number">1</span>
+                mu.Unlock()
+            &#125;
+        &#125;
+    &#125;)
+&#125;</code></pre>
+<p>在读多写少的场景下，<code>sync.Map</code>通常比加锁的map性能更好。但如果写操作频繁或者有大量的删除操作，传统的加锁map可能更合适。</p>
+<h3 id="⚛️-atomic：原子操作"><a class="header-anchor" href="#⚛️-atomic：原子操作"></a>⚛️ atomic：原子操作</h3>
+<p><code>sync/atomic</code>包提供了底层的原子操作，用于在不使用锁的情况下安全修改共享变量。</p>
+<h4 id="基本用法-8"><a class="header-anchor" href="#基本用法-8"></a>基本用法</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span>
+
+<span class="hljs-comment">// 原子加法</span>
+atomic.AddInt64(&amp;counter, <span class="hljs-number">1</span>)
+
+<span class="hljs-comment">// 原子加载</span>
+value := atomic.LoadInt64(&amp;counter)
+
+<span class="hljs-comment">// 原子存储</span>
+atomic.StoreInt64(&amp;counter, <span class="hljs-number">42</span>)
+
+<span class="hljs-comment">// 原子交换</span>
+old := atomic.SwapInt64(&amp;counter, <span class="hljs-number">100</span>)
+
+<span class="hljs-comment">// 比较并交换</span>
+swapped := atomic.CompareAndSwapInt64(&amp;counter, <span class="hljs-number">100</span>, <span class="hljs-number">200</span>)</code></pre>
+<h4 id="内部实现原理-8"><a class="header-anchor" href="#内部实现原理-8"></a>内部实现原理</h4>
+<p>原子操作通常映射到CPU的原子指令，如LOCK前缀指令（x86）或Load-Link/Store-Conditional（ARM）。</p>
+<h4 id="使用场景-6"><a class="header-anchor" href="#使用场景-6"></a>使用场景</h4>
+<ol>
+<li><strong>计数器</strong>：如请求计数、错误计数</li>
+<li><strong>标志位</strong>：如状态标志、完成标志</li>
+<li><strong>无锁数据结构</strong>：实现无锁队列、栈等</li>
+</ol>
+<h4 id="性能比较-2"><a class="header-anchor" href="#性能比较-2"></a>性能比较</h4>
+<p>以下是使用原子操作和互斥锁的性能比较：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkAtomic</span><span class="hljs-params">(b *testing.B)</span></span> &#123;
+    <span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span>
+    b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> &#123;
+        <span class="hljs-keyword">for</span> pb.Next() &#123;
+            atomic.AddInt64(&amp;counter, <span class="hljs-number">1</span>)
+        &#125;
+    &#125;)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkMutex</span><span class="hljs-params">(b *testing.B)</span></span> &#123;
+    <span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span>
+    <span class="hljs-keyword">var</span> mu sync.Mutex
+    b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> &#123;
+        <span class="hljs-keyword">for</span> pb.Next() &#123;
+            mu.Lock()
+            counter++
+            mu.Unlock()
+        &#125;
+    &#125;)
+&#125;</code></pre>
+<p>对于简单的计数器操作，原子操作通常比互斥锁快很多。</p>
+<h3 id="🔄-atomic-Value：原子值"><a class="header-anchor" href="#🔄-atomic-Value：原子值"></a>🔄 atomic.Value：原子值</h3>
+<p><code>atomic.Value</code>提供了对任意类型的原子加载和存储操作。</p>
+<h4 id="基本用法-9"><a class="header-anchor" href="#基本用法-9"></a>基本用法</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">var</span> config atomic.Value
+
+<span class="hljs-comment">// 存储配置</span>
+cfg := &amp;Config&#123;...&#125;
+config.Store(cfg)
+
+<span class="hljs-comment">// 加载配置</span>
+currentCfg := config.Load().(*Config)</code></pre>
+<h4 id="内部实现原理-9"><a class="header-anchor" href="#内部实现原理-9"></a>内部实现原理</h4>
+<p><code>atomic.Value</code>内部使用了<code>unsafe.Pointer</code>和CAS操作：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Value <span class="hljs-keyword">struct</span> &#123;
+    v <span class="hljs-keyword">interface</span>&#123;&#125;
+&#125;</code></pre>
+<p>存储操作使用CAS确保原子性，加载操作使用原子加载。</p>
+<h4 id="使用场景-7"><a class="header-anchor" href="#使用场景-7"></a>使用场景</h4>
+<ol>
+<li><strong>配置更新</strong>：原子更新配置，读取不需要锁</li>
+<li><strong>缓存</strong>：原子更新缓存内容</li>
+<li><strong>发布-订阅模式</strong>：原子更新最新值</li>
+</ol>
+<h4 id="注意事项-2"><a class="header-anchor" href="#注意事项-2"></a>注意事项</h4>
+<ol>
+<li>存储的值类型必须一致</li>
+<li>不能存储nil</li>
+<li>一旦存储了某种类型，就不能存储其他类型</li>
+</ol>
+<h3 id="🔒-sync包的最佳实践"><a class="header-anchor" href="#🔒-sync包的最佳实践"></a>🔒 sync包的最佳实践</h3>
+<h4 id="选择合适的并发原语"><a class="header-anchor" href="#选择合适的并发原语"></a>选择合适的并发原语</h4>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐的并发原语</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>保护共享资源</td>
+<td>Mutex</td>
+</tr>
+<tr>
+<td>读多写少</td>
+<td>RWMutex</td>
+</tr>
+<tr>
+<td>等待多个goroutine</td>
+<td>WaitGroup</td>
+</tr>
+<tr>
+<td>一次性初始化</td>
+<td>Once</td>
+</tr>
+<tr>
+<td>条件等待</td>
+<td>Cond</td>
+</tr>
+<tr>
+<td>对象复用</td>
+<td>Pool</td>
+</tr>
+<tr>
+<td>并发安全的map</td>
+<td>sync.Map（特定场景）</td>
+</tr>
+<tr>
+<td>简单计数器</td>
+<td>atomic</td>
+</tr>
+<tr>
+<td>原子更新复杂值</td>
+<td>atomic.Value</td>
+</tr>
+</tbody>
+</table>
+<h4 id="性能优化技巧"><a class="header-anchor" href="#性能优化技巧"></a>性能优化技巧</h4>
+<ol>
+<li><strong>减少锁的粒度</strong>：只锁定必要的代码段</li>
+<li><strong>分片锁</strong>：将一个大锁分成多个小锁，减少竞争</li>
+<li><strong>避免嵌套锁</strong>：防止死锁</li>
+<li><strong>优先使用原子操作</strong>：适用于简单操作时</li>
+<li><strong>使用读写锁</strong>：读多写少的场景</li>
+<li><strong>批处理</strong>：减少加锁次数</li>
+</ol>
+<h4 id="常见反模式"><a class="header-anchor" href="#常见反模式"></a>常见反模式</h4>
+<ol>
+<li><strong>复制包含锁的结构体</strong></li>
+<li><strong>忘记解锁</strong></li>
+<li><strong>在不同goroutine中加锁和解锁</strong></li>
+<li><strong>使用<code>defer</code>解锁后再次使用锁</strong></li>
+<li><strong>忽略<code>WaitGroup</code>的平衡</strong></li>
+<li><strong>在<code>sync.Pool</code>中存储带状态对象而不重置</strong></li>
+</ol>
+<h3 id="📈-实际案例分析"><a class="header-anchor" href="#📈-实际案例分析"></a>📈 实际案例分析</h3>
+<h4 id="案例1：高性能计数器"><a class="header-anchor" href="#案例1：高性能计数器"></a>案例1：高性能计数器</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Counter <span class="hljs-keyword">struct</span> &#123;
+    value <span class="hljs-keyword">int64</span>
+&#125;
+
+<span class="hljs-comment">// 使用原子操作的计数器</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Counter)</span> <span class="hljs-title">Inc</span><span class="hljs-params">()</span></span> &#123;
+    atomic.AddInt64(&amp;c.value, <span class="hljs-number">1</span>)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Counter)</span> <span class="hljs-title">Value</span><span class="hljs-params">()</span> <span class="hljs-title">int64</span></span> &#123;
+    <span class="hljs-keyword">return</span> atomic.LoadInt64(&amp;c.value)
+&#125;</code></pre>
+<h4 id="案例2：并发安全的配置管理"><a class="header-anchor" href="#案例2：并发安全的配置管理"></a>案例2：并发安全的配置管理</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Config <span class="hljs-keyword">struct</span> &#123;
+    <span class="hljs-comment">// 配置字段</span>
+    DatabaseURL <span class="hljs-keyword">string</span>
+    APIKeys     <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span>
+    Timeout     time.Duration
+&#125;
+
+<span class="hljs-keyword">type</span> ConfigManager <span class="hljs-keyword">struct</span> &#123;
+    config atomic.Value
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewConfigManager</span><span class="hljs-params">(initialConfig *Config)</span> *<span class="hljs-title">ConfigManager</span></span> &#123;
+    cm := &amp;ConfigManager&#123;&#125;
+    cm.config.Store(initialConfig)
+    <span class="hljs-keyword">return</span> cm
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(cm *ConfigManager)</span> <span class="hljs-title">UpdateConfig</span><span class="hljs-params">(newConfig *Config)</span></span> &#123;
+    cm.config.Store(newConfig)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(cm *ConfigManager)</span> <span class="hljs-title">GetConfig</span><span class="hljs-params">()</span> *<span class="hljs-title">Config</span></span> &#123;
+    <span class="hljs-keyword">return</span> cm.config.Load().(*Config)
+&#125;</code></pre>
+<h4 id="案例3：高效的连接池"><a class="header-anchor" href="#案例3：高效的连接池"></a>案例3：高效的连接池</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Connection <span class="hljs-keyword">struct</span> &#123;
+    <span class="hljs-comment">// 连接相关字段</span>
+&#125;
+
+<span class="hljs-keyword">type</span> ConnectionPool <span class="hljs-keyword">struct</span> &#123;
+    mu    sync.Mutex
+    cond  *sync.Cond
+    conns []*Connection
+    count <span class="hljs-keyword">int</span> <span class="hljs-comment">// 当前可用连接数</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewConnectionPool</span><span class="hljs-params">(size <span class="hljs-keyword">int</span>)</span> *<span class="hljs-title">ConnectionPool</span></span> &#123;
+    cp := &amp;ConnectionPool&#123;
+        conns: <span class="hljs-built_in">make</span>([]*Connection, size),
+    &#125;
+    cp.cond = sync.NewCond(&amp;cp.mu)
+    
+    <span class="hljs-comment">// 初始化连接</span>
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; size; i++ &#123;
+        cp.conns[i] = &amp;Connection&#123;&#125;
+        cp.count++
+    &#125;
+    
+    <span class="hljs-keyword">return</span> cp
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(cp *ConnectionPool)</span> <span class="hljs-title">Get</span><span class="hljs-params">()</span> *<span class="hljs-title">Connection</span></span> &#123;
+    cp.mu.Lock()
+    <span class="hljs-keyword">defer</span> cp.mu.Unlock()
+    
+    <span class="hljs-comment">// 等待可用连接</span>
+    <span class="hljs-keyword">for</span> cp.count == <span class="hljs-number">0</span> &#123;
+        cp.cond.Wait()
+    &#125;
+    
+    cp.count--
+    conn := cp.conns[cp.count]
+    <span class="hljs-keyword">return</span> conn
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(cp *ConnectionPool)</span> <span class="hljs-title">Put</span><span class="hljs-params">(conn *Connection)</span></span> &#123;
+    cp.mu.Lock()
+    <span class="hljs-keyword">defer</span> cp.mu.Unlock()
+    
+    <span class="hljs-comment">// 归还连接</span>
+    cp.conns[cp.count] = conn
+    cp.count++
+    
+    <span class="hljs-comment">// 通知等待者</span>
+    cp.cond.Signal()
+&#125;</code></pre>
+<h3 id="📝-总结"><a class="header-anchor" href="#📝-总结"></a>📝 总结</h3>
+<p>Go语言的<code>sync</code>包提供了丰富的并发原语，让我们能够精确控制并发行为。本文详细介绍了<code>sync</code>包中的各种并发原语，包括它们的工作原理、使用场景和最佳实践。</p>
+<p>关键要点：</p>
+<ol>
+<li><strong>选择合适的并发原语</strong>：根据场景选择最合适的并发控制机制</li>
+<li><strong>理解内部实现</strong>：了解内部实现有助于正确使用并避免陷阱</li>
+<li><strong>遵循最佳实践</strong>：避免常见错误，如死锁、竞态条件等</li>
+<li><strong>性能优化</strong>：合理使用并发原语可以显著提高程序性能</li>
+</ol>
+<p>虽然Go推崇&quot;通过通信共享内存，而不是通过共享内存通信&quot;的理念，但在某些场景下，<code>sync</code>包的并发原语仍然是不可或缺的工具。掌握这些工具，将帮助你编写更高效、更可靠的并发程序。</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/">Golang</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/golang/">golang</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%B9%B6%E5%8F%91/">并发</a>
+                    
+                      <a class="hover-with-bg" href="/tags/sync/">sync</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%94%81/">锁</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/06/10/golang-%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3%E4%B8%8E%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">golang 反射机制详解与实战应用</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2024/04/15/golang-%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84RPC%E6%A1%86%E6%9E%B6/">
+                        <span class="hidden-mobile">golang 实现一个简单的RPC框架</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2024/05/05/golang-深入理解sync包的并发原语/';
+          this.page.identifier = '/2024/05/05/golang-深入理解sync包的并发原语/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

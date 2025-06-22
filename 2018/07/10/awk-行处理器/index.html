@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>awk 行处理器 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                awk 行处理器
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2018-07-10 16:45">
+      2018年7月10日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      18
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <blockquote>
+<p><strong>linux 强大的awk命令</strong> 相比较屏幕处理的优点，在处理庞大文件时不会出现内存溢出或是处理缓慢的问题，通常用来格式化文本信息</p>
+</blockquote>
+<h4 id="命令行"><a class="header-anchor" href="#命令行"></a>命令行</h4>
+<p><code>awk [-F|-f|-v] 'BEGIN&#123;&#125; //&#123;command1; command2&#125; END&#123;&#125;' file</code> <code>[-F|-f|-v]</code> 大参数，-F指定分隔符，-f调用脚本，-v定义变量 var=value <code>''</code> 引用代码块 <code>BEGIN</code> 初始代码块，在对每一行进行处理之前，初始化代码，引用全局变量，设置分割符FS <code>//</code> 匹配代码块，可以使字符串或正则表达式 <code>&#123;&#125;</code> 命令代码块，包含一条或多条命令 <code>;</code> 多条命令使用分号分隔 <code>END</code> 结尾代码块，在对每一行进行处理之后再执行的代码块，主要是进行最终计算或输出结尾摘要信息</p>
+<h4 id="要点"><a class="header-anchor" href="#要点"></a>要点</h4>
+<p><code>$0</code> 表示当前行 <code>$1</code> 每行一个字段 <code>NF</code> 字段数量 <code>NR</code> 行号 <code>FNR</code> 与NR类似，不过多文件记录不递增，每个文件都从1开始 <code>\t、\n</code> 格式化符号 <code>FS</code> BEGIN时定义分隔符 <code>RS</code> 输入的记录分隔符， 默认为换行符(即文本是按一行一行输入) <code>~</code> 匹配，与==相比不是精确比较 <code>!~</code> 不匹配，不精确比较 <code>==</code> 等于，必须全部相等，精确比较 <code>!=</code> 不等于，精确比较 <code>&amp;&amp;</code> 逻辑与 <code>||</code> 逻辑或 <code>+</code> 匹配时表示1个或1个以上 <code>/[0-9][0-9]+/</code> 两个或两个以上数字 <code>/[0-9][0-9]*/</code> 一个或一个以上数字 <code>FILENAME</code> 文件名 <code>OFS</code> 输出字段分隔符， 默认也是空格，可以改为制表符等 <code>ORS</code> 输出的记录分隔符，默认为换行符,即处理结果也是一行一行输出到屏幕 <code>-F'[:#/]'</code> 定义三个分隔符 <strong>print</strong> print 是awk打印指定内容的主要命令 <code>awk '&#123;print&#125;' /etc/passwd == awk '&#123;print $0&#125;' /etc/passwd</code> <code>awk '&#123;print &quot; &quot;&#125;' /etc/passwd</code> 每处理一行输出一个空行 <code>awk '&#123;print &quot;a&quot;&#125;' /etc/passwd</code> 每处理一行输出一个行且行内容只有a字符 <code>awk -F&quot;:&quot; '&#123;print $1&#125;' /etc/passwd</code> 以：为分隔符每行输出一个字段 <code>awk -F: '&#123;print $1; print $2&#125;' /etc/passwd</code> 以：为分隔符分行输出第一个字段和第二个字段 <code>awk -F: '&#123;print $1,$3,$6&#125;' OFS=&quot;\t&quot; /etc/passwd</code> 输出字段1,3,6，以制表符作为分隔符 <strong>-f指定脚本文件</strong> <code>awk -f script.awk file</code></p>
+<pre><code class="hljs shell">BEGIN&#123;
+FS=&quot;:&quot;
+&#125;
+&#123;print $1&#125;</code></pre>
+<p>效果与awk -F&quot;:&quot; '{print $1}'相同,只是分隔符使用FS在代码自身中指定 <code>ls -l|awk 'BEGIN&#123;sum=0&#125; !/^d/&#123;sum+=$5&#125; END&#123;print &quot;total size is&quot;,sum&#125;'</code> 计算当前目录文件总大小 <strong>-F指定分隔符</strong> <code>awk -F'[:#/]' '&#123;print NF&#125;' test.sh</code> 指定三个分隔符，并输出每行字段数 <strong>//匹配代码块 //纯字符匹配 !//纯字符不匹配 ~//字段值匹配 !~//字段值不匹配 ~/a1|a2/字段值匹配a1或a2</strong> <code>awk '/mysql/' /etc/passwd</code> 拼配mysql字符 <code>awk '!/mysql/&#123;print $0&#125;' /etc/passwd</code> 输出不匹配mysql的行 <code>awk -F: '/mail/,/mysql/&#123;print&#125;' /etc/passwd</code> 区间匹配 <code>awk -F: '$1~/mail/&#123;print $1&#125;' /etc/passwd</code> $1匹配指定内容才显示 <code>awk -F: '&#123;if($1~/mail/) print $1&#125;' /etc/passwd</code> 与上面相同 <code>awk -F: '$1!~/mail/&#123;print $1&#125;' /etc/passwd</code> 不匹配 <strong>if语句</strong> <code>awk -F: '&#123;if($1~/mail/) print $1&#125;' /etc/passwd == awk -F: '&#123;if($1~/mail/) &#123;print $1&#125;&#125;' /etc/passwd</code> <code>awk -F: '&#123;if($1~/mail/) &#123;print $1&#125; else &#123;print $2&#125;&#125;' /etc/passwd</code> <strong>条件表达式 == != &gt; &gt;=</strong></p>
+<pre><code class="hljs shell">awk -F&quot;:&quot; &#x27;$1==&quot;mysql&quot;&#123;print $3&#125;&#x27; /etc/passwd  
+awk -F&quot;:&quot; &#x27;&#123;if($1==&quot;mysql&quot;) print $3&#125;&#x27; /etc/passwd          //与上面相同 
+awk -F&quot;:&quot; &#x27;$1!=&quot;mysql&quot;&#123;print $3&#125;&#x27; /etc/passwd                 //不等于
+awk -F&quot;:&quot; &#x27;$3&gt;1000&#123;print $3&#125;&#x27; /etc/passwd                      //大于
+awk -F&quot;:&quot; &#x27;$3&gt;=100&#123;print $3&#125;&#x27; /etc/passwd                     //大于等于
+awk -F&quot;:&quot; &#x27;$3&lt;1&#123;print $3&#125;&#x27; /etc/passwd                            //小于
+awk -F&quot;:&quot; &#x27;$3&lt;=1&#123;print $3&#125;&#x27; /etc/passwd</code></pre>
+<p>**逻辑运算符 &amp;&amp;　|| **</p>
+<pre><code class="hljs shell">awk -F: &#x27;$1~/mail/ &amp;&amp; $3&gt;8 &#123;print &#125;&#x27; /etc/passwd         //逻辑与，$1匹配mail，并且$3&gt;8
+awk -F: &#x27;&#123;if($1~/mail/ &amp;&amp; $3&gt;8) print &#125;&#x27; /etc/passwd
+awk -F: &#x27;$1~/mail/ || $3&gt;1000 &#123;print &#125;&#x27; /etc/passwd       //逻辑或
+awk -F: &#x27;&#123;if($1~/mail/ || $3&gt;1000) print &#125;&#x27; /etc/passwd   //取整</code></pre>
+<p><strong>输出分隔符OFS</strong> <code>awk -F &quot;:&quot; '&#123;print $1,$3&#125;' OFS=&quot;\n&quot; /etc/passwd</code></p>
+<pre><code class="hljs shell">root
+0
+daemon
+1
+bin
+2
+sys
+3
+sync
+4
+games
+5
+man
+6
+lp
+7
+mail
+8
+news
+9
+uucp
+</code></pre>
+<p><strong>while语句</strong></p>
+<pre><code class="hljs shell">awk -F: &#x27;BEGIN&#123;i=1&#125; &#123;while(i&lt;NF) print NF,$i,i++&#125;&#x27; /etc/passwd 
+7 root 1
+7 x 2
+7 0 3
+7 0 4
+7 root 5
+7 /root 6</code></pre>
+<p><strong>数组</strong></p>
+<pre><code class="hljs shell">netstat -anp|awk &#x27;NR!=1&#123;a[$6]++&#125; END&#123;for (i in a) print i,&quot;\t&quot;,a[i]&#125;&#x27;
+netstat -anp|awk &#x27;NR!=1&#123;a[$6]++&#125; END&#123;for (i in a) printf &quot;%-20s %-10s %-5s \n&quot;, i,&quot;\t&quot;,a[i]&#125;&#x27;
+9523                               1
+9929                               1
+LISTEN                            6
+7903                               1
+3038/cupsd                          1
+10837                             1
+9833                               1</code></pre>
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/linux/">linux</a>
+                    
+                      <a class="hover-with-bg" href="/categories/linux/shell/">shell</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/awk/">awk</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/">命令行</a>
+                    
+                      <a class="hover-with-bg" href="/tags/linux/">linux</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/07/11/%E5%88%AB%E5%86%8D%E4%BD%BF%E7%94%A8%E5%8F%A4%E8%80%81%E7%9A%84top%E4%BA%86-%E7%94%A8htop%E5%90%A7%EF%BC%81/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">别再使用古老的top了  用htop吧！</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2018/07/10/workerman%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95/">
+                        <span class="hidden-mobile">workerman压力测试</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2018/07/10/awk-行处理器/';
+          this.page.identifier = '/2018/07/10/awk-行处理器/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

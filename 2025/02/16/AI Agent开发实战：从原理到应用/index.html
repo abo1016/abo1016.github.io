@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>🤖 AI Agent开发实战：从原理到应用 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                🤖 AI Agent开发实战：从原理到应用
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2025-02-16 15:40">
+      2025年2月16日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      5.3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      69
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h1>🤖 AI Agent开发实战：从原理到应用</h1>
+<p>AI Agent（智能代理）是大模型应用的前沿领域，它让AI系统能够规划、推理并利用工具完成复杂任务。这篇文章将结合我的实践经验，从原理到代码实现，分享如何构建有实用价值的AI Agent。</p>
+<h2 id="📚-什么是AI-Agent？"><a class="header-anchor" href="#📚-什么是AI-Agent？"></a>📚 什么是AI Agent？</h2>
+<p>简单来说，AI Agent是一个能够<strong>自主决策并采取行动</strong>的AI系统。与简单的问答系统不同，Agent可以：</p>
+<ul>
+<li>分析并理解复杂任务</li>
+<li>制定解决问题的计划</li>
+<li>通过调用工具与外部世界交互</li>
+<li>根据反馈调整行为</li>
+</ul>
+<p>这种能力让AI从单纯的&quot;回答器&quot;变成了能够完成实际任务的&quot;助手&quot;。</p>
+<h3 id="Agent-vs-传统AI应用"><a class="header-anchor" href="#Agent-vs-传统AI应用"></a>Agent vs 传统AI应用</h3>
+<table>
+<thead>
+<tr>
+<th>特点</th>
+<th>传统AI应用</th>
+<th>AI Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>行为模式</td>
+<td>被动响应</td>
+<td>主动规划</td>
+</tr>
+<tr>
+<td>交互方式</td>
+<td>单轮或简单多轮</td>
+<td>复杂多轮、工具使用</td>
+</tr>
+<tr>
+<td>决策能力</td>
+<td>直接映射输入到输出</td>
+<td>可以制定和调整计划</td>
+</tr>
+<tr>
+<td>复杂度</td>
+<td>相对简单</td>
+<td>复杂且灵活</td>
+</tr>
+<tr>
+<td>应用场景</td>
+<td>特定任务回答</td>
+<td>流程型任务执行</td>
+</tr>
+</tbody>
+</table>
+<h2 id="🧠-Agent的核心原理"><a class="header-anchor" href="#🧠-Agent的核心原理"></a>🧠 Agent的核心原理</h2>
+<p>要理解AI Agent的工作原理，我们需要熟悉几个关键概念：</p>
+<h3 id="1-ReAct模式-Reasoning-Acting"><a class="header-anchor" href="#1-ReAct模式-Reasoning-Acting"></a>1. ReAct模式 (Reasoning + Acting)</h3>
+<p>大多数现代Agent遵循ReAct模式，将思考和行动结合起来：</p>
+<pre><code class="hljs gcode">观察<span class="hljs-comment">(Observe)</span> → 思考<span class="hljs-comment">(Think)</span> → 行动<span class="hljs-comment">(Act)</span> → 观察新结果 → ...</code></pre>
+<p>这个循环让Agent能够像人类一样，边思考边行动，并根据结果调整后续行为。</p>
+<h3 id="2-提示工程技巧"><a class="header-anchor" href="#2-提示工程技巧"></a>2. 提示工程技巧</h3>
+<p>有效的Agent提示通常包含以下要素：</p>
+<ul>
+<li>明确的角色定义</li>
+<li>可用工具列表及其功能描述</li>
+<li>任务分解指导</li>
+<li>输出格式规范</li>
+</ul>
+<p>一个简化的Agent提示模板：</p>
+<pre><code class="hljs ldif">你是一个任务助手。你将获得一个任务，需要规划并执行完成它。
+你可以使用以下工具:
+<span class="hljs-attribute">1. search_web(query)</span>: 搜索互联网获取信息
+<span class="hljs-attribute">2. calculator(expression)</span>: 计算数学表达式
+<span class="hljs-attribute">3. code_interpreter(code)</span>: 执行Python代码
+
+当需要使用工具时，请使用以下格式:
+<span class="hljs-attribute">Thought</span>: 你的思考过程
+<span class="hljs-attribute">Action</span>: 工具名称
+<span class="hljs-attribute">Action Input</span>: &#123;工具输入参数&#125;
+
+工具将返回结果，然后你可以继续思考和使用工具，直到完成任务。
+最终回答应以&quot;Final Answer:&quot;开头。
+
+任务: &#123;用户任务&#125;</code></pre>
+<h3 id="3-工具使用框架"><a class="header-anchor" href="#3-工具使用框架"></a>3. 工具使用框架</h3>
+<p>工具使用是Agent的核心能力，主要包含三个部分：</p>
+<ul>
+<li><strong>工具定义</strong>：描述工具功能和参数</li>
+<li><strong>工具调用</strong>：Agent选择并调用适当的工具</li>
+<li><strong>结果处理</strong>：解析工具返回结果并继续下一步</li>
+</ul>
+<h2 id="🛠️-构建Agent的技术栈"><a class="header-anchor" href="#🛠️-构建Agent的技术栈"></a>🛠️ 构建Agent的技术栈</h2>
+<h3 id="基础组件"><a class="header-anchor" href="#基础组件"></a>基础组件</h3>
+<p>现代AI Agent通常基于以下组件构建：</p>
+<ol>
+<li><strong>大语言模型</strong>：作为Agent的&quot;大脑&quot;</li>
+<li><strong>工具集</strong>：扩展Agent的能力边界</li>
+<li><strong>记忆系统</strong>：存储对话历史和上下文</li>
+<li><strong>调度器</strong>：控制Agent的执行流程</li>
+<li><strong>监控与安全机制</strong>：确保Agent行为安全可控</li>
+</ol>
+<h3 id="常用技术框架"><a class="header-anchor" href="#常用技术框架"></a>常用技术框架</h3>
+<p>几个流行的Agent开发框架：</p>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>优点</th>
+<th>缺点</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LangChain</td>
+<td>组件丰富，高度模块化</td>
+<td>有一定学习曲线</td>
+<td>全功能Agent开发</td>
+</tr>
+<tr>
+<td>LlamaIndex</td>
+<td>专注于知识检索增强</td>
+<td>Agent功能相对有限</td>
+<td>知识密集型应用</td>
+</tr>
+<tr>
+<td>AutoGPT</td>
+<td>自主性强</td>
+<td>控制精度较低</td>
+<td>探索性任务</td>
+</tr>
+<tr>
+<td>CrewAI</td>
+<td>专注多Agent协作</td>
+<td>较新，文档有限</td>
+<td>复杂任务分工</td>
+</tr>
+</tbody>
+</table>
+<p>在这篇文章中，我将主要使用LangChain框架进行实战演示。</p>
+<h2 id="💻-实战案例一：构建基础Agent"><a class="header-anchor" href="#💻-实战案例一：构建基础Agent"></a>💻 实战案例一：构建基础Agent</h2>
+<p>让我们从一个简单的Agent开始，它可以回答问题、搜索信息和执行基本计算：</p>
+<h3 id="第一步：环境准备"><a class="header-anchor" href="#第一步：环境准备"></a>第一步：环境准备</h3>
+<pre><code class="hljs bash"><span class="hljs-comment"># 创建虚拟环境</span>
+python -m venv agent-env
+<span class="hljs-built_in">source</span> agent-env/bin/activate  <span class="hljs-comment"># Linux/Mac</span>
+<span class="hljs-comment"># agent-env\Scripts\activate    # Windows</span>
+
+<span class="hljs-comment"># 安装依赖包</span>
+pip install langchain langchain-openai pydantic python-dotenv</code></pre>
+<h3 id="第二步：配置环境变量"><a class="header-anchor" href="#第二步：配置环境变量"></a>第二步：配置环境变量</h3>
+<pre><code class="hljs python"><span class="hljs-comment"># .env 文件</span>
+OPENAI_API_KEY=your_openai_api_key
+SERPAPI_API_KEY=your_serpapi_key  <span class="hljs-comment"># 用于网络搜索</span></code></pre>
+<h3 id="第三步：定义工具"><a class="header-anchor" href="#第三步：定义工具"></a>第三步：定义工具</h3>
+<pre><code class="hljs python"><span class="hljs-comment"># tools.py</span>
+<span class="hljs-keyword">from</span> langchain.tools <span class="hljs-keyword">import</span> BaseTool, StructuredTool
+<span class="hljs-keyword">from</span> langchain.callbacks.manager <span class="hljs-keyword">import</span> CallbackManagerForToolRun
+<span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Optional, Type
+<span class="hljs-keyword">from</span> pydantic <span class="hljs-keyword">import</span> BaseModel, Field
+<span class="hljs-keyword">import</span> math
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CalculatorInput</span>(<span class="hljs-params">BaseModel</span>):</span>
+    expression: str = Field(description=<span class="hljs-string">&quot;数学表达式，如 &#x27;2 + 2&#x27; 或 &#x27;sin(30)&#x27;&quot;</span>)
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Calculator</span>(<span class="hljs-params">BaseTool</span>):</span>
+    name = <span class="hljs-string">&quot;calculator&quot;</span>
+    description = <span class="hljs-string">&quot;用于计算数学表达式&quot;</span>
+    args_schema: Type[BaseModel] = CalculatorInput
+    
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_run</span>(<span class="hljs-params">self, expression: str, run_manager: Optional[CallbackManagerForToolRun] = None</span>) -&gt; str:</span>
+        <span class="hljs-keyword">try</span>:
+            <span class="hljs-comment"># 创建一个安全的局部环境，只包含基本数学函数</span>
+            safe_locals = &#123;
+                <span class="hljs-string">&#x27;sin&#x27;</span>: math.sin,
+                <span class="hljs-string">&#x27;cos&#x27;</span>: math.cos,
+                <span class="hljs-string">&#x27;tan&#x27;</span>: math.tan,
+                <span class="hljs-string">&#x27;sqrt&#x27;</span>: math.sqrt,
+                <span class="hljs-string">&#x27;pi&#x27;</span>: math.pi,
+                <span class="hljs-string">&#x27;e&#x27;</span>: math.e
+            &#125;
+            
+            <span class="hljs-comment"># 计算表达式</span>
+            result = eval(expression, &#123;<span class="hljs-string">&quot;__builtins__&quot;</span>: &#123;&#125;&#125;, safe_locals)
+            <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;表达式 &#x27;<span class="hljs-subst">&#123;expression&#125;</span>&#x27; 的计算结果是: <span class="hljs-subst">&#123;result&#125;</span>&quot;</span>
+        <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
+            <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;计算表达式时出错: <span class="hljs-subst">&#123;str(e)&#125;</span>&quot;</span>
+
+<span class="hljs-comment"># 更多工具定义...</span></code></pre>
+<h3 id="第四步：构建Agent"><a class="header-anchor" href="#第四步：构建Agent"></a>第四步：构建Agent</h3>
+<pre><code class="hljs python"><span class="hljs-comment"># agent.py</span>
+<span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">from</span> dotenv <span class="hljs-keyword">import</span> load_dotenv
+<span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> initialize_agent, AgentType
+<span class="hljs-keyword">from</span> langchain.chat_models <span class="hljs-keyword">import</span> ChatOpenAI
+<span class="hljs-keyword">from</span> langchain.tools <span class="hljs-keyword">import</span> DuckDuckGoSearchRun
+
+<span class="hljs-comment"># 导入我们的自定义工具</span>
+<span class="hljs-keyword">from</span> tools <span class="hljs-keyword">import</span> Calculator
+
+<span class="hljs-comment"># 加载环境变量</span>
+load_dotenv()
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_assistant</span>():</span>
+    <span class="hljs-comment"># 初始化LLM</span>
+    llm = ChatOpenAI(
+        model=<span class="hljs-string">&quot;gpt-4-turbo&quot;</span>,
+        temperature=<span class="hljs-number">0</span>,  <span class="hljs-comment"># 使用确定性输出</span>
+    )
+    
+    <span class="hljs-comment"># 初始化工具</span>
+    search_tool = DuckDuckGoSearchRun()
+    calculator_tool = Calculator()
+    
+    tools = [search_tool, calculator_tool]
+    
+    <span class="hljs-comment"># 创建Agent</span>
+    agent = initialize_agent(
+        tools=tools,
+        llm=llm,
+        agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
+        verbose=<span class="hljs-literal">True</span>,
+        handle_parsing_errors=<span class="hljs-literal">True</span>,
+        max_iterations=<span class="hljs-number">10</span>,  <span class="hljs-comment"># 防止无限循环</span>
+    )
+    
+    <span class="hljs-comment"># 自定义系统消息</span>
+    system_message = <span class="hljs-string">&quot;&quot;&quot;</span>
+<span class="hljs-string">    你是一个智能助手，可以回答问题、搜索信息和执行计算。</span>
+<span class="hljs-string">    对于不确定的问题，请使用搜索工具获取最新信息。</span>
+<span class="hljs-string">    对于需要计算的问题，请使用计算器工具。</span>
+<span class="hljs-string">    请先思考问题需要哪些信息或计算，然后选择合适的工具。</span>
+<span class="hljs-string">    &quot;&quot;&quot;</span>
+    
+    agent.agent.llm_chain.prompt.messages[<span class="hljs-number">0</span>].prompt.template = system_message
+    
+    <span class="hljs-keyword">return</span> agent
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:
+    agent = create_assistant()
+    
+    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
+        query = input(<span class="hljs-string">&quot;\n请输入您的问题 (输入&#x27;quit&#x27;退出): &quot;</span>)
+        <span class="hljs-keyword">if</span> query.lower() == <span class="hljs-string">&quot;quit&quot;</span>:
+            <span class="hljs-keyword">break</span>
+            
+        response = agent.run(input=query)
+        print(<span class="hljs-string">f&quot;\n回答: <span class="hljs-subst">&#123;response&#125;</span>&quot;</span>)</code></pre>
+<h3 id="第五步：运行与测试"><a class="header-anchor" href="#第五步：运行与测试"></a>第五步：运行与测试</h3>
+<pre><code class="hljs python"><span class="hljs-comment"># 运行示例</span>
+python agent.py
+
+<span class="hljs-comment"># 示例问题:</span>
+<span class="hljs-comment"># 1. 计算地球到月球的距离除以光速需要多少秒?</span>
+<span class="hljs-comment"># 2. 2023年世界杯冠军是哪个国家?</span>
+<span class="hljs-comment"># 3. 解释量子计算的基本原理</span></code></pre>
+<p>在这个基础Agent中，我们实现了：</p>
+<ul>
+<li>自定义工具集成</li>
+<li>搜索引擎查询</li>
+<li>简单的Agent循环控制</li>
+<li>用户友好的交互界面</li>
+</ul>
+<h2 id="🔄-实战案例二：多步骤任务Agent"><a class="header-anchor" href="#🔄-实战案例二：多步骤任务Agent"></a>🔄 实战案例二：多步骤任务Agent</h2>
+<p>基础Agent只能处理简单查询，现在让我们构建一个能处理多步骤任务的Agent。这个Agent可以：</p>
+<ol>
+<li>分析复杂任务</li>
+<li>分解为子任务</li>
+<li>顺序执行子任务</li>
+<li>整合结果提供最终答案</li>
+</ol>
+<p>这类Agent特别适合处理需要多个步骤的工作流程。</p>
+<h3 id="使用LangChain的PLAN-AND-EXECUTE代理"><a class="header-anchor" href="#使用LangChain的PLAN-AND-EXECUTE代理"></a>使用LangChain的PLAN_AND_EXECUTE代理</h3>
+<pre><code class="hljs python"><span class="hljs-comment"># advanced_agent.py</span>
+<span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> create_plan_and_execute_agent
+<span class="hljs-keyword">from</span> langchain.chat_models <span class="hljs-keyword">import</span> ChatOpenAI
+<span class="hljs-keyword">from</span> langchain_community.tools.tavily_search <span class="hljs-keyword">import</span> TavilySearchResults
+<span class="hljs-keyword">from</span> langchain_core.tools <span class="hljs-keyword">import</span> Tool
+
+<span class="hljs-comment"># 初始化LLM</span>
+llm = ChatOpenAI(model=<span class="hljs-string">&quot;gpt-4-turbo&quot;</span>, temperature=<span class="hljs-number">0</span>)
+
+<span class="hljs-comment"># 定义更多工具</span>
+search = TavilySearchResults(max_results=<span class="hljs-number">3</span>)
+
+<span class="hljs-comment"># 自定义工具：数据分析</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">analyze_data</span>(<span class="hljs-params">data_description</span>):</span>
+    <span class="hljs-comment"># 这里是简化实现，实际应用中可能需要调用数据分析库</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;分析结果: 已完成对 &#x27;<span class="hljs-subst">&#123;data_description&#125;</span>&#x27; 的基础统计分析&quot;</span>
+
+<span class="hljs-comment"># 自定义工具：生成报告</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">generate_report</span>(<span class="hljs-params">analysis_results, report_type=<span class="hljs-string">&quot;summary&quot;</span></span>):</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;已生成 <span class="hljs-subst">&#123;report_type&#125;</span> 报告，基于分析: <span class="hljs-subst">&#123;analysis_results&#125;</span>&quot;</span>
+
+<span class="hljs-comment"># 组装工具集</span>
+tools = [
+    Tool(
+        name=<span class="hljs-string">&quot;web_search&quot;</span>,
+        func=search.run,
+        description=<span class="hljs-string">&quot;当你需要查找最新信息时使用这个工具。输入应该是一个搜索查询。&quot;</span>
+    ),
+    Tool(
+        name=<span class="hljs-string">&quot;data_analysis&quot;</span>,
+        func=analyze_data,
+        description=<span class="hljs-string">&quot;用于分析数据集。输入应该是对数据的描述。&quot;</span>
+    ),
+    Tool(
+        name=<span class="hljs-string">&quot;report_generator&quot;</span>,
+        func=generate_report,
+        description=<span class="hljs-string">&quot;生成基于分析结果的报告。输入格式为: &#x27;分析结果,报告类型&#x27;。&quot;</span>
+    )
+]
+
+<span class="hljs-comment"># 创建规划执行型Agent</span>
+agent = create_plan_and_execute_agent(llm, tools, verbose=<span class="hljs-literal">True</span>)
+
+<span class="hljs-comment"># 运行Agent处理复杂任务</span>
+task = <span class="hljs-string">&quot;&quot;&quot;</span>
+<span class="hljs-string">为我分析2023年全球电动汽车销售趋势，并生成一份包含主要市场、增长率和主要制造商的简报。</span>
+<span class="hljs-string">&quot;&quot;&quot;</span>
+
+result = agent.invoke(&#123;<span class="hljs-string">&quot;input&quot;</span>: task&#125;)
+print(result[<span class="hljs-string">&quot;output&quot;</span>])</code></pre>
+<h3 id="PLAN-AND-EXECUTE代理工作流程"><a class="header-anchor" href="#PLAN-AND-EXECUTE代理工作流程"></a>PLAN_AND_EXECUTE代理工作流程</h3>
+<p>这种代理首先制定一个计划，然后按步执行：</p>
+<pre><code class="hljs angelscript">计划阶段:
+<span class="hljs-number">1.</span> 搜索<span class="hljs-number">2023</span>年全球电动汽车销售数据
+<span class="hljs-number">2.</span> 分析销售数据以提取关键趋势
+<span class="hljs-number">3.</span> 识别主要市场和增长率
+<span class="hljs-number">4.</span> 确定主要电动汽车制造商
+<span class="hljs-number">5.</span> 生成包含所有信息的简报
+
+执行阶段:
+[执行步骤<span class="hljs-number">1</span>] 使用web_search工具搜索数据...
+[执行步骤<span class="hljs-number">2</span>] 使用data_analysis工具分析数据...
+...依此类推</code></pre>
+<h2 id="🧩-实战案例三：构建专业领域Agent"><a class="header-anchor" href="#🧩-实战案例三：构建专业领域Agent"></a>🧩 实战案例三：构建专业领域Agent</h2>
+<p>通用Agent很强大，但专注于特定领域的Agent往往更实用。下面我们构建一个专注于编程辅助的Agent：</p>
+<h3 id="代码助手Agent"><a class="header-anchor" href="#代码助手Agent"></a>代码助手Agent</h3>
+<pre><code class="hljs python"><span class="hljs-comment"># code_agent.py</span>
+<span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> initialize_agent, AgentType
+<span class="hljs-keyword">from</span> langchain.chat_models <span class="hljs-keyword">import</span> ChatOpenAI
+<span class="hljs-keyword">from</span> langchain.memory <span class="hljs-keyword">import</span> ConversationBufferMemory
+<span class="hljs-keyword">from</span> langchain.tools <span class="hljs-keyword">import</span> Tool
+<span class="hljs-keyword">from</span> langchain.utilities <span class="hljs-keyword">import</span> PythonREPL
+<span class="hljs-keyword">import</span> subprocess
+<span class="hljs-keyword">import</span> tempfile
+<span class="hljs-keyword">import</span> os
+
+<span class="hljs-comment"># 初始化Python REPL工具</span>
+python_repl = PythonREPL()
+
+<span class="hljs-comment"># 代码解释工具</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">explain_code</span>(<span class="hljs-params">code_snippet</span>):</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;这段代码的功能是: [代码解释结果]&quot;</span>  <span class="hljs-comment"># 实际中可调用LLM生成解释</span>
+
+<span class="hljs-comment"># 代码执行工具（安全版本）</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">execute_code_safely</span>(<span class="hljs-params">code</span>):</span>
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-comment"># 创建临时文件</span>
+        <span class="hljs-keyword">with</span> tempfile.NamedTemporaryFile(suffix=<span class="hljs-string">&#x27;.py&#x27;</span>, delete=<span class="hljs-literal">False</span>) <span class="hljs-keyword">as</span> f:
+            f.write(code.encode(<span class="hljs-string">&#x27;utf-8&#x27;</span>))
+            temp_file_name = f.name
+        
+        <span class="hljs-comment"># 在子进程中执行代码，设置超时</span>
+        result = subprocess.run(
+            [<span class="hljs-string">&#x27;python&#x27;</span>, temp_file_name],
+            capture_output=<span class="hljs-literal">True</span>,
+            text=<span class="hljs-literal">True</span>,
+            timeout=<span class="hljs-number">5</span>  <span class="hljs-comment"># 5秒超时</span>
+        )
+        
+        <span class="hljs-comment"># 清理临时文件</span>
+        os.unlink(temp_file_name)
+        
+        <span class="hljs-comment"># 返回执行结果</span>
+        <span class="hljs-keyword">if</span> result.returncode == <span class="hljs-number">0</span>:
+            <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;代码执行成功:\n<span class="hljs-subst">&#123;result.stdout&#125;</span>&quot;</span>
+        <span class="hljs-keyword">else</span>:
+            <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;代码执行错误:\n<span class="hljs-subst">&#123;result.stderr&#125;</span>&quot;</span>
+    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
+        <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;执行出现异常: <span class="hljs-subst">&#123;str(e)&#125;</span>&quot;</span>
+
+<span class="hljs-comment"># 代码优化工具</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">optimize_code</span>(<span class="hljs-params">code_snippet</span>):</span>
+    <span class="hljs-comment"># 实际使用中可调用专门的代码优化LLM</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;优化后的代码:\n```python\n<span class="hljs-subst">&#123;code_snippet&#125;</span>\n```&quot;</span>
+
+<span class="hljs-comment"># 定义工具集</span>
+tools = [
+    Tool(
+        name=<span class="hljs-string">&quot;python_repl&quot;</span>,
+        func=python_repl.run,
+        description=<span class="hljs-string">&quot;用于执行Python代码并获取结果的Python REPL。&quot;</span>
+    ),
+    Tool(
+        name=<span class="hljs-string">&quot;explain_code&quot;</span>,
+        func=explain_code,
+        description=<span class="hljs-string">&quot;解释一段代码的功能和工作原理。&quot;</span>
+    ),
+    Tool(
+        name=<span class="hljs-string">&quot;execute_code_safely&quot;</span>,
+        func=execute_code_safely,
+        description=<span class="hljs-string">&quot;安全地执行Python代码，并返回结果或错误信息。&quot;</span>
+    ),
+    Tool(
+        name=<span class="hljs-string">&quot;optimize_code&quot;</span>,
+        func=optimize_code,
+        description=<span class="hljs-string">&quot;优化提供的代码，提高其效率或可读性。&quot;</span>
+    )
+]
+
+<span class="hljs-comment"># 创建对话记忆</span>
+memory = ConversationBufferMemory(memory_key=<span class="hljs-string">&quot;chat_history&quot;</span>, return_messages=<span class="hljs-literal">True</span>)
+
+<span class="hljs-comment"># 初始化LLM</span>
+llm = ChatOpenAI(model=<span class="hljs-string">&quot;gpt-4-turbo&quot;</span>, temperature=<span class="hljs-number">0</span>)
+
+<span class="hljs-comment"># 创建Agent</span>
+agent = initialize_agent(
+    tools,
+    llm,
+    agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
+    memory=memory,
+    verbose=<span class="hljs-literal">True</span>
+)
+
+<span class="hljs-comment"># 自定义系统提示</span>
+system_message = <span class="hljs-string">&quot;&quot;&quot;</span>
+<span class="hljs-string">你是一个专业的编程助手，专注于帮助用户编写、理解和优化Python代码。</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">工作流程指南:</span>
+<span class="hljs-string">1. 当用户请求编写代码时，生成高质量、符合PEP8规范的Python代码</span>
+<span class="hljs-string">2. 当用户要求解释代码时，使用explain_code工具提供清晰解释</span>
+<span class="hljs-string">3. 当需要测试代码时，使用execute_code_safely工具安全执行</span>
+<span class="hljs-string">4. 当用户要求优化代码时，使用optimize_code工具</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">始终优先考虑代码的:</span>
+<span class="hljs-string">- 正确性</span>
+<span class="hljs-string">- 效率</span>
+<span class="hljs-string">- 可读性</span>
+<span class="hljs-string">- 安全性</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">在回答中，先简要解释代码的功能和逻辑，再提供代码。</span>
+<span class="hljs-string">&quot;&quot;&quot;</span>
+
+<span class="hljs-comment"># 设置Agent的系统消息</span>
+agent.agent.llm_chain.prompt.messages[<span class="hljs-number">0</span>].prompt.template = system_message
+
+<span class="hljs-comment"># 交互式测试</span>
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:
+    print(<span class="hljs-string">&quot;Python编程助手已启动。输入&#x27;quit&#x27;退出。&quot;</span>)
+    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
+        query = input(<span class="hljs-string">&quot;\n请输入您的问题或代码需求: &quot;</span>)
+        <span class="hljs-keyword">if</span> query.lower() == <span class="hljs-string">&quot;quit&quot;</span>:
+            <span class="hljs-keyword">break</span>
+            
+        response = agent.run(input=query)
+        print(<span class="hljs-string">f&quot;\n<span class="hljs-subst">&#123;response&#125;</span>&quot;</span>)</code></pre>
+<h3 id="专业领域Agent的关键点"><a class="header-anchor" href="#专业领域Agent的关键点"></a>专业领域Agent的关键点</h3>
+<ol>
+<li><strong>工具专业化</strong>：提供领域特定工具</li>
+<li><strong>任务聚焦</strong>：明确Agent的职责边界</li>
+<li><strong>专业知识注入</strong>：通过系统提示提供领域知识</li>
+<li><strong>安全性考虑</strong>：特别是执行代码等敏感操作时</li>
+</ol>
+<h2 id="🔧-实战案例四：带有自定义UI的Agent应用"><a class="header-anchor" href="#🔧-实战案例四：带有自定义UI的Agent应用"></a>🔧 实战案例四：带有自定义UI的Agent应用</h2>
+<p>前面的例子都是命令行交互，现在我们构建一个带有Web界面的Agent应用。这里使用Gradio框架快速搭建一个简单界面：</p>
+<pre><code class="hljs python"><span class="hljs-comment"># agent_webapp.py</span>
+<span class="hljs-keyword">import</span> gradio <span class="hljs-keyword">as</span> gr
+<span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> initialize_agent, AgentType
+<span class="hljs-keyword">from</span> langchain.chat_models <span class="hljs-keyword">import</span> ChatOpenAI
+<span class="hljs-keyword">from</span> langchain.memory <span class="hljs-keyword">import</span> ConversationBufferMemory
+<span class="hljs-keyword">from</span> langchain.schema <span class="hljs-keyword">import</span> SystemMessage
+<span class="hljs-keyword">from</span> langchain.tools <span class="hljs-keyword">import</span> DuckDuckGoSearchRun
+
+<span class="hljs-comment"># 初始化组件</span>
+llm = ChatOpenAI(model=<span class="hljs-string">&quot;gpt-4-turbo&quot;</span>, temperature=<span class="hljs-number">0.7</span>)
+search = DuckDuckGoSearchRun()
+memory = ConversationBufferMemory(memory_key=<span class="hljs-string">&quot;chat_history&quot;</span>, return_messages=<span class="hljs-literal">True</span>)
+
+<span class="hljs-comment"># 定义工具</span>
+tools = [
+    Tool(
+        name=<span class="hljs-string">&quot;web_search&quot;</span>,
+        func=search.run,
+        description=<span class="hljs-string">&quot;搜索互联网获取最新信息&quot;</span>
+    )
+]
+
+<span class="hljs-comment"># 创建Agent</span>
+agent = initialize_agent(
+    tools,
+    llm,
+    agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
+    memory=memory,
+    verbose=<span class="hljs-literal">True</span>
+)
+
+<span class="hljs-comment"># 自定义系统消息</span>
+system_msg = <span class="hljs-string">&quot;&quot;&quot;</span>
+<span class="hljs-string">你是一个智能助手，可以回答用户问题并搜索互联网获取信息。</span>
+<span class="hljs-string">当你不确定或需要最新信息时，请使用搜索工具。</span>
+<span class="hljs-string">回答要简洁、准确，并标明信息来源。</span>
+<span class="hljs-string">&quot;&quot;&quot;</span>
+
+agent.agent.llm_chain.prompt.messages[<span class="hljs-number">0</span>].prompt.template = system_msg
+
+<span class="hljs-comment"># 处理函数</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">process_query</span>(<span class="hljs-params">message, history</span>):</span>
+    <span class="hljs-comment"># 记录对话历史</span>
+    <span class="hljs-keyword">if</span> history:
+        <span class="hljs-keyword">for</span> human, ai <span class="hljs-keyword">in</span> history:
+            memory.chat_memory.add_user_message(human)
+            memory.chat_memory.add_ai_message(ai)
+    
+    <span class="hljs-comment"># 调用Agent处理消息</span>
+    response = agent.run(input=message)
+    
+    <span class="hljs-comment"># 清理响应中可能的工具调用格式</span>
+    cleaned_response = response.replace(<span class="hljs-string">&quot;Action:&quot;</span>, <span class="hljs-string">&quot;&quot;</span>).replace(<span class="hljs-string">&quot;Action Input:&quot;</span>, <span class="hljs-string">&quot;&quot;</span>).replace(<span class="hljs-string">&quot;Observation:&quot;</span>, <span class="hljs-string">&quot;&quot;</span>).replace(<span class="hljs-string">&quot;Thought:&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)
+    
+    <span class="hljs-keyword">return</span> cleaned_response
+
+<span class="hljs-comment"># 创建Gradio界面</span>
+demo = gr.ChatInterface(
+    process_query,
+    title=<span class="hljs-string">&quot;AI智能助手&quot;</span>,
+    description=<span class="hljs-string">&quot;我可以回答问题并搜索互联网获取最新信息。请输入您的问题:&quot;</span>,
+    theme=<span class="hljs-string">&quot;soft&quot;</span>,
+    examples=[
+        <span class="hljs-string">&quot;2024年的热门AI技术趋势有哪些?&quot;</span>,
+        <span class="hljs-string">&quot;Python和Go语言哪个更适合微服务开发?&quot;</span>,
+        <span class="hljs-string">&quot;如何开始学习AI Agent开发?&quot;</span>
+    ]
+)
+
+<span class="hljs-comment"># 启动应用</span>
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:
+    demo.launch()</code></pre>
+<h2 id="📈-扩展与高级功能"><a class="header-anchor" href="#📈-扩展与高级功能"></a>📈 扩展与高级功能</h2>
+<p>随着开发的深入，我们可以为Agent添加更高级的功能：</p>
+<h3 id="1-记忆系统增强"><a class="header-anchor" href="#1-记忆系统增强"></a>1. 记忆系统增强</h3>
+<p>基本记忆只存储对话历史，可以扩展为：</p>
+<pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.memory <span class="hljs-keyword">import</span> ConversationSummaryMemory
+
+<span class="hljs-comment"># 摘要记忆：自动总结长对话</span>
+summary_memory = ConversationSummaryMemory(
+    llm=llm,
+    memory_key=<span class="hljs-string">&quot;chat_history&quot;</span>,
+    return_messages=<span class="hljs-literal">True</span>
+)
+
+<span class="hljs-comment"># 向量存储记忆：基于语义相似性检索</span>
+<span class="hljs-keyword">from</span> langchain.memory <span class="hljs-keyword">import</span> VectorStoreRetrieverMemory
+<span class="hljs-keyword">from</span> langchain.vectorstores <span class="hljs-keyword">import</span> FAISS
+<span class="hljs-keyword">from</span> langchain.embeddings <span class="hljs-keyword">import</span> OpenAIEmbeddings
+
+<span class="hljs-comment"># 初始化向量存储</span>
+embeddings = OpenAIEmbeddings()
+vectorstore = FAISS.from_texts([<span class="hljs-string">&quot;&quot;</span>], embedding=embeddings)
+retriever = vectorstore.as_retriever(search_kwargs=dict(k=<span class="hljs-number">5</span>))
+
+<span class="hljs-comment"># 创建向量记忆</span>
+vector_memory = VectorStoreRetrieverMemory(retriever=retriever)</code></pre>
+<h3 id="2-多Agent系统"><a class="header-anchor" href="#2-多Agent系统"></a>2. 多Agent系统</h3>
+<p>对于复杂任务，可以使用多个专业Agent协作：</p>
+<pre><code class="hljs python"><span class="hljs-keyword">from</span> crewai <span class="hljs-keyword">import</span> Agent, Task, Crew, Process
+
+<span class="hljs-comment"># 定义专业Agent</span>
+researcher = Agent(
+    role=<span class="hljs-string">&quot;研究员&quot;</span>,
+    goal=<span class="hljs-string">&quot;找到最新、最相关的信息&quot;</span>,
+    backstory=<span class="hljs-string">&quot;你是一个专业研究员，善于搜索和分析信息&quot;</span>,
+    allow_delegation=<span class="hljs-literal">True</span>,
+    verbose=<span class="hljs-literal">True</span>,
+    llm=llm
+)
+
+analyst = Agent(
+    role=<span class="hljs-string">&quot;数据分析师&quot;</span>,
+    goal=<span class="hljs-string">&quot;分析数据并提取洞见&quot;</span>,
+    backstory=<span class="hljs-string">&quot;你是一个经验丰富的数据分析师，能从原始数据中找出有价值的模式&quot;</span>,
+    allow_delegation=<span class="hljs-literal">True</span>,
+    verbose=<span class="hljs-literal">True</span>,
+    llm=llm
+)
+
+writer = Agent(
+    role=<span class="hljs-string">&quot;内容创作者&quot;</span>,
+    goal=<span class="hljs-string">&quot;创作清晰、引人入胜的内容&quot;</span>,
+    backstory=<span class="hljs-string">&quot;你是一个技术写作专家，擅长将复杂概念转化为易懂的内容&quot;</span>,
+    allow_delegation=<span class="hljs-literal">True</span>,
+    verbose=<span class="hljs-literal">True</span>,
+    llm=llm
+)
+
+<span class="hljs-comment"># 定义任务</span>
+research_task = Task(
+    description=<span class="hljs-string">&quot;研究最新的AI Agent技术发展趋势&quot;</span>,
+    expected_output=<span class="hljs-string">&quot;一份包含关键发展的研究报告&quot;</span>,
+    agent=researcher,
+    tools=[search_tool]
+)
+
+analysis_task = Task(
+    description=<span class="hljs-string">&quot;分析研究结果，确定主要趋势和机会&quot;</span>,
+    expected_output=<span class="hljs-string">&quot;一份分析报告，包含关键趋势和机会&quot;</span>,
+    agent=analyst,
+)
+
+writing_task = Task(
+    description=<span class="hljs-string">&quot;基于研究和分析，撰写一篇博客文章&quot;</span>,
+    expected_output=<span class="hljs-string">&quot;一篇2000字的博客文章，介绍AI Agent的发展趋势&quot;</span>,
+    agent=writer,
+)
+
+<span class="hljs-comment"># 组建Crew并执行任务</span>
+crew = Crew(
+    agents=[researcher, analyst, writer],
+    tasks=[research_task, analysis_task, writing_task],
+    process=Process.sequential,  <span class="hljs-comment"># 按顺序执行任务</span>
+    verbose=<span class="hljs-number">2</span>
+)
+
+result = crew.kickoff()
+print(result)</code></pre>
+<h3 id="3-反思和自我改进机制"><a class="header-anchor" href="#3-反思和自我改进机制"></a>3. 反思和自我改进机制</h3>
+<p>让Agent能够评估自己的输出并改进：</p>
+<pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">agent_with_reflection</span>(<span class="hljs-params">query</span>):</span>
+    <span class="hljs-comment"># 第一次响应</span>
+    initial_response = agent.run(input=query)
+    
+    <span class="hljs-comment"># 反思提示</span>
+    reflection_prompt = <span class="hljs-string">f&quot;&quot;&quot;</span>
+<span class="hljs-string">    请评估你对以下查询的响应质量:</span>
+<span class="hljs-string">    </span>
+<span class="hljs-string">    查询: <span class="hljs-subst">&#123;query&#125;</span></span>
+<span class="hljs-string">    </span>
+<span class="hljs-string">    你的响应: <span class="hljs-subst">&#123;initial_response&#125;</span></span>
+<span class="hljs-string">    </span>
+<span class="hljs-string">    请检查:</span>
+<span class="hljs-string">    1. 回答是否完整解决了用户问题</span>
+<span class="hljs-string">    2. 是否有任何事实错误或误导信息</span>
+<span class="hljs-string">    3. 回答是否清晰、结构良好</span>
+<span class="hljs-string">    4. 有哪些方面可以改进</span>
+<span class="hljs-string">    </span>
+<span class="hljs-string">    如果需要改进，请提供改进后的回答。</span>
+<span class="hljs-string">    &quot;&quot;&quot;</span>
+    
+    <span class="hljs-comment"># 请Agent反思并改进</span>
+    reflection = llm.predict(reflection_prompt)
+    
+    <span class="hljs-comment"># 如果反思包含新的回答，则使用改进版</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;改进后的回答&quot;</span> <span class="hljs-keyword">in</span> reflection:
+        improved_answer = reflection.split(<span class="hljs-string">&quot;改进后的回答:&quot;</span>)[<span class="hljs-number">-1</span>].strip()
+        <span class="hljs-keyword">return</span> improved_answer
+    
+    <span class="hljs-comment"># 否则返回原始回答</span>
+    <span class="hljs-keyword">return</span> initial_response</code></pre>
+<h2 id="🛡️-Agent的安全与责任"><a class="header-anchor" href="#🛡️-Agent的安全与责任"></a>🛡️ Agent的安全与责任</h2>
+<p>开发强大的Agent系统也带来了安全责任：</p>
+<h3 id="1-权限控制"><a class="header-anchor" href="#1-权限控制"></a>1. 权限控制</h3>
+<p>限制Agent可以执行的操作范围：</p>
+<pre><code class="hljs python"><span class="hljs-comment"># 安全的文件操作工具</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">safe_read_file</span>(<span class="hljs-params">filepath</span>):</span>
+    <span class="hljs-comment"># 检查文件路径，防止目录遍历</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;..&quot;</span> <span class="hljs-keyword">in</span> filepath <span class="hljs-keyword">or</span> filepath.startswith(<span class="hljs-string">&quot;/&quot;</span>):
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;错误: 不允许访问此路径&quot;</span>
+        
+    <span class="hljs-comment"># 限制可访问的文件类型</span>
+    allowed_extensions = [<span class="hljs-string">&#x27;.txt&#x27;</span>, <span class="hljs-string">&#x27;.md&#x27;</span>, <span class="hljs-string">&#x27;.csv&#x27;</span>, <span class="hljs-string">&#x27;.json&#x27;</span>]
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> any(filepath.endswith(ext) <span class="hljs-keyword">for</span> ext <span class="hljs-keyword">in</span> allowed_extensions):
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;错误: 只能访问文本和数据文件&quot;</span>
+    
+    <span class="hljs-comment"># 安全读取文件</span>
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-keyword">with</span> open(filepath, <span class="hljs-string">&#x27;r&#x27;</span>) <span class="hljs-keyword">as</span> f:
+            <span class="hljs-keyword">return</span> f.read()
+    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
+        <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;读取文件时出错: <span class="hljs-subst">&#123;str(e)&#125;</span>&quot;</span></code></pre>
+<h3 id="2-输出过滤"><a class="header-anchor" href="#2-输出过滤"></a>2. 输出过滤</h3>
+<p>防止有害内容生成：</p>
+<pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">filter_content</span>(<span class="hljs-params">content</span>):</span>
+    <span class="hljs-comment"># 检查是否包含有害内容的简单示例</span>
+    harmful_patterns = [
+        <span class="hljs-string">&quot;rm -rf&quot;</span>,  <span class="hljs-comment"># 危险命令</span>
+        <span class="hljs-string">&quot;DROP TABLE&quot;</span>,  <span class="hljs-comment"># SQL注入</span>
+        <span class="hljs-string">&quot;&lt;script&gt;&quot;</span>,  <span class="hljs-comment"># XSS攻击</span>
+        <span class="hljs-comment"># 更多模式...</span>
+    ]
+    
+    <span class="hljs-keyword">for</span> pattern <span class="hljs-keyword">in</span> harmful_patterns:
+        <span class="hljs-keyword">if</span> pattern.lower() <span class="hljs-keyword">in</span> content.lower():
+            <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;内容包含潜在有害代码，已被过滤。&quot;</span>
+    
+    <span class="hljs-keyword">return</span> content</code></pre>
+<h3 id="3-行为监控"><a class="header-anchor" href="#3-行为监控"></a>3. 行为监控</h3>
+<p>实现监控系统记录Agent活动：</p>
+<pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AgentMonitor</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, log_file=<span class="hljs-string">&quot;agent_logs.jsonl&quot;</span></span>):</span>
+        self.log_file = log_file
+    
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">log_action</span>(<span class="hljs-params">self, action_type, action_input, action_output, user_query</span>):</span>
+        log_entry = &#123;
+            <span class="hljs-string">&quot;timestamp&quot;</span>: datetime.now().isoformat(),
+            <span class="hljs-string">&quot;action_type&quot;</span>: action_type,
+            <span class="hljs-string">&quot;action_input&quot;</span>: action_input,
+            <span class="hljs-string">&quot;action_output&quot;</span>: action_output,
+            <span class="hljs-string">&quot;user_query&quot;</span>: user_query
+        &#125;
+        
+        <span class="hljs-keyword">with</span> open(self.log_file, <span class="hljs-string">&quot;a&quot;</span>) <span class="hljs-keyword">as</span> f:
+            f.write(json.dumps(log_entry) + <span class="hljs-string">&quot;\n&quot;</span>)
+    
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_agent_stats</span>(<span class="hljs-params">self</span>):</span>
+        <span class="hljs-comment"># 分析日志，生成统计信息</span>
+        <span class="hljs-keyword">pass</span></code></pre>
+<h2 id="💼-Agent的商业应用场景"><a class="header-anchor" href="#💼-Agent的商业应用场景"></a>💼 Agent的商业应用场景</h2>
+<p>AI Agent在多个行业都有实用价值：</p>
+<h3 id="1-客户服务"><a class="header-anchor" href="#1-客户服务"></a>1. 客户服务</h3>
+<p>构建可以回答问题、处理订单和解决问题的客服Agent：</p>
+<pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomerServiceAgent</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, company_knowledge_base, order_system_api, ticket_system_api</span>):</span>
+        self.kb = company_knowledge_base
+        self.order_api = order_system_api
+        self.ticket_api = ticket_system_api
+        
+        <span class="hljs-comment"># 初始化LLM和工具</span>
+        self.llm = ChatOpenAI(model=<span class="hljs-string">&quot;gpt-4-turbo&quot;</span>, temperature=<span class="hljs-number">0.2</span>)
+        
+        <span class="hljs-comment"># 定义查询产品信息工具</span>
+        <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">query_product</span>(<span class="hljs-params">product_id</span>):</span>
+            <span class="hljs-comment"># 调用产品API获取信息</span>
+            <span class="hljs-keyword">return</span> self.kb.get_product_info(product_id)
+            
+        <span class="hljs-comment"># 定义查询订单工具</span>
+        <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">check_order_status</span>(<span class="hljs-params">order_id</span>):</span>
+            <span class="hljs-comment"># 调用订单系统API</span>
+            <span class="hljs-keyword">return</span> self.order_api.get_order_status(order_id)
+            
+        <span class="hljs-comment"># 定义创建支持工单工具</span>
+        <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_support_ticket</span>(<span class="hljs-params">customer_id, issue, priority=<span class="hljs-string">&quot;medium&quot;</span></span>):</span>
+            <span class="hljs-comment"># 创建支持工单</span>
+            ticket_id = self.ticket_api.create_ticket(customer_id, issue, priority)
+            <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;已创建工单，编号: <span class="hljs-subst">&#123;ticket_id&#125;</span>&quot;</span>
+        
+        <span class="hljs-comment"># 组装工具集</span>
+        self.tools = [
+            Tool(<span class="hljs-string">&quot;query_product&quot;</span>, query_product, <span class="hljs-string">&quot;查询产品信息&quot;</span>),
+            Tool(<span class="hljs-string">&quot;check_order_status&quot;</span>, check_order_status, <span class="hljs-string">&quot;查询订单状态&quot;</span>),
+            Tool(<span class="hljs-string">&quot;create_support_ticket&quot;</span>, create_support_ticket, <span class="hljs-string">&quot;创建支持工单&quot;</span>)
+        ]
+        
+        <span class="hljs-comment"># 创建Agent</span>
+        self.agent = initialize_agent(
+            self.tools,
+            self.llm,
+            agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
+            verbose=<span class="hljs-literal">True</span>
+        )
+        
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">handle_customer_query</span>(<span class="hljs-params">self, customer_id, query</span>):</span>
+        <span class="hljs-comment"># 添加客户上下文</span>
+        customer_context = self.kb.get_customer_info(customer_id)
+        enhanced_query = <span class="hljs-string">f&quot;客户信息: <span class="hljs-subst">&#123;customer_context&#125;</span>\n\n客户查询: <span class="hljs-subst">&#123;query&#125;</span>&quot;</span>
+        
+        <span class="hljs-comment"># 调用Agent处理查询</span>
+        response = self.agent.run(enhanced_query)
+        <span class="hljs-keyword">return</span> response</code></pre>
+<h3 id="2-个人生产力助手"><a class="header-anchor" href="#2-个人生产力助手"></a>2. 个人生产力助手</h3>
+<p>构建可以帮助管理日程、总结会议和起草电子邮件的个人助手：</p>
+<pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProductivityAssistant</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, calendar_api, email_api, document_api</span>):</span>
+        self.calendar = calendar_api
+        self.email = email_api
+        self.docs = document_api
+        
+        <span class="hljs-comment"># 创建Agent和工具...</span>
+        
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">summarize_meeting</span>(<span class="hljs-params">self, meeting_transcript</span>):</span>
+        <span class="hljs-string">&quot;&quot;&quot;总结会议内容&quot;&quot;&quot;</span>
+        prompt = <span class="hljs-string">f&quot;&quot;&quot;</span>
+<span class="hljs-string">        请总结以下会议记录的关键点、决策和后续行动项:</span>
+<span class="hljs-string">        </span>
+<span class="hljs-string">        <span class="hljs-subst">&#123;meeting_transcript&#125;</span></span>
+<span class="hljs-string">        </span>
+<span class="hljs-string">        格式:</span>
+<span class="hljs-string">        1. 主要讨论点</span>
+<span class="hljs-string">        2. 决策</span>
+<span class="hljs-string">        3. 行动项(包括负责人和截止日期)</span>
+<span class="hljs-string">        &quot;&quot;&quot;</span>
+        
+        <span class="hljs-keyword">return</span> self.llm.predict(prompt)
+        
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">draft_email</span>(<span class="hljs-params">self, context, recipient, purpose</span>):</span>
+        <span class="hljs-string">&quot;&quot;&quot;起草电子邮件&quot;&quot;&quot;</span>
+        prompt = <span class="hljs-string">f&quot;&quot;&quot;</span>
+<span class="hljs-string">        请根据以下信息起草一封专业的电子邮件:</span>
+<span class="hljs-string">        </span>
+<span class="hljs-string">        收件人: <span class="hljs-subst">&#123;recipient&#125;</span></span>
+<span class="hljs-string">        目的: <span class="hljs-subst">&#123;purpose&#125;</span></span>
+<span class="hljs-string">        背景信息: <span class="hljs-subst">&#123;context&#125;</span></span>
+<span class="hljs-string">        </span>
+<span class="hljs-string">        电子邮件应包含:</span>
+<span class="hljs-string">        - 专业的问候语</span>
+<span class="hljs-string">        - 清晰的主题说明</span>
+<span class="hljs-string">        - 主要内容</span>
+<span class="hljs-string">        - 适当的结束语</span>
+<span class="hljs-string">        &quot;&quot;&quot;</span>
+        
+        <span class="hljs-keyword">return</span> self.llm.predict(prompt)</code></pre>
+<h2 id="🔮-Agent技术的未来趋势"><a class="header-anchor" href="#🔮-Agent技术的未来趋势"></a>🔮 Agent技术的未来趋势</h2>
+<p>AI Agent技术正在快速发展，几个值得关注的趋势：</p>
+<ol>
+<li><strong>多模态Agent</strong>：能处理图像、音频和视频</li>
+<li><strong>长期记忆</strong>: 基于检索增强和向量数据库的持久记忆</li>
+<li><strong>多Agent协作系统</strong>: 多个专业Agent协同工作</li>
+<li><strong>自主学习与改进</strong>: Agent自主收集反馈并改进</li>
+<li><strong>低代码Agent构建平台</strong>: 使非技术用户也能创建Agent</li>
+</ol>
+<h2 id="💡-结语"><a class="header-anchor" href="#💡-结语"></a>💡 结语</h2>
+<p>AI Agent技术代表了AI应用的下一代发展方向，从简单的问答系统到能够规划和执行复杂任务的智能助手。通过本文介绍的原理和实战案例，希望你能掌握构建实用Agent的基本技能。</p>
+<p>随着大语言模型和工具调用能力的不断进步，我相信Agent将在更多领域展现价值。无论是构建个人助手、企业自动化系统还是专业领域应用，掌握Agent开发技术都将是一项越来越重要的能力。</p>
+<p>最后，记住构建Agent的核心在于清晰的目标定义、合适的工具选择和良好的提示设计。从简单开始，逐步迭代完善，你也能构建出强大实用的AI Agent系统。</p>
+<p>有什么问题或者Agent开发经验，欢迎在评论区交流！</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/AI/">AI</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Agent/">Agent</a>
+                    
+                      <a class="hover-with-bg" href="/tags/LangChain/">LangChain</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/">工具调用</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/03/24/Go%E8%AF%AD%E8%A8%80%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%BC%8F%E4%B8%8E%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">⚡ Go语言并发编程模式与性能调优</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/18/%E5%9F%BA%E4%BA%8EGo%E8%AF%AD%E8%A8%80%E6%9E%84%E5%BB%BA%E9%AB%98%E6%80%A7%E8%83%BD%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/">
+                        <span class="hidden-mobile">🔄 基于Go语言构建高性能微服务架构</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2025/02/16/AI Agent开发实战：从原理到应用/';
+          this.page.identifier = '/2025/02/16/AI Agent开发实战：从原理到应用/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

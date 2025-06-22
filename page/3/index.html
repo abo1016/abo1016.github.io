@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 100vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels-code.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                
+              
+            </span>
+
+            
+          </div>
+
+          
+            <div class="scroll-down-bar">
+              <i class="iconfont icon-arrowdown"></i>
+            </div>
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-md">
+        <div class="py-5" id="board"
+          style=margin-top:0>
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2024/04/15/golang-%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84RPC%E6%A1%86%E6%9E%B6/">golang 实现一个简单的RPC框架</a>
+
+      <a href="/2024/04/15/golang-%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84RPC%E6%A1%86%E6%9E%B6/" class="index-excerpt">
+        
+        
+          
+        
+        <div>🔌 golang 实现一个简单的RPC框架
+远程过程调用(RPC)是分布式系统中不可或缺的通信方式，它允许一个程序调用另一个地址空间（通常是网络上的另一台机器）的过程或函数，就像调用本地函数一样。本文将带你从零开始实现一个简单但功能完整的Go语言RPC框架，帮助你深入理解RPC的工作原理。
+📚 RPC基础概念
+在开始实现之前，让我们先了解RPC的基本概念和工作流程：
+
+客户端存根(Client</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2024-04-15
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Golang/">Golang</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/golang/">golang</a>
+            
+              <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>
+            
+              <a href="/tags/RPC/">RPC</a>
+            
+              <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2024/04/02/golang-%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5/">golang 函数式编程实践</a>
+
+      <a href="/2024/04/02/golang-%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5/" class="index-excerpt">
+        
+        
+          
+        
+        <div>🧩 golang 函数式编程实践
+虽然Go语言主要是命令式和面向对象的编程语言，但它也支持许多函数式编程的特性和模式。函数式编程强调使用函数作为主要的构建块，避免状态变化和可变数据。本文将探讨如何在Go中应用函数式编程的思想和技术，以编写更简洁、更可维护的代码。
+📚 函数式编程基础
+函数式编程基于以下核心概念：
+
+一等公民函数：函数可以作为值传递、赋值给变量、作为参数传递给其他函数，或作为返回</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2024-04-02
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Golang/">Golang</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/golang/">golang</a>
+            
+              <a href="/tags/%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/">函数式编程</a>
+            
+              <a href="/tags/%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0/">高阶函数</a>
+            
+              <a href="/tags/%E9%97%AD%E5%8C%85/">闭包</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2024/03/28/golang-%E4%BD%BF%E7%94%A8wire%E8%BF%9B%E8%A1%8C%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/">golang 使用wire进行依赖注入</a>
+
+      <a href="/2024/03/28/golang-%E4%BD%BF%E7%94%A8wire%E8%BF%9B%E8%A1%8C%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/" class="index-excerpt">
+        
+        
+          
+        
+        <div>🔌 golang 使用wire进行依赖注入
+依赖注入(Dependency Injection，简称DI)是一种设计模式，它可以让我们编写更加模块化、可测试和可维护的代码。在Go语言中，Google开源的Wire库提供了一种编译时依赖注入的解决方案，可以帮助我们自动生成依赖关系代码。本文将详细介绍如何使用Wire进行依赖注入。
+📚 依赖注入基础
+在深入Wire之前，让我们先了解一下什么是依赖注</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2024-03-28
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Golang/">Golang</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/golang/">golang</a>
+            
+              <a href="/tags/wire/">wire</a>
+            
+              <a href="/tags/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/">依赖注入</a>
+            
+              <a href="/tags/DI/">DI</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2024/03/15/golang-%E5%88%87%E7%89%87%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BC%98%E5%8C%96%E6%8A%80%E5%B7%A7/">golang 切片底层原理与优化技巧</a>
+
+      <a href="/2024/03/15/golang-%E5%88%87%E7%89%87%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BC%98%E5%8C%96%E6%8A%80%E5%B7%A7/" class="index-excerpt">
+        
+        
+          
+        
+        <div>🔪 golang 切片底层原理与优化技巧
+切片（slice）是 Go 语言中最常用的数据结构之一，它提供了比数组更灵活的操作方式。本文将深入探讨切片的底层实现原理，以及如何优化切片操作以提高程序性能。
+🧩 切片的底层结构
+切片本质上是对底层数组的引用，它由三个部分组成：
+type slice struct &#123;
+    array unsafe.Pointer // 指向底层数组的指针</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2024-03-15
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Golang/">Golang</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/golang/">golang</a>
+            
+              <a href="/tags/slice/">slice</a>
+            
+              <a href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">性能优化</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2024/03/05/golang-%E5%B9%B6%E5%8F%91%E5%AE%89%E5%85%A8%E7%9A%84map%E5%AE%9E%E7%8E%B0%E8%AF%A6%E8%A7%A3/">golang 并发安全的map实现详解</a>
+
+      <a href="/2024/03/05/golang-%E5%B9%B6%E5%8F%91%E5%AE%89%E5%85%A8%E7%9A%84map%E5%AE%9E%E7%8E%B0%E8%AF%A6%E8%A7%A3/" class="index-excerpt">
+        
+        
+          
+        
+        <div>🔍 golang 中并发安全的map实现详解
+在Go语言中，内置的map类型不是并发安全的。如果在多个goroutine中同时读写一个map，可能会导致程序崩溃。本文将介绍几种实现并发安全map的方法。
+方案一：使用 sync.Mutex 保护普通map
+最简单直接的方法是使用互斥锁来保护对普通map的访问：
+package main
+
+import (
+	&quot;fmt&quot;
+	&q</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2024-03-05
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Golang/">Golang</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/golang/">golang</a>
+            
+              <a href="/tags/%E5%B9%B6%E5%8F%91/">并发</a>
+            
+              <a href="/tags/map/">map</a>
+            
+              <a href="/tags/sync/">sync</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2024/02/28/golang-%E6%B3%9B%E5%9E%8B%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">golang 泛型使用技巧与最佳实践</a>
+
+      <a href="/2024/02/28/golang-%E6%B3%9B%E5%9E%8B%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" class="index-excerpt">
+        
+        
+          
+        
+        <div>golang 泛型使用技巧与最佳实践
+🔍 泛型简介
+Go语言在经历了长时间的讨论和设计后，终于在1.18版本中引入了期待已久的泛型特性。泛型的加入使得Go能够编写更加灵活、可复用的代码，同时保持类型安全。本文将详细介绍Go泛型的使用技巧和最佳实践，帮助你更好地利用这一强大特性。
+🧩 泛型的基本语法
+Go语言的泛型通过类型参数（Type Parameters）来实现。类型参数使用方括号 [] 声</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2024-02-28
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Golang/">Golang</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/golang/">golang</a>
+            
+              <a href="/tags/%E6%B3%9B%E5%9E%8B/">泛型</a>
+            
+              <a href="/tags/%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0/">类型参数</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2024/02/15/golang-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E9%80%89%E5%9E%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5/">golang 微服务框架选型与实践</a>
+
+      <a href="/2024/02/15/golang-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E9%80%89%E5%9E%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5/" class="index-excerpt">
+        
+        
+          
+        
+        <div>🏗️ golang 微服务框架选型与实践
+Go语言凭借其简洁的语法、出色的并发支持和优秀的性能，已成为构建微服务的理想选择。本文将对当前流行的Go微服务框架进行对比，并分享实践经验，帮助你为项目选择合适的框架。
+📊 主流Go微服务框架对比
+1. Go-kit
+Go-kit 是一个用于构建微服务的编程工具包，遵循&quot;小而美&quot;的设计哲学。
+优点：
+
+模块化设计，支持中间件、服务发</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2024-02-15
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Golang/">Golang</a>
+            
+              <a href="/categories/Golang/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/golang/">golang</a>
+            
+              <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>
+            
+              <a href="/tags/%E6%A1%86%E6%9E%B6/">框架</a>
+            
+              <a href="/tags/gRPC/">gRPC</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2024/02/15/golang%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E9%80%89%E5%9E%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5/">golang微服务框架选型与实践</a>
+
+      <a href="/2024/02/15/golang%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E9%80%89%E5%9E%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5/" class="index-excerpt">
+        
+        
+          
+        
+        <div>golang微服务框架选型与实践
+🔍 微服务架构的价值与挑战
+微服务架构作为现代应用开发的主流范式，通过将复杂系统拆分为一系列小型、松耦合、可独立部署的服务，带来了显著的敏捷性和可伸缩性提升。Go语言凭借其出色的并发处理能力、低资源占用和高性能特性，成为实现微服务的理想选择。
+然而，微服务架构也带来了诸多挑战，包括服务发现、负载均衡、熔断降级、分布式跟踪等。为了应对这些挑战，多种Go微服务框架应</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2024-02-15
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Golang/">Golang</a>
+            
+              <a href="/categories/Golang/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/golang/">golang</a>
+            
+              <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>
+            
+              <a href="/tags/%E6%A1%86%E6%9E%B6/">框架</a>
+            
+              <a href="/tags/gRPC/">gRPC</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2024/02/08/kubernetes-pod%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E4%B8%8E%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5/">kubernetes pod资源管理与调度策略</a>
+
+      <a href="/2024/02/08/kubernetes-pod%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E4%B8%8E%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5/" class="index-excerpt">
+        
+        
+          
+        
+        <div>🎯 kubernetes pod资源管理与调度策略详解
+Kubernetes作为目前最流行的容器编排平台，其核心功能之一就是高效地管理和调度Pod资源。合理的资源管理和调度策略能够提高集群资源利用率，确保应用程序稳定运行。本文将深入探讨Kubernetes中Pod的资源管理与调度策略。
+📊 Pod资源管理基础
+资源请求与限制
+Kubernetes的资源管理主要通过两个概念实现：资源请求(req</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2024-02-08
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/">容器技术</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/kubernetes/">kubernetes</a>
+            
+              <a href="/tags/pod/">pod</a>
+            
+              <a href="/tags/%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86/">资源管理</a>
+            
+              <a href="/tags/%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5/">调度策略</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2024/01/30/golang-%E9%AB%98%E7%BA%A7%E5%B9%B6%E5%8F%91%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/">golang 高级并发模式详解</a>
+
+      <a href="/2024/01/30/golang-%E9%AB%98%E7%BA%A7%E5%B9%B6%E5%8F%91%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/" class="index-excerpt">
+        
+        
+          
+        
+        <div>🔄 golang 高级并发模式详解
+Go语言因其出色的并发支持而广受欢迎，通过goroutine和channel，Go提供了一种简洁而强大的并发编程模型。在实际开发中，我们常常需要使用一些高级并发模式来解决复杂的并发问题。本文将详细介绍Go语言中常用的高级并发模式，帮助你更好地掌握Go的并发编程。
+📚 基础回顾
+在深入高级并发模式之前，让我们先简要回顾Go并发的基础概念：
+Goroutine
+</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2024-01-30
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Golang/">Golang</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/golang/">golang</a>
+            
+              <a href="/tags/%E5%B9%B6%E5%8F%91/">并发</a>
+            
+              <a href="/tags/goroutine/">goroutine</a>
+            
+              <a href="/tags/channel/">channel</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <a class="extend prev" rel="prev" href="/page/2/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/4/"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+  
+  <script>
+    for (ele of document.getElementById("pagination").getElementsByTagName("a")) {
+      ele.href += '#board';
+    }
+  </script>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

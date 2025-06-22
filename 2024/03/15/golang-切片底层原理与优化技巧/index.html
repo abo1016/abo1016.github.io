@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>golang 切片底层原理与优化技巧 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                golang 切片底层原理与优化技巧
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2024-03-15 14:35">
+      2024年3月15日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.7k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      21
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="🔪-golang-切片底层原理与优化技巧"><a class="header-anchor" href="#🔪-golang-切片底层原理与优化技巧"></a>🔪 golang 切片底层原理与优化技巧</h2>
+<p>切片（slice）是 Go 语言中最常用的数据结构之一，它提供了比数组更灵活的操作方式。本文将深入探讨切片的底层实现原理，以及如何优化切片操作以提高程序性能。</p>
+<h3 id="🧩-切片的底层结构"><a class="header-anchor" href="#🧩-切片的底层结构"></a>🧩 切片的底层结构</h3>
+<p>切片本质上是对底层数组的引用，它由三个部分组成：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> slice <span class="hljs-keyword">struct</span> &#123;
+    array unsafe.Pointer <span class="hljs-comment">// 指向底层数组的指针</span>
+    <span class="hljs-built_in">len</span>   <span class="hljs-keyword">int</span>            <span class="hljs-comment">// 切片的长度</span>
+    <span class="hljs-built_in">cap</span>   <span class="hljs-keyword">int</span>            <span class="hljs-comment">// 切片的容量</span>
+&#125;</code></pre>
+<p>这个结构在运行时包中定义，虽然我们在日常编码中不会直接使用它，但理解这个结构对优化切片操作非常重要。</p>
+<p>让我们通过一个简单的例子来说明：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 创建一个长度为3的切片</span>
+    s1 := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;
+    fmt.Printf(<span class="hljs-string">&quot;s1: %v, len: %d, cap: %d\n&quot;</span>, s1, <span class="hljs-built_in">len</span>(s1), <span class="hljs-built_in">cap</span>(s1))
+    
+    <span class="hljs-comment">// 截取一个新切片</span>
+    s2 := s1[<span class="hljs-number">1</span>:<span class="hljs-number">3</span>]
+    fmt.Printf(<span class="hljs-string">&quot;s2: %v, len: %d, cap: %d\n&quot;</span>, s2, <span class="hljs-built_in">len</span>(s2), <span class="hljs-built_in">cap</span>(s2))
+    
+    <span class="hljs-comment">// 修改s2，观察s1的变化</span>
+    s2[<span class="hljs-number">0</span>] = <span class="hljs-number">22</span>
+    fmt.Printf(<span class="hljs-string">&quot;s1: %v\n&quot;</span>, s1)
+    fmt.Printf(<span class="hljs-string">&quot;s2: %v\n&quot;</span>, s2)
+&#125;</code></pre>
+<p>输出结果：</p>
+<pre><code class="hljs yaml"><span class="hljs-attr">s1:</span> [<span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span>]<span class="hljs-string">,</span> <span class="hljs-attr">len:</span> <span class="hljs-number">3</span><span class="hljs-string">,</span> <span class="hljs-attr">cap:</span> <span class="hljs-number">3</span>
+<span class="hljs-attr">s2:</span> [<span class="hljs-number">2</span> <span class="hljs-number">3</span>]<span class="hljs-string">,</span> <span class="hljs-attr">len:</span> <span class="hljs-number">2</span><span class="hljs-string">,</span> <span class="hljs-attr">cap:</span> <span class="hljs-number">2</span>
+<span class="hljs-attr">s1:</span> [<span class="hljs-number">1</span> <span class="hljs-number">22</span> <span class="hljs-number">3</span>]
+<span class="hljs-attr">s2:</span> [<span class="hljs-number">22</span> <span class="hljs-number">3</span>]</code></pre>
+<p>这个例子展示了重要的一点：<strong>切片之间共享底层数组</strong>，修改一个切片会影响到其他共享同一底层数组的切片。</p>
+<h3 id="🚀-切片扩容机制"><a class="header-anchor" href="#🚀-切片扩容机制"></a>🚀 切片扩容机制</h3>
+<p>当切片的容量不足以容纳更多元素时，Go 会创建一个新的、更大的底层数组，并将原切片的内容复制过去。这个过程称为扩容。</p>
+<p>从 Go 1.18 开始，切片扩容策略如下：</p>
+<ul>
+<li>如果新容量（所需的最小容量）大于当前容量的两倍，则直接使用新容量</li>
+<li>如果当前容量小于 256，则新容量为当前容量的 2 倍</li>
+<li>如果当前容量大于等于 256，则新容量为当前容量的 1.25 倍，直到满足所需容量</li>
+</ul>
+<p>以下代码演示了切片扩容过程：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;reflect&quot;</span>
+	<span class="hljs-string">&quot;unsafe&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+	s := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>)
+	
+	<span class="hljs-comment">// 获取切片的内部数组地址</span>
+	getPointer := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(s []<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">uintptr</span></span> &#123;
+		<span class="hljs-keyword">return</span> reflect.ValueOf(s).Pointer()
+	&#125;
+	
+	fmt.Printf(<span class="hljs-string">&quot;初始：%p, 内部地址：%x\n&quot;</span>, &amp;s, getPointer(s))
+	
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;
+		s = <span class="hljs-built_in">append</span>(s, i)
+		fmt.Printf(<span class="hljs-string">&quot;append %d 后: len=%d, cap=%d, 内部地址：%x\n&quot;</span>, 
+			i, <span class="hljs-built_in">len</span>(s), <span class="hljs-built_in">cap</span>(s), getPointer(s))
+	&#125;
+&#125;</code></pre>
+<p>输出类似：</p>
+<pre><code class="hljs routeros">初始：0xc000012028, 内部地址：0
+append 0 后: <span class="hljs-attribute">len</span>=1, <span class="hljs-attribute">cap</span>=1, 内部地址：c0000180f0
+append 1 后: <span class="hljs-attribute">len</span>=2, <span class="hljs-attribute">cap</span>=2, 内部地址：c000018100
+append 2 后: <span class="hljs-attribute">len</span>=3, <span class="hljs-attribute">cap</span>=4, 内部地址：c000018120
+append 3 后: <span class="hljs-attribute">len</span>=4, <span class="hljs-attribute">cap</span>=4, 内部地址：c000018120
+append 4 后: <span class="hljs-attribute">len</span>=5, <span class="hljs-attribute">cap</span>=8, 内部地址：c000018180
+append 5 后: <span class="hljs-attribute">len</span>=6, <span class="hljs-attribute">cap</span>=8, 内部地址：c000018180
+append 6 后: <span class="hljs-attribute">len</span>=7, <span class="hljs-attribute">cap</span>=8, 内部地址：c000018180
+append 7 后: <span class="hljs-attribute">len</span>=8, <span class="hljs-attribute">cap</span>=8, 内部地址：c000018180
+append 8 后: <span class="hljs-attribute">len</span>=9, <span class="hljs-attribute">cap</span>=16, 内部地址：c000046000
+append 9 后: <span class="hljs-attribute">len</span>=10, <span class="hljs-attribute">cap</span>=16, 内部地址：c000046000</code></pre>
+<p>可以看到，当容量不足时，内部地址会发生变化，表明底层数组被重新分配。</p>
+<h3 id="⚙️-切片操作性能优化技巧"><a class="header-anchor" href="#⚙️-切片操作性能优化技巧"></a>⚙️ 切片操作性能优化技巧</h3>
+<h4 id="1-预分配内存"><a class="header-anchor" href="#1-预分配内存"></a>1. 预分配内存</h4>
+<p>当你知道切片的大致大小时，使用 <code>make()</code> 预先分配容量可以避免多次扩容：</p>
+<pre><code class="hljs go"><span class="hljs-comment">// 低效方式 - 可能导致多次扩容</span>
+s := []<span class="hljs-keyword">int</span>&#123;&#125;
+<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10000</span>; i++ &#123;
+    s = <span class="hljs-built_in">append</span>(s, i)
+&#125;
+
+<span class="hljs-comment">// 高效方式 - 一次性分配足够容量</span>
+s := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">10000</span>)
+<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10000</span>; i++ &#123;
+    s = <span class="hljs-built_in">append</span>(s, i)
+&#125;</code></pre>
+<h4 id="2-谨慎使用-append-返回值"><a class="header-anchor" href="#2-谨慎使用-append-返回值"></a>2. 谨慎使用 append 返回值</h4>
+<p><code>append</code> 函数可能会返回一个指向新底层数组的切片，总是使用返回值而不是原切片：</p>
+<pre><code class="hljs go"><span class="hljs-comment">// 正确的方式</span>
+s = <span class="hljs-built_in">append</span>(s, <span class="hljs-number">100</span>)
+
+<span class="hljs-comment">// 错误的方式 - s不会包含新添加的元素</span>
+<span class="hljs-built_in">append</span>(s, <span class="hljs-number">100</span>)</code></pre>
+<h4 id="3-合理使用-copy-函数"><a class="header-anchor" href="#3-合理使用-copy-函数"></a>3. 合理使用 copy 函数</h4>
+<p><code>copy</code> 函数可以有效避免切片之间的意外共享：</p>
+<pre><code class="hljs go"><span class="hljs-comment">// 创建s1的完整副本，两个切片不共享底层数组</span>
+s2 := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-built_in">len</span>(s1))
+<span class="hljs-built_in">copy</span>(s2, s1)</code></pre>
+<h4 id="4-避免在循环中反复扩容"><a class="header-anchor" href="#4-避免在循环中反复扩容"></a>4. 避免在循环中反复扩容</h4>
+<pre><code class="hljs go"><span class="hljs-comment">// 低效 - bytes.Buffer会在内部多次扩容</span>
+<span class="hljs-keyword">var</span> b bytes.Buffer
+<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;
+    fmt.Fprintf(&amp;b, <span class="hljs-string">&quot;第%d行\n&quot;</span>, i)
+&#125;
+
+<span class="hljs-comment">// 高效 - 预估大小并一次性分配</span>
+<span class="hljs-keyword">var</span> b bytes.Buffer
+b.Grow(<span class="hljs-number">1000</span>) <span class="hljs-comment">// 预分配足够空间</span>
+<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;
+    fmt.Fprintf(&amp;b, <span class="hljs-string">&quot;第%d行\n&quot;</span>, i)
+&#125;</code></pre>
+<h4 id="5-使用-clear-函数清空切片（Go-1-21-）"><a class="header-anchor" href="#5-使用-clear-函数清空切片（Go-1-21-）"></a>5. 使用 clear 函数清空切片（Go 1.21+）</h4>
+<p>从 Go 1.21 开始，可以使用 <code>clear</code> 函数快速清空切片：</p>
+<pre><code class="hljs go">s := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;
+clear(s) <span class="hljs-comment">// 将切片所有元素置为零值，保持长度不变</span>
+fmt.Println(s) <span class="hljs-comment">// [0 0 0 0 0]</span></code></pre>
+<h3 id="📈-切片操作的性能对比"><a class="header-anchor" href="#📈-切片操作的性能对比"></a>📈 切片操作的性能对比</h3>
+<p>以下是常见切片操作的性能对比：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>时间复杂度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>访问元素</td>
+<td>O(1)</td>
+<td>随机访问，性能极佳</td>
+</tr>
+<tr>
+<td>append 不扩容</td>
+<td>O(1)</td>
+<td>添加单个元素，无需扩容</td>
+</tr>
+<tr>
+<td>append 扩容</td>
+<td>O(n)</td>
+<td>需要复制所有元素到新数组</td>
+</tr>
+<tr>
+<td>删除元素</td>
+<td>O(n)</td>
+<td>需要移动删除位置后的所有元素</td>
+</tr>
+<tr>
+<td>插入元素</td>
+<td>O(n)</td>
+<td>需要移动插入位置后的所有元素</td>
+</tr>
+</tbody>
+</table>
+<h3 id="🧠-常见陷阱和注意事项"><a class="header-anchor" href="#🧠-常见陷阱和注意事项"></a>🧠 常见陷阱和注意事项</h3>
+<ol>
+<li><strong>切片作为函数参数</strong></li>
+</ol>
+<p>切片作为函数参数传递时是按值传递的，但由于切片包含指向底层数组的指针，因此函数内部对切片元素的修改会影响原切片：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">modifySlice</span><span class="hljs-params">(s []<span class="hljs-keyword">int</span>)</span></span> &#123;
+    s[<span class="hljs-number">0</span>] = <span class="hljs-number">999</span> <span class="hljs-comment">// 原切片的第一个元素也会被修改</span>
+    s = <span class="hljs-built_in">append</span>(s, <span class="hljs-number">1000</span>) <span class="hljs-comment">// 这里可能创建新数组，不影响原切片长度</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    s := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;
+    modifySlice(s)
+    fmt.Println(s) <span class="hljs-comment">// 输出 [999 2 3]，而不是 [999 2 3 1000]</span>
+&#125;</code></pre>
+<ol start="2">
+<li><strong>nil切片与空切片</strong></li>
+</ol>
+<pre><code class="hljs go"><span class="hljs-keyword">var</span> nilSlice []<span class="hljs-keyword">int</span>          <span class="hljs-comment">// nil切片，len=0, cap=0, 指针为nil</span>
+emptySlice := []<span class="hljs-keyword">int</span>&#123;&#125;       <span class="hljs-comment">// 空切片，len=0, cap=0, 指针不为nil</span>
+makeSlice := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>) <span class="hljs-comment">// 空切片，len=0, cap=0, 指针不为nil</span>
+
+fmt.Println(nilSlice == <span class="hljs-literal">nil</span>)   <span class="hljs-comment">// true</span>
+fmt.Println(emptySlice == <span class="hljs-literal">nil</span>) <span class="hljs-comment">// false</span>
+fmt.Println(makeSlice == <span class="hljs-literal">nil</span>)  <span class="hljs-comment">// false</span></code></pre>
+<p>虽然在功能上几乎一样，但在某些情况下（如JSON序列化）表现不同。</p>
+<h3 id="📝-总结"><a class="header-anchor" href="#📝-总结"></a>📝 总结</h3>
+<p>理解切片的底层原理是编写高效Go程序的关键。记住以下几点：</p>
+<ol>
+<li>切片是对数组的引用，多个切片可能共享同一数组</li>
+<li>预先分配足够的容量可以避免频繁扩容</li>
+<li>删除或插入操作可能导致性能瓶颈</li>
+<li>切片作为函数参数时，需要注意append操作带来的影响</li>
+</ol>
+<p>通过合理使用这些技巧，你可以充分利用Go切片的优势，同时避免常见的性能陷阱。</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/">Golang</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/golang/">golang</a>
+                    
+                      <a class="hover-with-bg" href="/tags/slice/">slice</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">性能优化</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/03/28/golang-%E4%BD%BF%E7%94%A8wire%E8%BF%9B%E8%A1%8C%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">golang 使用wire进行依赖注入</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/05/golang-%E5%B9%B6%E5%8F%91%E5%AE%89%E5%85%A8%E7%9A%84map%E5%AE%9E%E7%8E%B0%E8%AF%A6%E8%A7%A3/">
+                        <span class="hidden-mobile">golang 并发安全的map实现详解</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2024/03/15/golang-切片底层原理与优化技巧/';
+          this.page.identifier = '/2024/03/15/golang-切片底层原理与优化技巧/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>mysql 分区表 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                mysql 分区表
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2018-06-27 15:13">
+      2018年6月27日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      18
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <blockquote>
+<h3 id="mysql-分区表"><a class="header-anchor" href="#mysql-分区表"></a>mysql 分区表</h3>
+</blockquote>
+<h4 id="什么是分区表"><a class="header-anchor" href="#什么是分区表"></a>什么是分区表</h4>
+<p><strong>单表数据到了几百万甚至上千万时，会使得数据库的查询效率变得很低，有复杂的联合查询时可能会导致mysql进程挂机或宕机。<strong>此时通过分表或者分区将一张数据表中的数据分割成多份小的数据，本次要讲的是</strong>分区</strong>。</p>
+<blockquote>
+<blockquote>
+<p>从Mysql5.1之后，分区功能出现了，表分区就像是将一个大表分成了若干个小表，用户在执行查询的时候无需进行全表扫描，只需要对满足要求的表分区中进行查询即可，极大的提高了查询速率，另外，表分区的实现也方便了对数据的管理，比如产品需要删除去年的所有数据，那么只需要将去年数据所在的表分区删除即可。</p>
+</blockquote>
+</blockquote>
+<h4 id="常见的分区类型"><a class="header-anchor" href="#常见的分区类型"></a>常见的分区类型</h4>
+<blockquote>
+<p><strong>RANGE</strong>分区：基于属于一个给定连续区间的列值，把多行分配给分区。 <strong>LIST</strong>分区：类似于按RANGE分区，区别在于LIST分区是基于列值匹配一个离散值集合中的某个值来进行选择。 <strong>HASH</strong>分区：基于用户定义的表达式的返回值来进行选择的分区，该表达式使用将要插入到表中的这些行的列值进行计算。这个函数可以包含MySQL 中有效的、产生非负整数值的任何表达式。 <strong>KEY</strong>分区：类似于按HASH分区，区别在于KEY分区只支持计算一列或多列，且MySQL服务器提供其自身的哈希函数。必须有一列或多列包含整数值。</p>
+</blockquote>
+<p>**注意：**所有的表分区使用的列均需要使用源表中存在的主键或者唯一索引列，否则创建失败，如果源表中本来就不存在任何的主键或者唯一索引列，那么可以在分区的时候根据需要选取任意列。</p>
+<blockquote>
+<blockquote>
+<p>RANGE：顾名思义，通过确定选取列的值的范围的方式进行分区。 如下是创建普通表的语句： 为了实验的方便，此处date 字段使用的时间类型为：DATETIME,而非TIMESTAMP，原因是TIMESTAMP不支持在分区的时候使用YEAR(),MONTH(),TO_DAYS()等操作，只能使用UNIX_TIMSTAMP()函数，所以在设计表的时候需要考虑到这点</p>
+</blockquote>
+</blockquote>
+<pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span>  <span class="hljs-keyword">TABLE</span> t1  ( <span class="hljs-keyword">id</span> <span class="hljs-built_in">INT</span>, <span class="hljs-built_in">date</span> DATETIME <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CURRENT_TIMESTAMP</span>) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">Innodb</span>;</code></pre>
+<p>插入测试数据</p>
+<pre><code class="hljs sql">mysql&gt; SELECT * FROM t1;
++<span class="hljs-comment">------+---------------------+</span>
+| id   | date                |
++<span class="hljs-comment">------+---------------------+</span>
+|    1 | 2013-05-23 12:59:39 |
+|    2 | 2013-05-23 12:59:43 |
+|    3 | 2013-05-23 12:59:44 |
+|    4 | 2013-07-04 19:35:45 |
+|    5 | 2014-04-04 19:35:45 |
+|    6 | 2014-05-04 19:35:45 |
+|    7 | 2015-05-04 19:35:45 |
+|    8 | 2015-05-05 19:35:45 |
+|    9 | 2017-05-05 19:35:45 |
+|   10 | 2018-05-05 19:35:45 |
++<span class="hljs-comment">------+---------------------+</span>
+10 rows in <span class="hljs-keyword">set</span> (<span class="hljs-number">0.00</span> sec)</code></pre>
+<p>查询 结果为全表扫描</p>
+<pre><code class="hljs sql">mysql&gt; EXPLAIN SELECT * FROM t1;
++<span class="hljs-comment">----+-------------+-------+------+---------------+------+---------+------+------+-------+</span>
+| id | select_type | table | type | possible_keys | key  | key_len | ref  | rows | Extra |
++<span class="hljs-comment">----+-------------+-------+------+---------------+------+---------+------+------+-------+</span>
+|  1 | SIMPLE      | t1    | ALL  | NULL          | NULL | NULL    | NULL |   10 | NULL  |
++<span class="hljs-comment">----+-------------+-------+------+---------------+------+---------+------+------+-------+</span>
+1 row in <span class="hljs-keyword">set</span> (<span class="hljs-number">0.00</span> sec)
+mysql&gt; <span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> t1 <span class="hljs-keyword">WHERE</span> <span class="hljs-built_in">date</span> &gt;= <span class="hljs-string">&#x27;2014-03-05 19:00:12&#x27;</span>
+    -&gt; <span class="hljs-keyword">AND</span> <span class="hljs-built_in">date</span> &lt;= <span class="hljs-string">&#x27;2016-03-05 18:45:12&#x27;</span>;
++<span class="hljs-comment">----+-------------+-------+------+---------------+------+---------+------+------+-------------+</span>
+| id | select_type | table | type | possible_keys | key  | key_len | ref  | rows | Extra       |
++<span class="hljs-comment">----+-------------+-------+------+---------------+------+---------+------+------+-------------+</span>
+|  1 | SIMPLE      | t1    | ALL  | NULL          | NULL | NULL    | NULL |   10 | Using where |
++<span class="hljs-comment">----+-------------+-------+------+---------------+------+---------+------+------+-------------+</span>
+1 row in <span class="hljs-keyword">set</span> (<span class="hljs-number">0.00</span> sec)</code></pre>
+<blockquote>
+<p><strong>进行RANGE分区</strong></p>
+</blockquote>
+<pre><code class="hljs sql">mysql&gt; ALTER  TABLE t1  PARTITION BY RANGE (YEAR(date)) (
+    -&gt;     PARTITION p2013 VALUES LESS THAN(2014),
+    -&gt;     PARTITION p2014 VALUES LESS THAN(2015),
+    -&gt;     PARTITION p2015 VALUES LESS THAN(2016),
+    -&gt;     PARTITION p2016 VALUES LESS THAN(2017),
+    -&gt;     PARTITION p2017 VALUES LESS THAN(2018),
+    -&gt;     PARTITION p2099 VALUES LESS THAN MAXVALUE
+    -&gt; ) ;</code></pre>
+<p>查看数据分区状态：</p>
+<pre><code class="hljs sql">mysql&gt; SELECT table_name,partition_name,table_rows FROM information_schema.PARTITIONS  WHERE  table_schema=database() AND table_name=&#x27;t1&#x27;;
++<span class="hljs-comment">------------+----------------+------------+</span>
+| table_name | partition_name | table_rows |
++<span class="hljs-comment">------------+----------------+------------+</span>
+| t2         | p2013          |          4 |
+| t2         | p2014          |          2 |
+| t2         | p2015          |          2 |
+| t2         | p2016          |          0 |
+| t2         | p2017          |          1 |
+| t2         | p2099          |          1 |
++<span class="hljs-comment">------------+----------------+------------+</span></code></pre>
+<p>where 查询</p>
+<pre><code class="hljs sql">mysql&gt; EXPLAIN PARTITIONS SELECT * FROM t2 WHERE date &gt;= &#x27;2014-03-05 19:00:12&#x27; AND date &lt;= &#x27;2016-03-05 18:45:12&#x27;;
++<span class="hljs-comment">----+-------------+-------+-------------------+------+---------------+------+---------+------+------+-------------+</span>
+| id | select_type | table | partitions        | type | possible_keys | key  | key_len | ref  | rows | Extra       |
++<span class="hljs-comment">----+-------------+-------+-------------------+------+---------------+------+---------+------+------+-------------+</span>
+|  1 | SIMPLE      | t2    | p2014,p2015,p2016 | ALL  | NULL          | NULL | NULL    | NULL |    5 | Using where |
++<span class="hljs-comment">----+-------------+-------+-------------------+------+---------------+------+---------+------+------+-------------+</span></code></pre>
+<blockquote>
+<p><strong>hash分区</strong> 测试数据量 310万+</p>
+</blockquote>
+<p>未分区前查询： <img src="https://s1.ax1x.com/2018/06/27/PPI4UJ.png" srcset="/img/loading.gif" alt="PPI4UJ.png"> <strong>分区</strong> hash规则：通过将整张数据表中的数据分成为7个分区，对于每一天的数据记录分成一个区。在查询数据时 通过取模方法获取所查数据的分区名（part） ，进而指定分区（hash分区后，若不指定分区查询 还是对数据进行全部分区扫描 ，分区的意义也就不在）进行查询。</p>
+<pre><code class="hljs sql"><span class="hljs-keyword">alter</span> <span class="hljs-keyword">table</span> camera_alarm <span class="hljs-keyword">partition</span> <span class="hljs-keyword">by</span> <span class="hljs-keyword">hash</span>(<span class="hljs-keyword">to_days</span>(<span class="hljs-built_in">time</span>)) <span class="hljs-keyword">partitions</span> <span class="hljs-number">7</span>;</code></pre>
+<pre><code class="hljs sql">mysql&gt; SELECT  
+    -&gt;   partition_name part,   
+    -&gt;   partition_expression expr,   
+    -&gt;   table_rows   
+    -&gt; FROM  
+    -&gt;   INFORMATION_SCHEMA.partitions   
+    -&gt; WHERE  
+    -&gt;   TABLE_SCHEMA = schema()   
+    -&gt;   AND TABLE_NAME=&#x27;camera_alarm&#x27;;
++<span class="hljs-comment">------+---------------+------------+</span>
+| part | expr          | table_rows |
++<span class="hljs-comment">------+---------------+------------+</span>
+| p0   | to_days(time) |     528175 |
+| p1   | to_days(time) |     549812 |
+| p2   | to_days(time) |     144302 |
+| p3   | to_days(time) |     493172 |
+| p4   | to_days(time) |     493332 |
+| p5   | to_days(time) |     494127 |
+| p6   | to_days(time) |     512142 |
++<span class="hljs-comment">------+---------------+------------+</span>
+7 rows in <span class="hljs-keyword">set</span> (<span class="hljs-number">0.00</span> sec)</code></pre>
+<p><strong>分区后</strong>指定分区查询：</p>
+<pre><code class="hljs sql">mysql&gt; select * from camera_alarm PARTITION (p4) where time &lt;= &#x27;2018-03-21 23:59:59&#x27; and time &gt; &#x27;2018-03-21 00:00:00&#x27;;
+
+mysql&gt; show profiles;
++<span class="hljs-comment">----------+------------+------------------------------------------------------------------------------------------------------------------------+</span>
+| Query_ID | Duration   | Query                                                                                                                  |
++<span class="hljs-comment">----------+------------+------------------------------------------------------------------------------------------------------------------------+</span>
+|        1 |  0.0011805 | <span class="hljs-keyword">explain</span> <span class="hljs-keyword">select</span> * <span class="hljs-keyword">from</span> camera_alarm <span class="hljs-keyword">PARTITION</span> (p4) <span class="hljs-keyword">where</span> <span class="hljs-built_in">time</span> &lt;= <span class="hljs-string">&#x27;2018-03-21 23:59:59&#x27;</span> <span class="hljs-keyword">and</span> <span class="hljs-built_in">time</span> &gt; <span class="hljs-string">&#x27;2018-03-21 00:00:00&#x27;</span> |
+|        <span class="hljs-number">2</span> | <span class="hljs-number">1.34151975</span> | <span class="hljs-keyword">select</span> * <span class="hljs-keyword">from</span> camera_alarm <span class="hljs-keyword">PARTITION</span> (p4) <span class="hljs-keyword">where</span> <span class="hljs-built_in">time</span> &lt;= <span class="hljs-string">&#x27;2018-03-21 23:59:59&#x27;</span> <span class="hljs-keyword">and</span> <span class="hljs-built_in">time</span> &gt; <span class="hljs-string">&#x27;2018-03-21 00:00:00&#x27;</span>         |
++<span class="hljs-comment">----------+------------+------------------------------------------------------------------------------------------------------------------------+</span>
+<span class="hljs-number">2</span> <span class="hljs-keyword">rows</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">set</span></code></pre>
+<p><strong>分区后指定分区进行查询效率提高超100%</strong></p>
+<blockquote>
+<blockquote>
+<p>list和key分区类型此处不作研究</p>
+</blockquote>
+</blockquote>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/mysql/">mysql</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%88%86%E5%8C%BA%E8%A1%A8/">分区表</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/07/02/mysql-%E7%94%A8%E6%88%B7%E6%8E%88%E6%9D%83/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">mysql 用户授权</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2018/06/22/swoole%E5%85%A5%E9%97%A8-echo%E6%9C%8D%E5%8A%A1%E5%99%A8/">
+                        <span class="hidden-mobile">swoole入门-- Echo服务器</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2018/06/27/mysql-分区表/';
+          this.page.identifier = '/2018/06/27/mysql-分区表/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

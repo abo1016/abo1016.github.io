@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>大模型时代的AI应用开发实践 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                大模型时代的AI应用开发实践
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2024-08-15 14:30">
+      2024年8月15日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.7k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      19
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h1>🚀 大模型时代的AI应用开发实践</h1>
+<p>最近一年多来，随着ChatGPT、Claude、文心一言等大语言模型(LLM)的爆火，AI应用开发迎来了翻天覆地的变化。我在实际项目中接触并使用了这些技术，这里分享一些实践经验和思考。</p>
+<h3 id="📚-大模型基础概念"><a class="header-anchor" href="#📚-大模型基础概念"></a>📚 大模型基础概念</h3>
+<p><strong>什么是大模型？</strong></p>
+<p>大模型(LLMs)就是那些参数规模动辄上千亿的预训练语言模型，比如：</p>
+<ul>
+<li>OpenAI的GPT-4/3.5</li>
+<li>Anthropic的Claude</li>
+<li>Google的Gemini</li>
+<li>国内的文心一言、通义千问等</li>
+</ul>
+<p>这些模型通过海量文本数据预训练，学会了语言规律和世界知识，有点类似于给了AI一个&quot;大脑&quot;。</p>
+<p><strong>能力边界</strong></p>
+<p>大模型目前能做的事情：</p>
+<ul>
+<li>✅ 流畅对话与文本生成</li>
+<li>✅ 编写和调试代码</li>
+<li>✅ 回答知识问题</li>
+<li>✅ 总结长文本</li>
+<li>✅ 创意内容创作</li>
+<li>✅ 多模态理解(图像+文本)</li>
+</ul>
+<p>但也有明显的短板：</p>
+<ul>
+<li>❌ 幻觉问题（就是胡说八道）</li>
+<li>❌ 时效性受限（训练数据有截止日期）</li>
+<li>❌ 专业领域深度不足</li>
+<li>❌ 复杂推理能力有限</li>
+</ul>
+<h3 id="🔄-AI应用开发新范式"><a class="header-anchor" href="#🔄-AI应用开发新范式"></a>🔄 AI应用开发新范式</h3>
+<p>过去和现在的AI开发区别超级大：</p>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>传统AI开发</th>
+<th>大模型应用开发</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>开发方式</td>
+<td>训练专用模型</td>
+<td>调用API+提示工程</td>
+</tr>
+<tr>
+<td>数据需求</td>
+<td>大量标注数据</td>
+<td>少量示例或零样本</td>
+</tr>
+<tr>
+<td>开发周期</td>
+<td>月级别</td>
+<td>天级别甚至小时级</td>
+</tr>
+<tr>
+<td>技术门槛</td>
+<td>机器学习专业知识</td>
+<td>提示设计能力</td>
+</tr>
+<tr>
+<td>成本结构</td>
+<td>前期大投入，后期低成本</td>
+<td>按量付费模式</td>
+</tr>
+</tbody>
+</table>
+<h3 id="🛠️-核心技术栈"><a class="header-anchor" href="#🛠️-核心技术栈"></a>🛠️ 核心技术栈</h3>
+<h4 id="1-提示工程-Prompt-Engineering"><a class="header-anchor" href="#1-提示工程-Prompt-Engineering"></a>1. 提示工程(Prompt Engineering)</h4>
+<p>提示工程就是如何和大模型&quot;说话&quot;的艺术，简单示例：</p>
+<pre><code class="hljs 1c"><span class="hljs-meta"># 普通提示</span>
+<span class="hljs-string">&quot;写一个Python函数计算斐波那契数列&quot;</span>
+
+<span class="hljs-meta"># 优化提示</span>
+<span class="hljs-string">&quot;请编写一个Python函数calc_fibonacci(n)，实现斐波那契数列计算。</span>
+要求：
+<span class="hljs-number">1</span>. 使用动态规划优化性能
+<span class="hljs-number">2</span>. 添加适当的注释
+<span class="hljs-number">3</span>. 处理n&lt;=<span class="hljs-number">0</span>的边界情况
+<span class="hljs-number">4</span>. 包含简单的测试用例<span class="hljs-string">&quot;</span></code></pre>
+<h4 id="2-RAG-检索增强生成"><a class="header-anchor" href="#2-RAG-检索增强生成"></a>2. RAG(检索增强生成)</h4>
+<p>当你需要让AI访问特定知识时，RAG是最常用的方案：</p>
+<pre><code class="hljs python"><span class="hljs-comment"># 简化的RAG实现示例</span>
+<span class="hljs-keyword">from</span> langchain.vectorstores <span class="hljs-keyword">import</span> Chroma
+<span class="hljs-keyword">from</span> langchain.embeddings <span class="hljs-keyword">import</span> OpenAIEmbeddings
+<span class="hljs-keyword">from</span> langchain.chat_models <span class="hljs-keyword">import</span> ChatOpenAI
+<span class="hljs-keyword">from</span> langchain.chains <span class="hljs-keyword">import</span> RetrievalQA
+
+<span class="hljs-comment"># 1. 创建向量数据库</span>
+embeddings = OpenAIEmbeddings()
+vectordb = Chroma.from_documents(documents, embeddings)
+
+<span class="hljs-comment"># 2. 创建检索器</span>
+retriever = vectordb.as_retriever()
+
+<span class="hljs-comment"># 3. 创建问答链</span>
+llm = ChatOpenAI(model=<span class="hljs-string">&quot;gpt-3.5-turbo&quot;</span>)
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    chain_type=<span class="hljs-string">&quot;stuff&quot;</span>,
+    retriever=retriever
+)
+
+<span class="hljs-comment"># 4. 查询</span>
+result = qa_chain.run(<span class="hljs-string">&quot;你的问题&quot;</span>)</code></pre>
+<h4 id="3-Agent与工具调用"><a class="header-anchor" href="#3-Agent与工具调用"></a>3. Agent与工具调用</h4>
+<p>让AI能够使用工具是近期最火的方向：</p>
+<pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> initialize_agent, Tool
+<span class="hljs-keyword">from</span> langchain.chat_models <span class="hljs-keyword">import</span> ChatOpenAI
+
+<span class="hljs-comment"># 定义工具</span>
+tools = [
+    Tool(
+        name=<span class="hljs-string">&quot;搜索引擎&quot;</span>,
+        func=search_func,
+        description=<span class="hljs-string">&quot;当你需要查询最新信息时使用&quot;</span>
+    ),
+    Tool(
+        name=<span class="hljs-string">&quot;计算器&quot;</span>,
+        func=calculator_func,
+        description=<span class="hljs-string">&quot;进行数学计算时使用&quot;</span>
+    )
+]
+
+<span class="hljs-comment"># 初始化Agent</span>
+agent = initialize_agent(
+    tools, 
+    ChatOpenAI(temperature=<span class="hljs-number">0</span>), 
+    agent=<span class="hljs-string">&quot;chat-zero-shot-react-description&quot;</span>, 
+    verbose=<span class="hljs-literal">True</span>
+)
+
+<span class="hljs-comment"># 执行任务</span>
+agent.run(<span class="hljs-string">&quot;查询今天上海的天气，并计算未来3天的平均气温&quot;</span>)</code></pre>
+<h4 id="4-微调与定制"><a class="header-anchor" href="#4-微调与定制"></a>4. 微调与定制</h4>
+<p>有时候需要针对特定任务定制模型：</p>
+<pre><code class="hljs bash"><span class="hljs-comment"># 使用OpenAI的微调API示例</span>
+openai api fine_tunes.create \
+  -t training_data.jsonl \
+  -m davinci \
+  --n_epochs 3 \
+  --learning_rate_multiplier 0.1</code></pre>
+<h3 id="🏗️-实战开发流程"><a class="header-anchor" href="#🏗️-实战开发流程"></a>🏗️ 实战开发流程</h3>
+<h4 id="1️⃣-场景定义"><a class="header-anchor" href="#1️⃣-场景定义"></a>1️⃣ 场景定义</h4>
+<p>在开始之前，我一般会先问自己这些问题：</p>
+<ul>
+<li>用户实际痛点是什么？</li>
+<li>大模型如何解决这个问题？</li>
+<li>是否需要专业领域知识？</li>
+<li>准确性和响应速度要求？</li>
+</ul>
+<h4 id="2️⃣-模型选型"><a class="header-anchor" href="#2️⃣-模型选型"></a>2️⃣ 模型选型</h4>
+<p>选模型时的几个考虑因素：</p>
+<ul>
+<li>能力需求：GPT-4最强但成本高，3.5适中</li>
+<li>预算限制：开源模型部署成本低，API按量付费</li>
+<li>部署要求：本地部署有隐私优势但需硬件</li>
+<li>中英文需求：国内模型中文表现更好</li>
+</ul>
+<h4 id="3️⃣-开发实践"><a class="header-anchor" href="#3️⃣-开发实践"></a>3️⃣ 开发实践</h4>
+<p>实际开发中的关键点：</p>
+<ul>
+<li><strong>提示模板设计</strong>：结构化提示，角色定义清晰</li>
+</ul>
+<pre><code class="hljs dust"><span class="xml">角色：</span><span class="hljs-template-variable">&#123;你是一位医疗顾问&#125;</span>
+<span class="xml">背景：</span><span class="hljs-template-variable">&#123;用户正在咨询健康问题&#125;</span>
+<span class="xml">约束：</span><span class="hljs-template-variable">&#123;仅提供一般建议，不做具体诊断&#125;</span>
+<span class="xml">输入：</span><span class="hljs-template-variable">&#123;用户问题&#125;</span>
+<span class="xml">输出格式：</span><span class="hljs-template-variable">&#123;简明扼要的回答，必要时建议就医&#125;</span></code></pre>
+<ul>
+<li>
+<p><strong>RAG系统实现</strong>：</p>
+<ul>
+<li>文档切分：我一般用500-1000token大小</li>
+<li>重叠处理：相邻块重叠10-20%提高连贯性</li>
+<li>元数据标记：保留文档来源、时间等信息</li>
+</ul>
+</li>
+<li>
+<p><strong>架构设计</strong>：一个实用的生产架构</p>
+</li>
+</ul>
+<pre><code class="hljs plain">用户界面 → API网关 → 应用服务 → 大模型服务
+                      ↑           ↓
+                    工具API   向量数据库
+                      ↓           ↓
+                    监控系统     日志系统</code></pre>
+<h3 id="📊-实战案例分享"><a class="header-anchor" href="#📊-实战案例分享"></a>📊 实战案例分享</h3>
+<h4 id="案例：智能客服系统"><a class="header-anchor" href="#案例：智能客服系统"></a>案例：智能客服系统</h4>
+<p><strong>痛点</strong>：传统客服机器人回答僵硬，无法理解上下文</p>
+<p><strong>解决方案</strong>：</p>
+<ol>
+<li>使用RAG检索知识库</li>
+<li>多级回答策略：</li>
+</ol>
+<pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">answer_query</span>(<span class="hljs-params">query</span>):</span>
+    <span class="hljs-comment"># 1. 尝试FAQ精确匹配</span>
+    faq_answer = faq_db.match(query)
+    <span class="hljs-keyword">if</span> faq_answer.confidence &gt; <span class="hljs-number">0.9</span>:
+        <span class="hljs-keyword">return</span> faq_answer
+        
+    <span class="hljs-comment"># 2. 知识库检索</span>
+    rag_docs = vector_db.search(query)
+    <span class="hljs-keyword">if</span> rag_docs:
+        context = <span class="hljs-string">&quot;\n&quot;</span>.join(rag_docs)
+        rag_answer = llm.generate(<span class="hljs-string">f&quot;&quot;&quot;</span>
+<span class="hljs-string">        基于以下信息回答问题: <span class="hljs-subst">&#123;query&#125;</span></span>
+<span class="hljs-string">        </span>
+<span class="hljs-string">        信息: <span class="hljs-subst">&#123;context&#125;</span></span>
+<span class="hljs-string">        </span>
+<span class="hljs-string">        如果信息不足以回答问题，请说不知道。</span>
+<span class="hljs-string">        &quot;&quot;&quot;</span>)
+        <span class="hljs-keyword">return</span> rag_answer
+    
+    <span class="hljs-comment"># 3. 兜底通用回答</span>
+    <span class="hljs-keyword">return</span> llm.generate(<span class="hljs-string">f&quot;以客服身份回答: <span class="hljs-subst">&#123;query&#125;</span>&quot;</span>)</code></pre>
+<ol start="3">
+<li>集成业务流程，实现订单查询、状态更新等</li>
+</ol>
+<p><strong>效果</strong>：</p>
+<ul>
+<li>解决率提升40%</li>
+<li>客户满意度提升35%</li>
+<li>人工客服工作量降低50%</li>
+</ul>
+<h3 id="🔧-性能与成本优化"><a class="header-anchor" href="#🔧-性能与成本优化"></a>🔧 性能与成本优化</h3>
+<p>几个实用优化手段：</p>
+<ol>
+<li><strong>缓存常见问题回答</strong>：</li>
+</ol>
+<pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_answer</span>(<span class="hljs-params">query</span>):</span>
+    <span class="hljs-comment"># 缓存查询</span>
+    cache_key = hash_function(query)
+    <span class="hljs-keyword">if</span> cache_key <span class="hljs-keyword">in</span> redis_cache:
+        <span class="hljs-keyword">return</span> redis_cache[cache_key]
+    
+    <span class="hljs-comment"># 生成新回答</span>
+    answer = llm_chain.run(query)
+    
+    <span class="hljs-comment"># 存入缓存(设置过期时间)</span>
+    redis_cache.set(cache_key, answer, ex=<span class="hljs-number">3600</span>*<span class="hljs-number">24</span>)
+    <span class="hljs-keyword">return</span> answer</code></pre>
+<ol start="2">
+<li><strong>流式响应</strong>：不要等全部生成完再返回</li>
+<li><strong>模型大小选择</strong>：简单任务用小模型，复杂任务用大模型</li>
+<li><strong>批量处理</strong>：合并API请求减少调用次数</li>
+</ol>
+<h3 id="🔮-未来展望"><a class="header-anchor" href="#🔮-未来展望"></a>🔮 未来展望</h3>
+<p>我认为大模型应用未来会往这几个方向发展：</p>
+<ul>
+<li>多模态集成会更加无缝</li>
+<li>推理能力会显著增强</li>
+<li>更精细的个性化体验</li>
+<li>与实际业务系统更紧密集成</li>
+</ul>
+<h3 id="💡-经验总结"><a class="header-anchor" href="#💡-经验总结"></a>💡 经验总结</h3>
+<ol>
+<li>不要迷信大模型，它只是工具</li>
+<li>关注用户体验而非技术炫耀</li>
+<li>提示工程是核心竞争力</li>
+<li>做好评估与迭代</li>
+<li>控制成本同样重要</li>
+</ol>
+<p>大模型时代刚刚开始，技术迭代极快，持续学习是必须的。作为开发者，我们正站在新技术浪潮的前沿，这既是挑战也是巨大的机遇！</p>
+<h3 id="📚-参考资料"><a class="header-anchor" href="#📚-参考资料"></a>📚 参考资料</h3>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.promptingguide.ai/">Prompt Engineering Guide</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.langchain.com/">LangChain文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/azure/cognitive-services/openai/concepts/best-practices">Azure OpenAI最佳实践</a></li>
+<li><a target="_blank" rel="noopener" href="https://huyenchip.com/2023/04/11/llm-engineering.html">Building LLM Applications</a></li>
+</ol>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/AI/">AI</a>
+                    
+                      <a class="hover-with-bg" href="/tags/LLM/">LLM</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/">应用开发</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/08/25/%E5%9F%BA%E4%BA%8EGitOps%E7%9A%84%E4%BA%91%E5%8E%9F%E7%94%9FDevOps%E5%AE%9E%E8%B7%B5%E6%8C%87%E5%8D%97/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">基于GitOps的云原生DevOps实践指南</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/10/Golang%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%EF%BC%9A%E4%BB%8Epanic%E5%88%B0%E4%BC%98%E9%9B%85%E6%81%A2%E5%A4%8D/">
+                        <span class="hidden-mobile">Golang错误处理最佳实践：从panic到优雅恢复</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2024/08/15/大模型时代的AI应用开发实践/';
+          this.page.identifier = '/2024/08/15/大模型时代的AI应用开发实践/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

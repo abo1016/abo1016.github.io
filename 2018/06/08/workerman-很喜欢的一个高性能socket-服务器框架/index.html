@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>workerman --很喜欢的一个高性能socket 服务器框架 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                workerman --很喜欢的一个高性能socket 服务器框架
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2018-06-08 09:54">
+      2018年6月8日 上午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      23
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h1>最近项目中一直在使用wokerman 确切的说应该是GatewayWorker（基于wokerman封装的TCP长连接应用框架）。</h1>
+<p>GatewayWorker是基于Workerman开发的一套<strong>TCP长连接</strong>的应用框架，实现了单发、群发、广播等接口，内置了mysql类库，GatewayWorker分为Gateway进程和Worker进程，天然支持分布式部署，能够支持庞大的连接数（百万甚至千万连接级别的应用）。<br>
+可用于开发IM聊天应用、移动通讯、游戏后台、物联网、智能家居后台等等。GatewayWorker是不支持udp的，若需要udp服务请选择wokerman。</p>
+<p>GatewayWorker使用经典的Gateway和Worker进程模型。Gateway进程负责维持客户端连接，并转发客户端的数据给BusinessWorker进程处理，BusinessWorker进程负责处理实际的业务逻辑（默认调用Events.php处理业务），并将结果推送给对应的客户端。Gateway服务和BusinessWorker服务可以分开部署在不同的服务器上，实现分布式集群。</p>
+<p>GatewayWorker提供非常方便的API，可以全局广播数据、可以向某个群体广播数据、也可以向某个特定客户端推送数据。配合Workerman的定时器，也可以定时推送数据。</p>
+<h1>GatewayWorker特性</h1>
+<h3 id="1、基于Workerman开发"><a class="header-anchor" href="#1、基于Workerman开发"></a>1、基于Workerman开发</h3>
+<p>GatewayWorker是基于Workerman开发的</p>
+<h3 id="2、基于Gateway、Worker进程模型"><a class="header-anchor" href="#2、基于Gateway、Worker进程模型"></a>2、基于Gateway、Worker进程模型</h3>
+<p>GatewayWorker使用经典的Gateway和Worker进程模型。Gateway进程负责维持客户端连接，并转发客户端的数据给Worker进程处理；Worker进程负责处理实际的业务逻辑，并将结果推送给对应的客户端。Gateway服务和Worker服务可以分开部署在不同的服务器上，实现分布式集群。</p>
+<h3 id="3、支持分布式部署"><a class="header-anchor" href="#3、支持分布式部署"></a>3、支持分布式部署</h3>
+<p>GatewayWorker可以非常方便实现分布式部署，Gateway服务和Worker服务都可以分开部署在不同的服务器集群上。并且操作简单、容易扩容、上下线用户无感知。</p>
+<h3 id="4、支持高并发"><a class="header-anchor" href="#4、支持高并发"></a>4、支持高并发</h3>
+<p>Gateway进程只负责网络IO，Worker进程负责业务逻辑。其中每个Gateway进程可以维持上万的并发连接，多个Gateway进程可以维持数十万甚至百万的并发连接，Gateway集群则可以维持千万级别的并发连接。</p>
+<h3 id="5、支持全局广播或者向任意客户端推送数据"><a class="header-anchor" href="#5、支持全局广播或者向任意客户端推送数据"></a>5、支持全局广播或者向任意客户端推送数据</h3>
+<p>GatewayWorker提供非常方便的API，可以全局广播数据、可以向某个群体广播数据、也可以向某个特定客户端推送数据。配合Workerman的定时器，也可以定时推送数据。</p>
+<h3 id="6、支持各种应用层协议"><a class="header-anchor" href="#6、支持各种应用层协议"></a>6、支持各种应用层协议</h3>
+<p>WorkerMan接口上支持各种应用层协议，包括自定义协议。同样GatewayWorker也支持各种应用层协议。</p>
+<h3 id="7、多协议支持"><a class="header-anchor" href="#7、多协议支持"></a>7、多协议支持</h3>
+<p>有时应用客户端所使用的协议不止一种，例如PC网页客户端使用的是WebSocket协议，而手机App使用的是其它协议。GatewayWorker可以非常方便的支持多协议，只需要以不同的协议开不同的端口即可，业务代码无需改动。</p>
+<h3 id="8、支持对象或者资源永久保持"><a class="header-anchor" href="#8、支持对象或者资源永久保持"></a>8、支持对象或者资源永久保持</h3>
+<p>WorkerMan在运行过程中只会载入解析一次PHP文件，然后便常驻内存，这使得类及函数声明、PHP执行环境、符号表等不会重复创建销毁，这与Web容器下运行的PHP机制是完全不同的。在WorkerMan中，一个进程生命周期内静态成员或者全局变量在不主动销毁的情况下是永久保持的，也就是将对象或者链接等资源放到全局变量或者类静态成员中则整个进程生命周期内的所有请求都可以复用。例如只要单个进程内初始化一次数据库连接，则以后这个进程的所有请求都可以复用这个数据库连接，避免了频繁连接数据库过程中TCP三次握手、 数据库权限验证、断开连接时TCP四次握手的过程，极大的提高了应用程序效率。</p>
+<h3 id="9、高性能"><a class="header-anchor" href="#9、高性能"></a>9、高性能</h3>
+<p>由于php文件从磁盘读取解析一次后便会常驻内存，下次使用时直接使用内存中的opcode， 极大的减少了磁盘IO及PHP中请求初始化、创建执行环境、词法解析、语法解析、编译opcode、请求关闭等诸多耗时过程， 并且不依赖nginx、apache等容器，少了nginx等容器与PHP通信的开销，最主要的是资源可以永久保持，不必每次初始化数据库连接等等， 所以使用WorkerMan开发应用程序，性能非常高。</p>
+<h3 id="10、支持HHVM"><a class="header-anchor" href="#10、支持HHVM"></a>10、支持HHVM</h3>
+<p>支持在HHVM虚拟机上运行，可成倍提升PHP性能。尤其是在cpu密集运算业务中，性能非常优异，是PHP Zend虚拟机8倍左右。通过实际压力测试对比，在没有负载业务的情况下，WorkerMan在HHVM下运行比在Zend PHP5.6运行网络吞吐量提高了30-80%左右</p>
+<h3 id="11、方便与其它项目集成"><a class="header-anchor" href="#11、方便与其它项目集成"></a>11、方便与其它项目集成</h3>
+<p>针对其它项目，GatewayWorker提供推送非常简单方便的API，可以在任何项目中使用这个API向所有客户端或者特定客户端推送数据，比如在普通Web项目中推送数据。</p>
+<h3 id="12、支持代码热更新"><a class="header-anchor" href="#12、支持代码热更新"></a>12、支持代码热更新</h3>
+<p>可以reload Worker进程实现业务代码更新升级，而不必担心客户端连接会断开，因为客户端连接都由Gateway进程维持。</p>
+<h3 id="13、支持长连接"><a class="header-anchor" href="#13、支持长连接"></a>13、支持长连接</h3>
+<p>GatewayWorker主要用于长连接即时通讯应用。如游戏服务器、物联网云服务、IM、移动应用等。</p>
+<p>workerman的手册对开发者非常友好，基本每一个点都写的很清晰明了，有兴趣的同学可以去官网看看它的手册。</p>
+<p>手册地址：<a target="_blank" rel="noopener" href="https://doc2.workerman.net/">https://doc2.workerman.net/</a></p>
+<p>下面讲下最近昨天用的很多的定时器（纯PHP的定时器，简直不要太高级啊！！！）</p>
+<p>Timer::add(float $time_interval, callable $callback [,$args = array(), bool $persistent = true]) //创建一个定时器</p>
+<p>注意：定时器是在当前进程中运行的，workerman中不会创建新的进程或者线程去运行定时器。</p>
+<h3 id="参数"><a class="header-anchor" href="#参数"></a>参数</h3>
+<p>time_interval</p>
+<p>多长时间执行一次，单位秒，支持小数，可以精确到0.001，即精确到毫秒级别。</p>
+<p>callback</p>
+<p>回调函数注意：如果回调函数是类的方法，则方法必须是public属性</p>
+<p>args</p>
+<p>回调函数的参数，必须为数组，数组元素为参数值</p>
+<p>persistent</p>
+<p>是否是持久的，如果只想定时执行一次，则传递false（只执行一次的任务在执行完毕后会自动销毁，不必调用Timer::del()）。默认是true，即一直定时执行。</p>
+<p>每个定时器都会返回一个 timerid，我们可以通过Timer::del($timerid)销毁这个定时器。</p>
+<p><strong>用法：</strong></p>
+<p><strong>1. 定时函数为匿名函数（闭包）</strong></p>
+<p>// 每2.5秒执行一次</p>
+<p>$time_interval = 2.5;<br>
+Timer::add($time_interval, function() { echo “task run\n”;<br>
+});</p>
+<p><strong>2</strong>**.** <strong>定时函数为匿名函数，利用闭包传递参数</strong></p>
+<p>// 每10秒执行一次 $time_interval = 10;<br>
+$connect_time = time(); // 给connection对象临时添加一个timer_id属性保存定时器id $connection-&gt;timer_id = Timer::add($time_interval, function()use($connect_time) {<br>
+$connection-&gt;send($connect_time);<br>
+});</p>
+<h3 id=""><a class="header-anchor" href="#"></a></h3>
+<pre><code>3、定时器函数为匿名函数，利用定时器接口传递参数
+</code></pre>
+<p>// 每10秒执行一次 $time_interval = 10;<br>
+$connect_time = time(); // 给connection对象临时添加一个timer_id属性保存定时器id $connection-&gt;timer_id = Timer::add($time_interval, function($connection, $connect_time) {<br>
+$connection-&gt;send($connect_time);<br>
+}, array($connection, $connect_time));<br>
+}; // 连接关闭时，删除对应连接的定时器 $ws_worker-&gt;onClose = function($connection) { // 删除定时器 Timer::del($connection-&gt;timer_id);<br>
+};</p>
+<h3 id="-2"><a class="header-anchor" href="#-2"></a></h3>
+<pre><code>4、定时函数为普通函数
+</code></pre>
+<p>function send_mail($to, $content){}</p>
+<p>// 10秒后执行发送邮件任务，最后一个参数传递false，表示只运行一次 Timer::add(10, ‘send_mail’, array($to, $content), false);</p>
+<h3 id="-3"><a class="header-anchor" href="#-3"></a></h3>
+<pre><code>5、定时函数为类的方法
+</code></pre>
+<p>class Mail { // 注意，回调函数属性必须是public public function send($to, $content) { echo “send mail …\n”;</p>
+<p>}</p>
+<p>}</p>
+<p>// 10秒后发送一次邮件 $mail = new Mail();<br>
+$to = ‘workerman@workerman.net’;<br>
+$content = ‘hello workerman’;<br>
+Timer::add(10, array($mail, ‘send’), array($to, $content), false);</p>
+<h3 id="-4"><a class="header-anchor" href="#-4"></a></h3>
+<pre><code>6、定时函数为类的静态方法
+</code></pre>
+<p>class Mail {</p>
+<p>// 注意这个是静态方法，回调函数属性也必须是public public static function send($to, $content) { echo “send mail …\n”;<br>
+}<br>
+}</p>
+<p>// 10秒后发送一次邮件 $to = ‘workerman@workerman.net’;<br>
+$content = ‘hello workerman’; // 定时调用类的静态方法 Timer::add(10, array(‘Mail’, ‘send’), array($to, $content), false);</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/PHP/">PHP</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/workerman/">workerman</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/06/20/golang-%E6%96%B0%E7%9A%84%E7%8E%A9%E5%85%B7/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Golang --新的玩具</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2018/05/31/%E9%80%9A%E4%BF%97%E5%8C%96-https/">
+                        <span class="hidden-mobile">通俗化 HTTPS</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2018/06/08/workerman-很喜欢的一个高性能socket-服务器框架/';
+          this.page.identifier = '/2018/06/08/workerman-很喜欢的一个高性能socket-服务器框架/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

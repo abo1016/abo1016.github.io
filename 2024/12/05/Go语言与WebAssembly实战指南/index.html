@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>🌐 Go语言与WebAssembly实战指南 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                🌐 Go语言与WebAssembly实战指南
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2024-12-05 14:20">
+      2024年12月5日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      61
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h1>🌐 Go语言与WebAssembly实战指南</h1>
+<p>WebAssembly(简称Wasm)作为一种新兴的web技术，让我们可以在浏览器中运行接近原生性能的代码。而Go语言从1.11版本开始已经支持编译到WebAssembly，这为Go开发者打开了一扇通向前端世界的大门。本文将分享我在使用Go+WebAssembly开发过程中的实战经验。</p>
+<h2 id="📚-WebAssembly简介"><a class="header-anchor" href="#📚-WebAssembly简介"></a>📚 WebAssembly简介</h2>
+<p>WebAssembly是一种低级字节码格式，设计目标是成为高性能web应用的便携式编译目标。它主要特点有：</p>
+<ul>
+<li>⚡ <strong>接近原生的执行速度</strong>：比JavaScript快得多</li>
+<li>🔒 <strong>安全的沙盒执行环境</strong>：内存安全，不能直接访问宿主环境</li>
+<li>🌉 <strong>与JavaScript的互操作性</strong>：可以与JS代码交互</li>
+<li>🔄 <strong>与Web API的互操作</strong>：可以调用DOM等Web API</li>
+</ul>
+<p>与JavaScript相比，WebAssembly的优势在哪里？</p>
+<table>
+<thead>
+<tr>
+<th>特点</th>
+<th>JavaScript</th>
+<th>WebAssembly</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>执行速度</td>
+<td>较慢</td>
+<td>接近原生</td>
+</tr>
+<tr>
+<td>加载时间</td>
+<td>需要解析</td>
+<td>二进制格式，加载快</td>
+</tr>
+<tr>
+<td>开发语言</td>
+<td>JavaScript/TypeScript</td>
+<td>C/C++/Rust/Go等</td>
+</tr>
+<tr>
+<td>内存控制</td>
+<td>自动垃圾回收</td>
+<td>更精细的内存管理</td>
+</tr>
+<tr>
+<td>学习曲线</td>
+<td>相对简单</td>
+<td>取决于源语言</td>
+</tr>
+</tbody>
+</table>
+<h2 id="🛠️-环境搭建"><a class="header-anchor" href="#🛠️-环境搭建"></a>🛠️ 环境搭建</h2>
+<p>要开始使用Go+WebAssembly，首先需要确保你的环境已经准备好：</p>
+<h3 id="1-Go环境准备"><a class="header-anchor" href="#1-Go环境准备"></a>1. Go环境准备</h3>
+<p>确保你已安装Go 1.11或更高版本：</p>
+<pre><code class="hljs bash"><span class="hljs-comment"># 检查Go版本</span>
+go version
+
+<span class="hljs-comment"># 应当看到类似输出</span>
+go version go1.21.0 windows/amd64</code></pre>
+<h3 id="2-设置GOOS和GOARCH"><a class="header-anchor" href="#2-设置GOOS和GOARCH"></a>2. 设置GOOS和GOARCH</h3>
+<p>编译WebAssembly需要设置特定的环境变量：</p>
+<pre><code class="hljs bash"><span class="hljs-comment"># Linux/macOS</span>
+<span class="hljs-built_in">export</span> GOOS=js
+<span class="hljs-built_in">export</span> GOARCH=wasm
+
+<span class="hljs-comment"># Windows (PowerShell)</span>
+<span class="hljs-variable">$env</span>:GOOS = <span class="hljs-string">&quot;js&quot;</span>
+<span class="hljs-variable">$env</span>:GOARCH = <span class="hljs-string">&quot;wasm&quot;</span></code></pre>
+<h3 id="3-复制WebAssembly支持文件"><a class="header-anchor" href="#3-复制WebAssembly支持文件"></a>3. 复制WebAssembly支持文件</h3>
+<p>Go提供了一个JavaScript文件，帮助加载和运行WebAssembly模块：</p>
+<pre><code class="hljs bash"><span class="hljs-comment"># 复制wasm_exec.js到你的项目目录</span>
+cp <span class="hljs-string">&quot;<span class="hljs-subst">$(go env GOROOT)</span>/misc/wasm/wasm_exec.js&quot;</span> ./</code></pre>
+<h2 id="🚀-你好，WebAssembly！"><a class="header-anchor" href="#🚀-你好，WebAssembly！"></a>🚀 你好，WebAssembly！</h2>
+<p>让我们从一个简单的例子开始，创建一个Hello World应用：</p>
+<h3 id="1-创建Go文件"><a class="header-anchor" href="#1-创建Go文件"></a>1. 创建Go文件</h3>
+<p>创建main.go文件：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;syscall/js&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 创建一个JavaScript函数</span>
+    hello := js.FuncOf(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(this js.Value, args []js.Value)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+        name := <span class="hljs-string">&quot;World&quot;</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(args) &gt; <span class="hljs-number">0</span> &#123;
+            name = args[<span class="hljs-number">0</span>].String()
+        &#125;
+        msg := <span class="hljs-string">&quot;Hello, &quot;</span> + name + <span class="hljs-string">&quot;!&quot;</span>
+        
+        <span class="hljs-comment">// 调用JavaScript的console.log函数</span>
+        js.Global().Get(<span class="hljs-string">&quot;console&quot;</span>).Call(<span class="hljs-string">&quot;log&quot;</span>, msg)
+        
+        <span class="hljs-comment">// 返回消息</span>
+        <span class="hljs-keyword">return</span> msg
+    &#125;)
+
+    <span class="hljs-comment">// 将函数导出到JavaScript全局空间</span>
+    js.Global().Set(<span class="hljs-string">&quot;goHello&quot;</span>, hello)
+
+    <span class="hljs-comment">// 保持程序运行</span>
+    <span class="hljs-keyword">select</span> &#123;&#125;
+&#125;</code></pre>
+<h3 id="2-编译为WebAssembly"><a class="header-anchor" href="#2-编译为WebAssembly"></a>2. 编译为WebAssembly</h3>
+<pre><code class="hljs bash">GOOS=js GOARCH=wasm go build -o main.wasm</code></pre>
+<h3 id="3-创建HTML文件"><a class="header-anchor" href="#3-创建HTML文件"></a>3. 创建HTML文件</h3>
+<p>创建index.html文件：</p>
+<pre><code class="hljs html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;utf-8&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Go WebAssembly<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;wasm_exec.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span>
+<span class="javascript">        <span class="hljs-keyword">const</span> go = <span class="hljs-keyword">new</span> Go();</span>
+<span class="javascript">        WebAssembly.instantiateStreaming(fetch(<span class="hljs-string">&quot;main.wasm&quot;</span>), go.importObject)</span>
+<span class="javascript">            .then(<span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> &#123;</span>
+                go.run(result.instance);
+                
+<span class="javascript">                <span class="hljs-comment">// 现在可以调用我们在Go中定义的函数</span></span>
+<span class="javascript">                <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;btn&quot;</span>).addEventListener(<span class="hljs-string">&quot;click&quot;</span>, <span class="hljs-function">() =&gt;</span> &#123;</span>
+<span class="javascript">                    <span class="hljs-keyword">const</span> name = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;name&quot;</span>).value || <span class="hljs-string">&quot;World&quot;</span>;</span>
+<span class="javascript">                    <span class="hljs-keyword">const</span> result = goHello(name);</span>
+<span class="javascript">                    <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;output&quot;</span>).textContent = result;</span>
+                &#125;);
+            &#125;);
+    <span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Go WebAssembly 示例<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;name&quot;</span> <span class="hljs-attr">placeholder</span>=<span class="hljs-string">&quot;输入你的名字&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>问候<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;output&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span></code></pre>
+<h3 id="4-启动本地服务器"><a class="header-anchor" href="#4-启动本地服务器"></a>4. 启动本地服务器</h3>
+<p>由于浏览器的安全限制，我们需要使用HTTP服务器来提供文件：</p>
+<pre><code class="hljs bash"><span class="hljs-comment"># 使用Go自带的HTTP服务器</span>
+go run -v server.go</code></pre>
+<p>server.go 内容：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">&quot;flag&quot;</span>
+    <span class="hljs-string">&quot;log&quot;</span>
+    <span class="hljs-string">&quot;net/http&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    port := flag.String(<span class="hljs-string">&quot;p&quot;</span>, <span class="hljs-string">&quot;8080&quot;</span>, <span class="hljs-string">&quot;端口号&quot;</span>)
+    directory := flag.String(<span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-string">&quot;.&quot;</span>, <span class="hljs-string">&quot;要提供的目录&quot;</span>)
+    flag.Parse()
+
+    http.Handle(<span class="hljs-string">&quot;/&quot;</span>, http.FileServer(http.Dir(*directory)))
+
+    log.Printf(<span class="hljs-string">&quot;服务器启动在 http://localhost:%s&quot;</span>, *port)
+    log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;:&quot;</span>+*port, <span class="hljs-literal">nil</span>))
+&#125;</code></pre>
+<h2 id="💡-Go与JavaScript交互"><a class="header-anchor" href="#💡-Go与JavaScript交互"></a>💡 Go与JavaScript交互</h2>
+<p>Go和JavaScript之间的交互是使用WebAssembly的核心，下面我们来详细了解它们如何通信：</p>
+<h3 id="1-从Go调用JavaScript函数"><a class="header-anchor" href="#1-从Go调用JavaScript函数"></a>1. 从Go调用JavaScript函数</h3>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;syscall/js&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 获取document对象</span>
+    document := js.Global().Get(<span class="hljs-string">&quot;document&quot;</span>)
+    
+    <span class="hljs-comment">// 创建一个新的div元素</span>
+    div := document.Call(<span class="hljs-string">&quot;createElement&quot;</span>, <span class="hljs-string">&quot;div&quot;</span>)
+    div.Set(<span class="hljs-string">&quot;innerHTML&quot;</span>, <span class="hljs-string">&quot;这个div是由Go创建的！&quot;</span>)
+    
+    <span class="hljs-comment">// 将div添加到body</span>
+    document.Get(<span class="hljs-string">&quot;body&quot;</span>).Call(<span class="hljs-string">&quot;appendChild&quot;</span>, div)
+    
+    <span class="hljs-comment">// 防止程序退出</span>
+    <span class="hljs-keyword">select</span> &#123;&#125;
+&#125;</code></pre>
+<h3 id="2-向JavaScript暴露Go函数"><a class="header-anchor" href="#2-向JavaScript暴露Go函数"></a>2. 向JavaScript暴露Go函数</h3>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">&quot;fmt&quot;</span>
+    <span class="hljs-string">&quot;syscall/js&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">calculateFactorial</span><span class="hljs-params">(this js.Value, args []js.Value)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(args) == <span class="hljs-number">0</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;请提供一个数字&quot;</span>
+    &#125;
+    
+    n := args[<span class="hljs-number">0</span>].Int()
+    result := <span class="hljs-number">1</span>
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">2</span>; i &lt;= n; i++ &#123;
+        result *= i
+    &#125;
+    
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 将函数注册到JavaScript全局空间</span>
+    js.Global().Set(<span class="hljs-string">&quot;factorial&quot;</span>, js.FuncOf(calculateFactorial))
+    
+    fmt.Println(<span class="hljs-string">&quot;Go WebAssembly已初始化，factorial函数已导出&quot;</span>)
+    
+    <span class="hljs-comment">// 保持程序运行</span>
+    <span class="hljs-keyword">select</span> &#123;&#125;
+&#125;</code></pre>
+<p>在JavaScript中调用：</p>
+<pre><code class="hljs javascript"><span class="hljs-comment">// HTML中</span>
+<span class="hljs-keyword">const</span> result = factorial(<span class="hljs-number">5</span>);  <span class="hljs-comment">// 返回120</span></code></pre>
+<h3 id="3-回调函数处理"><a class="header-anchor" href="#3-回调函数处理"></a>3. 回调函数处理</h3>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">&quot;syscall/js&quot;</span>
+    <span class="hljs-string">&quot;time&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">asyncOperation</span><span class="hljs-params">(this js.Value, args []js.Value)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+    <span class="hljs-comment">// 检查回调函数</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(args) == <span class="hljs-number">0</span> || !args[<span class="hljs-number">0</span>].InstanceOf(js.Global().Get(<span class="hljs-string">&quot;Function&quot;</span>)) &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;请提供回调函数&quot;</span>
+    &#125;
+    
+    callback := args[<span class="hljs-number">0</span>]
+    
+    <span class="hljs-comment">// 模拟异步操作</span>
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        time.Sleep(<span class="hljs-number">2</span> * time.Second)
+        
+        <span class="hljs-comment">// 调用JavaScript回调</span>
+        callback.Invoke(<span class="hljs-string">&quot;操作完成！&quot;</span>)
+    &#125;()
+    
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    js.Global().Set(<span class="hljs-string">&quot;performAsync&quot;</span>, js.FuncOf(asyncOperation))
+    <span class="hljs-keyword">select</span> &#123;&#125;
+&#125;</code></pre>
+<p>在JavaScript中使用：</p>
+<pre><code class="hljs javascript"><span class="hljs-comment">// HTML中</span>
+performAsync(<span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> &#123;
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;收到结果:&quot;</span>, result);
+&#125;);</code></pre>
+<h2 id="🔄-数据类型转换"><a class="header-anchor" href="#🔄-数据类型转换"></a>🔄 数据类型转换</h2>
+<p>Go和JavaScript之间传递数据需要进行类型转换，下面是常见数据类型的处理方法：</p>
+<h3 id="基本类型转换"><a class="header-anchor" href="#基本类型转换"></a>基本类型转换</h3>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;syscall/js&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">typeConversionExample</span><span class="hljs-params">(this js.Value, args []js.Value)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+    <span class="hljs-comment">// JavaScript -&gt; Go</span>
+    jsString := args[<span class="hljs-number">0</span>].String()           <span class="hljs-comment">// string</span>
+    jsNumber := args[<span class="hljs-number">1</span>].Float()            <span class="hljs-comment">// float64</span>
+    jsInt := args[<span class="hljs-number">2</span>].Int()                 <span class="hljs-comment">// int</span>
+    jsBool := args[<span class="hljs-number">3</span>].Bool()               <span class="hljs-comment">// bool</span>
+    
+    <span class="hljs-comment">// 创建一个JavaScript对象</span>
+    result := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">interface</span>&#123;&#125;)
+    result[<span class="hljs-string">&quot;stringSquared&quot;</span>] = jsString + jsString
+    result[<span class="hljs-string">&quot;numberDoubled&quot;</span>] = jsNumber * <span class="hljs-number">2</span>
+    result[<span class="hljs-string">&quot;intSquared&quot;</span>] = jsInt * jsInt
+    result[<span class="hljs-string">&quot;boolInverted&quot;</span>] = !jsBool
+    
+    <span class="hljs-comment">// Go -&gt; JavaScript (使用map转换为JS对象)</span>
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    js.Global().Set(<span class="hljs-string">&quot;convertTypes&quot;</span>, js.FuncOf(typeConversionExample))
+    <span class="hljs-keyword">select</span> &#123;&#125;
+&#125;</code></pre>
+<h3 id="数组和切片转换"><a class="header-anchor" href="#数组和切片转换"></a>数组和切片转换</h3>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">arrayExample</span><span class="hljs-params">(this js.Value, args []js.Value)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+    <span class="hljs-comment">// 将JavaScript数组转换为Go切片</span>
+    jsArray := args[<span class="hljs-number">0</span>]
+    length := jsArray.Length()
+    goSlice := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, length)
+    
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; length; i++ &#123;
+        goSlice[i] = jsArray.Index(i).Int()
+    &#125;
+    
+    <span class="hljs-comment">// 处理数据（将每个元素翻倍）</span>
+    <span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> goSlice &#123;
+        goSlice[i] *= <span class="hljs-number">2</span>
+    &#125;
+    
+    <span class="hljs-comment">// 创建一个新的JavaScript数组</span>
+    jsResult := js.Global().Get(<span class="hljs-string">&quot;Array&quot;</span>).New(<span class="hljs-built_in">len</span>(goSlice))
+    <span class="hljs-keyword">for</span> i, val := <span class="hljs-keyword">range</span> goSlice &#123;
+        jsResult.SetIndex(i, val)
+    &#125;
+    
+    <span class="hljs-keyword">return</span> jsResult
+&#125;</code></pre>
+<h3 id="复杂数据结构"><a class="header-anchor" href="#复杂数据结构"></a>复杂数据结构</h3>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Person <span class="hljs-keyword">struct</span> &#123;
+    Name    <span class="hljs-keyword">string</span> <span class="hljs-string">`json:&quot;name&quot;`</span>
+    Age     <span class="hljs-keyword">int</span>    <span class="hljs-string">`json:&quot;age&quot;`</span>
+    IsAdmin <span class="hljs-keyword">bool</span>   <span class="hljs-string">`json:&quot;isAdmin&quot;`</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">structExample</span><span class="hljs-params">(this js.Value, args []js.Value)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+    <span class="hljs-comment">// 从JavaScript对象创建Go结构体</span>
+    jsObj := args[<span class="hljs-number">0</span>]
+    person := Person&#123;
+        Name:    jsObj.Get(<span class="hljs-string">&quot;name&quot;</span>).String(),
+        Age:     jsObj.Get(<span class="hljs-string">&quot;age&quot;</span>).Int(),
+        IsAdmin: jsObj.Get(<span class="hljs-string">&quot;isAdmin&quot;</span>).Bool(),
+    &#125;
+    
+    <span class="hljs-comment">// 处理数据</span>
+    person.Age++
+    person.IsAdmin = !person.IsAdmin
+    
+    <span class="hljs-comment">// 将Go结构体转回JavaScript对象</span>
+    result := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">interface</span>&#123;&#125;)
+    result[<span class="hljs-string">&quot;name&quot;</span>] = person.Name
+    result[<span class="hljs-string">&quot;age&quot;</span>] = person.Age
+    result[<span class="hljs-string">&quot;isAdmin&quot;</span>] = person.IsAdmin
+    
+    <span class="hljs-keyword">return</span> result
+&#125;</code></pre>
+<h2 id="📊-实战案例：浏览器中的数据可视化"><a class="header-anchor" href="#📊-实战案例：浏览器中的数据可视化"></a>📊 实战案例：浏览器中的数据可视化</h2>
+<p>现在我们来创建一个实用的例子：一个在浏览器中使用Go进行数据处理和可视化的应用。</p>
+<h3 id="1-项目结构"><a class="header-anchor" href="#1-项目结构"></a>1. 项目结构</h3>
+<pre><code class="hljs awk">data-viz/
+├── main.go          <span class="hljs-regexp">//</span> Go WebAssembly代码
+├── index.html       <span class="hljs-regexp">//</span> HTML界面
+├── style.css        <span class="hljs-regexp">//</span> 样式
+├── wasm_exec.js     <span class="hljs-regexp">//</span> Go WebAssembly支持文件
+└── server.go        <span class="hljs-regexp">//</span> 本地服务器</code></pre>
+<h3 id="2-Go代码（main-go）"><a class="header-anchor" href="#2-Go代码（main-go）"></a>2. Go代码（main.go）</h3>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">&quot;encoding/json&quot;</span>
+    <span class="hljs-string">&quot;math&quot;</span>
+    <span class="hljs-string">&quot;syscall/js&quot;</span>
+)
+
+<span class="hljs-comment">// 数据点结构</span>
+<span class="hljs-keyword">type</span> DataPoint <span class="hljs-keyword">struct</span> &#123;
+    X <span class="hljs-keyword">float64</span> <span class="hljs-string">`json:&quot;x&quot;`</span>
+    Y <span class="hljs-keyword">float64</span> <span class="hljs-string">`json:&quot;y&quot;`</span>
+&#125;
+
+<span class="hljs-comment">// 生成正弦波数据</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">generateSineWave</span><span class="hljs-params">(this js.Value, args []js.Value)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+    <span class="hljs-comment">// 从参数获取点数和振幅</span>
+    points := <span class="hljs-number">100</span>
+    amplitude := <span class="hljs-number">1.0</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(args) &gt; <span class="hljs-number">0</span> &#123;
+        points = args[<span class="hljs-number">0</span>].Int()
+    &#125;
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(args) &gt; <span class="hljs-number">1</span> &#123;
+        amplitude = args[<span class="hljs-number">1</span>].Float()
+    &#125;
+    
+    <span class="hljs-comment">// 生成数据点</span>
+    data := <span class="hljs-built_in">make</span>([]DataPoint, points)
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; points; i++ &#123;
+        x := <span class="hljs-keyword">float64</span>(i) * (<span class="hljs-number">2</span> * math.Pi / <span class="hljs-keyword">float64</span>(points))
+        y := amplitude * math.Sin(x)
+        data[i] = DataPoint&#123;X: x, Y: y&#125;
+    &#125;
+    
+    <span class="hljs-comment">// 将数据序列化为JSON</span>
+    jsonData, _ := json.Marshal(data)
+    
+    <span class="hljs-comment">// 创建一个Uint8Array来存储JSON数据</span>
+    uint8Array := js.Global().Get(<span class="hljs-string">&quot;Uint8Array&quot;</span>).New(<span class="hljs-built_in">len</span>(jsonData))
+    js.CopyBytesToJS(uint8Array, jsonData)
+    
+    <span class="hljs-comment">// 创建一个TextDecoder来将Uint8Array转换为字符串</span>
+    decoder := js.Global().Get(<span class="hljs-string">&quot;TextDecoder&quot;</span>).New(<span class="hljs-string">&quot;utf-8&quot;</span>)
+    result := decoder.Call(<span class="hljs-string">&quot;decode&quot;</span>, uint8Array)
+    
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-comment">// 计算移动平均</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">calculateMovingAverage</span><span class="hljs-params">(this js.Value, args []js.Value)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+    <span class="hljs-comment">// 解析输入数据</span>
+    jsonStr := args[<span class="hljs-number">0</span>].String()
+    windowSize := <span class="hljs-number">5</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(args) &gt; <span class="hljs-number">1</span> &#123;
+        windowSize = args[<span class="hljs-number">1</span>].Int()
+    &#125;
+    
+    <span class="hljs-comment">// 解析JSON数据</span>
+    <span class="hljs-keyword">var</span> data []DataPoint
+    <span class="hljs-keyword">if</span> err := json.Unmarshal([]<span class="hljs-keyword">byte</span>(jsonStr), &amp;data); err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;JSON解析错误&quot;</span>
+    &#125;
+    
+    <span class="hljs-comment">// 计算移动平均</span>
+    result := <span class="hljs-built_in">make</span>([]DataPoint, <span class="hljs-built_in">len</span>(data))
+    <span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> data &#123;
+        sum := <span class="hljs-number">0.0</span>
+        count := <span class="hljs-number">0</span>
+        
+        <span class="hljs-comment">// 计算窗口内的平均值</span>
+        <span class="hljs-keyword">for</span> j := i - windowSize + <span class="hljs-number">1</span>; j &lt;= i; j++ &#123;
+            <span class="hljs-keyword">if</span> j &gt;= <span class="hljs-number">0</span> &#123;
+                sum += data[j].Y
+                count++
+            &#125;
+        &#125;
+        
+        <span class="hljs-comment">// 设置结果</span>
+        <span class="hljs-keyword">if</span> count &gt; <span class="hljs-number">0</span> &#123;
+            result[i] = DataPoint&#123;X: data[i].X, Y: sum / <span class="hljs-keyword">float64</span>(count)&#125;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            result[i] = data[i]
+        &#125;
+    &#125;
+    
+    <span class="hljs-comment">// 将结果序列化为JSON</span>
+    jsonResult, _ := json.Marshal(result)
+    
+    <span class="hljs-comment">// 创建一个Uint8Array来存储JSON数据</span>
+    uint8Array := js.Global().Get(<span class="hljs-string">&quot;Uint8Array&quot;</span>).New(<span class="hljs-built_in">len</span>(jsonResult))
+    js.CopyBytesToJS(uint8Array, jsonResult)
+    
+    <span class="hljs-comment">// 创建一个TextDecoder来将Uint8Array转换为字符串</span>
+    decoder := js.Global().Get(<span class="hljs-string">&quot;TextDecoder&quot;</span>).New(<span class="hljs-string">&quot;utf-8&quot;</span>)
+    <span class="hljs-keyword">return</span> decoder.Call(<span class="hljs-string">&quot;decode&quot;</span>, uint8Array)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 注册函数到JavaScript</span>
+    js.Global().Set(<span class="hljs-string">&quot;generateSineWave&quot;</span>, js.FuncOf(generateSineWave))
+    js.Global().Set(<span class="hljs-string">&quot;calculateMovingAverage&quot;</span>, js.FuncOf(calculateMovingAverage))
+    
+    <span class="hljs-comment">// 保持程序运行</span>
+    <span class="hljs-keyword">select</span> &#123;&#125;
+&#125;</code></pre>
+<h3 id="3-HTML界面（index-html）"><a class="header-anchor" href="#3-HTML界面（index-html）"></a>3. HTML界面（index.html）</h3>
+<pre><code class="hljs html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;utf-8&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Go WebAssembly 数据可视化<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;style.css&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;wasm_exec.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/chart.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span>
+<span class="javascript">        <span class="hljs-comment">// 初始化Go WebAssembly</span></span>
+<span class="javascript">        <span class="hljs-keyword">const</span> go = <span class="hljs-keyword">new</span> Go();</span>
+<span class="javascript">        WebAssembly.instantiateStreaming(fetch(<span class="hljs-string">&quot;main.wasm&quot;</span>), go.importObject)</span>
+<span class="javascript">            .then(<span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> &#123;</span>
+                go.run(result.instance);
+<span class="javascript">                <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;status&quot;</span>).textContent = <span class="hljs-string">&quot;WebAssembly已加载&quot;</span>;</span>
+                
+<span class="javascript">                <span class="hljs-comment">// 初始化图表</span></span>
+                initChart();
+            &#125;);
+        
+<span class="javascript">        <span class="hljs-keyword">let</span> chart;</span>
+<span class="javascript">        <span class="hljs-keyword">let</span> rawData;</span>
+        
+<span class="javascript">        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">initChart</span>(<span class="hljs-params"></span>) </span>&#123;</span>
+<span class="javascript">            <span class="hljs-keyword">const</span> ctx = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&#x27;chart&#x27;</span>).getContext(<span class="hljs-string">&#x27;2d&#x27;</span>);</span>
+<span class="javascript">            chart = <span class="hljs-keyword">new</span> Chart(ctx, &#123;</span>
+<span class="javascript">                type: <span class="hljs-string">&#x27;line&#x27;</span>,</span>
+                data: &#123;
+                    datasets: [
+                        &#123;
+<span class="javascript">                            label: <span class="hljs-string">&#x27;原始数据&#x27;</span>,</span>
+<span class="javascript">                            borderColor: <span class="hljs-string">&#x27;rgb(75, 192, 192)&#x27;</span>,</span>
+                            data: []
+                        &#125;,
+                        &#123;
+<span class="javascript">                            label: <span class="hljs-string">&#x27;移动平均&#x27;</span>,</span>
+<span class="javascript">                            borderColor: <span class="hljs-string">&#x27;rgb(255, 99, 132)&#x27;</span>,</span>
+                            data: []
+                        &#125;
+                    ]
+                &#125;,
+                options: &#123;
+<span class="javascript">                    responsive: <span class="hljs-literal">true</span>,</span>
+                    scales: &#123;
+                        x: &#123;
+                            title: &#123;
+<span class="javascript">                                display: <span class="hljs-literal">true</span>,</span>
+<span class="javascript">                                text: <span class="hljs-string">&#x27;X&#x27;</span></span>
+                            &#125;
+                        &#125;,
+                        y: &#123;
+                            title: &#123;
+<span class="javascript">                                display: <span class="hljs-literal">true</span>,</span>
+<span class="javascript">                                text: <span class="hljs-string">&#x27;Y&#x27;</span></span>
+                            &#125;
+                        &#125;
+                    &#125;
+                &#125;
+            &#125;);
+        &#125;
+        
+<span class="javascript">        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">updateChart</span>(<span class="hljs-params"></span>) </span>&#123;</span>
+<span class="javascript">            <span class="hljs-keyword">const</span> points = <span class="hljs-built_in">parseInt</span>(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;points&quot;</span>).value);</span>
+<span class="javascript">            <span class="hljs-keyword">const</span> amplitude = <span class="hljs-built_in">parseFloat</span>(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;amplitude&quot;</span>).value);</span>
+<span class="javascript">            <span class="hljs-keyword">const</span> windowSize = <span class="hljs-built_in">parseInt</span>(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;windowSize&quot;</span>).value);</span>
+            
+<span class="javascript">            <span class="hljs-comment">// 使用Go函数生成数据</span></span>
+<span class="javascript">            rawData = <span class="hljs-built_in">JSON</span>.parse(generateSineWave(points, amplitude));</span>
+            
+<span class="javascript">            <span class="hljs-comment">// 使用Go函数计算移动平均</span></span>
+<span class="javascript">            <span class="hljs-keyword">const</span> avgData = <span class="hljs-built_in">JSON</span>.parse(calculateMovingAverage(<span class="hljs-built_in">JSON</span>.stringify(rawData), windowSize));</span>
+            
+<span class="javascript">            <span class="hljs-comment">// 更新图表</span></span>
+<span class="javascript">            chart.data.datasets[<span class="hljs-number">0</span>].data = rawData.map(<span class="hljs-function"><span class="hljs-params">point</span> =&gt;</span> (&#123;<span class="hljs-attr">x</span>: point.x, <span class="hljs-attr">y</span>: point.y&#125;));</span>
+<span class="javascript">            chart.data.datasets[<span class="hljs-number">1</span>].data = avgData.map(<span class="hljs-function"><span class="hljs-params">point</span> =&gt;</span> (&#123;<span class="hljs-attr">x</span>: point.x, <span class="hljs-attr">y</span>: point.y&#125;));</span>
+            chart.update();
+        &#125;
+    <span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;container&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Go WebAssembly 数据可视化<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;status&quot;</span>&gt;</span>正在加载WebAssembly...<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+        
+        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;controls&quot;</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">label</span>&gt;</span>
+                数据点数量:
+                <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;number&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;points&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;100&quot;</span> <span class="hljs-attr">min</span>=<span class="hljs-string">&quot;10&quot;</span> <span class="hljs-attr">max</span>=<span class="hljs-string">&quot;1000&quot;</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">label</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">label</span>&gt;</span>
+                振幅:
+                <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;number&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;amplitude&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;1&quot;</span> <span class="hljs-attr">min</span>=<span class="hljs-string">&quot;0.1&quot;</span> <span class="hljs-attr">max</span>=<span class="hljs-string">&quot;10&quot;</span> <span class="hljs-attr">step</span>=<span class="hljs-string">&quot;0.1&quot;</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">label</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">label</span>&gt;</span>
+                移动平均窗口大小:
+                <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;number&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;windowSize&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-attr">min</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">max</span>=<span class="hljs-string">&quot;20&quot;</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">label</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;updateChart()&quot;</span>&gt;</span>更新图表<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+        
+        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;chart-container&quot;</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">canvas</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;chart&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">canvas</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span></code></pre>
+<h3 id="4-样式文件（style-css）"><a class="header-anchor" href="#4-样式文件（style-css）"></a>4. 样式文件（style.css）</h3>
+<pre><code class="hljs css"><span class="hljs-selector-tag">body</span> &#123;
+    <span class="hljs-attribute">font-family</span>: Arial, sans-serif;
+    <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.6</span>;
+    <span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span>;
+    <span class="hljs-attribute">padding</span>: <span class="hljs-number">20px</span>;
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#f5f5f5</span>;
+&#125;
+
+<span class="hljs-selector-class">.container</span> &#123;
+    <span class="hljs-attribute">max-width</span>: <span class="hljs-number">800px</span>;
+    <span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
+    <span class="hljs-attribute">background</span>: white;
+    <span class="hljs-attribute">padding</span>: <span class="hljs-number">20px</span>;
+    <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">8px</span>;
+    <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">2px</span> <span class="hljs-number">4px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.1</span>);
+&#125;
+
+<span class="hljs-selector-tag">h1</span> &#123;
+    <span class="hljs-attribute">color</span>: <span class="hljs-number">#333</span>;
+    <span class="hljs-attribute">text-align</span>: center;
+&#125;
+
+<span class="hljs-selector-class">.controls</span> &#123;
+    <span class="hljs-attribute">margin</span>: <span class="hljs-number">20px</span> <span class="hljs-number">0</span>;
+    <span class="hljs-attribute">display</span>: flex;
+    <span class="hljs-attribute">flex-wrap</span>: wrap;
+    <span class="hljs-attribute">gap</span>: <span class="hljs-number">10px</span>;
+    <span class="hljs-attribute">align-items</span>: center;
+&#125;
+
+<span class="hljs-selector-class">.controls</span> <span class="hljs-selector-tag">label</span> &#123;
+    <span class="hljs-attribute">margin-right</span>: <span class="hljs-number">10px</span>;
+&#125;
+
+<span class="hljs-selector-class">.controls</span> <span class="hljs-selector-tag">input</span> &#123;
+    <span class="hljs-attribute">padding</span>: <span class="hljs-number">8px</span>;
+    <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#ddd</span>;
+    <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">4px</span>;
+&#125;
+
+<span class="hljs-selector-tag">button</span> &#123;
+    <span class="hljs-attribute">padding</span>: <span class="hljs-number">8px</span> <span class="hljs-number">16px</span>;
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#4CAF50</span>;
+    <span class="hljs-attribute">color</span>: white;
+    <span class="hljs-attribute">border</span>: none;
+    <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">4px</span>;
+    <span class="hljs-attribute">cursor</span>: pointer;
+&#125;
+
+<span class="hljs-selector-tag">button</span><span class="hljs-selector-pseudo">:hover</span> &#123;
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#45a049</span>;
+&#125;
+
+<span class="hljs-selector-class">.chart-container</span> &#123;
+    <span class="hljs-attribute">margin-top</span>: <span class="hljs-number">20px</span>;
+    <span class="hljs-attribute">height</span>: <span class="hljs-number">400px</span>;
+&#125;
+
+<span class="hljs-selector-id">#status</span> &#123;
+    <span class="hljs-attribute">text-align</span>: center;
+    <span class="hljs-attribute">color</span>: <span class="hljs-number">#666</span>;
+&#125;</code></pre>
+<h2 id="🚀-性能优化技巧"><a class="header-anchor" href="#🚀-性能优化技巧"></a>🚀 性能优化技巧</h2>
+<p>在使用Go WebAssembly时，性能优化非常重要，下面是一些实用的优化技巧：</p>
+<h3 id="1-最小化Go和JavaScript之间的通信"><a class="header-anchor" href="#1-最小化Go和JavaScript之间的通信"></a>1. 最小化Go和JavaScript之间的通信</h3>
+<p>每次跨边界调用都有一定开销，尽量批量处理：</p>
+<pre><code class="hljs go"><span class="hljs-comment">// 低效方式：频繁跨边界调用</span>
+<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">1000</span>; i++ &#123;
+    js.Global().Call(<span class="hljs-string">&quot;processItem&quot;</span>, i)
+&#125;
+
+<span class="hljs-comment">// 优化方式：一次性传递数据</span>
+items := js.Global().Get(<span class="hljs-string">&quot;Array&quot;</span>).New(<span class="hljs-number">1000</span>)
+<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">1000</span>; i++ &#123;
+    items.SetIndex(i, i)
+&#125;
+js.Global().Call(<span class="hljs-string">&quot;processItems&quot;</span>, items)</code></pre>
+<h3 id="2-使用TypedArrays进行二进制数据交换"><a class="header-anchor" href="#2-使用TypedArrays进行二进制数据交换"></a>2. 使用TypedArrays进行二进制数据交换</h3>
+<p>对于大型数据传输，使用TypedArrays比JSON序列化效率更高：</p>
+<pre><code class="hljs go"><span class="hljs-comment">// 创建一个Float64Array</span>
+length := <span class="hljs-number">1000</span>
+array := js.Global().Get(<span class="hljs-string">&quot;Float64Array&quot;</span>).New(length)
+
+<span class="hljs-comment">// 将Go数据复制到TypedArray</span>
+<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; length; i++ &#123;
+    array.SetIndex(i, math.Sin(<span class="hljs-keyword">float64</span>(i)*<span class="hljs-number">0.01</span>))
+&#125;
+
+<span class="hljs-comment">// 将TypedArray传递给JavaScript</span>
+js.Global().Call(<span class="hljs-string">&quot;processArray&quot;</span>, array)</code></pre>
+<h3 id="3-避免频繁内存分配"><a class="header-anchor" href="#3-避免频繁内存分配"></a>3. 避免频繁内存分配</h3>
+<p>重用对象以减少垃圾回收：</p>
+<pre><code class="hljs go"><span class="hljs-comment">// 缓存常用JS对象引用</span>
+<span class="hljs-keyword">var</span> (
+    document = js.Global().Get(<span class="hljs-string">&quot;document&quot;</span>)
+    console  = js.Global().Get(<span class="hljs-string">&quot;console&quot;</span>)
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">updateUI</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 直接使用缓存的引用</span>
+    document.Call(<span class="hljs-string">&quot;getElementById&quot;</span>, <span class="hljs-string">&quot;status&quot;</span>).Set(<span class="hljs-string">&quot;textContent&quot;</span>, <span class="hljs-string">&quot;更新完成&quot;</span>)
+    console.Call(<span class="hljs-string">&quot;log&quot;</span>, <span class="hljs-string">&quot;UI已更新&quot;</span>)
+&#125;</code></pre>
+<h3 id="4-使用Worker进行并行处理"><a class="header-anchor" href="#4-使用Worker进行并行处理"></a>4. 使用Worker进行并行处理</h3>
+<p>Go WebAssembly可以在Web Worker中运行，避免阻塞主线程：</p>
+<pre><code class="hljs javascript"><span class="hljs-comment">// main.js</span>
+<span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> Worker(<span class="hljs-string">&#x27;worker.js&#x27;</span>);
+worker.onmessage = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>) </span>&#123;
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;从Worker收到结果:&#x27;</span>, e.data);
+&#125;;
+worker.postMessage(&#123;<span class="hljs-attr">action</span>: <span class="hljs-string">&#x27;process&#x27;</span>, <span class="hljs-attr">data</span>: [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>]&#125;);
+
+<span class="hljs-comment">// worker.js</span>
+importScripts(<span class="hljs-string">&#x27;wasm_exec.js&#x27;</span>);
+
+<span class="hljs-keyword">const</span> go = <span class="hljs-keyword">new</span> Go();
+WebAssembly.instantiateStreaming(fetch(<span class="hljs-string">&quot;worker.wasm&quot;</span>), go.importObject)
+    .then(<span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> &#123;
+        go.run(result.instance);
+        
+        <span class="hljs-comment">// 接收来自主线程的消息</span>
+        self.onmessage = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>) </span>&#123;
+            <span class="hljs-keyword">if</span> (e.data.action === <span class="hljs-string">&#x27;process&#x27;</span>) &#123;
+                <span class="hljs-comment">// 调用Go函数处理数据</span>
+                <span class="hljs-keyword">const</span> result = processData(e.data.data);
+                <span class="hljs-comment">// 将结果发送回主线程</span>
+                self.postMessage(result);
+            &#125;
+        &#125;;
+    &#125;);</code></pre>
+<h2 id="🔍-调试技巧"><a class="header-anchor" href="#🔍-调试技巧"></a>🔍 调试技巧</h2>
+<p>WebAssembly调试可能比较棘手，以下是一些有用的技巧：</p>
+<h3 id="1-使用console-log进行调试"><a class="header-anchor" href="#1-使用console-log进行调试"></a>1. 使用console.log进行调试</h3>
+<p>在Go中，使用<code>println</code>或通过JavaScript的<code>console.log</code>：</p>
+<pre><code class="hljs go"><span class="hljs-comment">// Go中的原生println（输出到浏览器控制台）</span>
+<span class="hljs-built_in">println</span>(<span class="hljs-string">&quot;Debug:&quot;</span>, someValue)
+
+<span class="hljs-comment">// 或通过JavaScript的console.log</span>
+js.Global().Get(<span class="hljs-string">&quot;console&quot;</span>).Call(<span class="hljs-string">&quot;log&quot;</span>, <span class="hljs-string">&quot;Debug:&quot;</span>, someValue)</code></pre>
+<h3 id="2-使用Chrome-DevTools"><a class="header-anchor" href="#2-使用Chrome-DevTools"></a>2. 使用Chrome DevTools</h3>
+<p>Chrome浏览器现在支持WebAssembly调试：</p>
+<ol>
+<li>打开Chrome DevTools</li>
+<li>转到Sources标签</li>
+<li>在左侧面板找到.wasm文件</li>
+<li>可以看到反汇编的WebAssembly代码</li>
+<li>设置断点并检查数据</li>
+</ol>
+<h3 id="3-实现错误处理"><a class="header-anchor" href="#3-实现错误处理"></a>3. 实现错误处理</h3>
+<p>包装Go函数以捕获并报告错误：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">safeJsFunc</span><span class="hljs-params">(fn <span class="hljs-keyword">func</span>(js.Value, []js.Value)</span> <span class="hljs-title">interface</span></span>&#123;&#125;) js.Func &#123;
+    <span class="hljs-keyword">return</span> js.FuncOf(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(this js.Value, args []js.Value)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+        <span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+            <span class="hljs-keyword">if</span> r := <span class="hljs-built_in">recover</span>(); r != <span class="hljs-literal">nil</span> &#123;
+                js.Global().Get(<span class="hljs-string">&quot;console&quot;</span>).Call(<span class="hljs-string">&quot;error&quot;</span>, <span class="hljs-string">&quot;Go函数错误:&quot;</span>, r)
+            &#125;
+        &#125;()
+        <span class="hljs-keyword">return</span> fn(this, args)
+    &#125;)
+&#125;
+
+<span class="hljs-comment">// 使用</span>
+js.Global().Set(<span class="hljs-string">&quot;myFunction&quot;</span>, safeJsFunc(actualFunction))</code></pre>
+<h2 id="🔮-未来展望与局限性"><a class="header-anchor" href="#🔮-未来展望与局限性"></a>🔮 未来展望与局限性</h2>
+<p>Go WebAssembly虽然有巨大潜力，但也存在一些局限性：</p>
+<h3 id="优势"><a class="header-anchor" href="#优势"></a>优势</h3>
+<ul>
+<li>Go的强大类型系统和并发模型</li>
+<li>能够复用现有的Go代码</li>
+<li>在浏览器中实现接近原生的性能</li>
+<li>可以使用Go生态系统中的库</li>
+</ul>
+<h3 id="局限性"><a class="header-anchor" href="#局限性"></a>局限性</h3>
+<ul>
+<li>二进制大小问题：Go WebAssembly通常比Rust或C++编译的二进制更大</li>
+<li>垃圾收集器开销：Go的GC可能会导致偶尔的卡顿</li>
+<li>DOM操作不够原生：与JavaScript相比，DOM操作较繁琐</li>
+<li>工具支持仍在完善中</li>
+</ul>
+<h3 id="未来发展趋势"><a class="header-anchor" href="#未来发展趋势"></a>未来发展趋势</h3>
+<ul>
+<li>WASI（WebAssembly系统接口）的发展将使WebAssembly用途更广</li>
+<li>组件模型将改进模块化和互操作性</li>
+<li>垃圾收集器提案将提升Go等语言的表现</li>
+<li>多线程支持将改进并发性能</li>
+</ul>
+<h2 id="📝-总结"><a class="header-anchor" href="#📝-总结"></a>📝 总结</h2>
+<p>Go WebAssembly为开发者提供了一种在Web前端使用Go语言能力的途径。虽然存在一些局限性，但随着WebAssembly技术的不断成熟，这些限制将逐渐被解决。</p>
+<p>对于以下场景，Go WebAssembly特别有价值：</p>
+<ul>
+<li>希望在前端复用Go后端代码的应用</li>
+<li>需要高性能计算的Web应用（如数据处理、图形处理）</li>
+<li>对类型安全和并发性有高要求的前端应用</li>
+</ul>
+<p>希望本文能帮助你开始使用Go WebAssembly，探索这一激动人心的技术。如果你有问题或经验要分享，欢迎在评论区交流！</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/">Golang</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Go/">Go</a>
+                    
+                      <a class="hover-with-bg" href="/tags/WebAssembly/">WebAssembly</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Wasm/">Wasm</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%89%8D%E7%AB%AF/">前端</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/27/DevOps%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E4%B8%8E%E9%83%A8%E7%BD%B2%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">🚀 DevOps自动化测试与部署最佳实践</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2024/11/15/AI%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BE%85%E5%8A%A9Go%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">
+                        <span class="hidden-mobile">🤖 AI大模型辅助Go代码生成最佳实践</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2024/12/05/Go语言与WebAssembly实战指南/';
+          this.page.identifier = '/2024/12/05/Go语言与WebAssembly实战指南/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>golang 使用wire进行依赖注入 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                golang 使用wire进行依赖注入
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2024-03-28 10:42">
+      2024年3月28日 上午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      25
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="🔌-golang-使用wire进行依赖注入"><a class="header-anchor" href="#🔌-golang-使用wire进行依赖注入"></a>🔌 golang 使用wire进行依赖注入</h2>
+<p>依赖注入(Dependency Injection，简称DI)是一种设计模式，它可以让我们编写更加模块化、可测试和可维护的代码。在Go语言中，Google开源的<a target="_blank" rel="noopener" href="https://github.com/google/wire">Wire</a>库提供了一种编译时依赖注入的解决方案，可以帮助我们自动生成依赖关系代码。本文将详细介绍如何使用Wire进行依赖注入。</p>
+<h3 id="📚-依赖注入基础"><a class="header-anchor" href="#📚-依赖注入基础"></a>📚 依赖注入基础</h3>
+<p>在深入Wire之前，让我们先了解一下什么是依赖注入。</p>
+<p>依赖注入的核心思想是：<strong>一个对象不应该负责创建它所依赖的对象，而应该从外部接收它们</strong>。比如：</p>
+<pre><code class="hljs go"><span class="hljs-comment">// 不使用依赖注入</span>
+<span class="hljs-keyword">type</span> Service <span class="hljs-keyword">struct</span> &#123;
+    repository *Repository
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewService</span><span class="hljs-params">()</span> *<span class="hljs-title">Service</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;Service&#123;
+        repository: NewRepository(), <span class="hljs-comment">// Service自己创建了Repository</span>
+    &#125;
+&#125;
+
+<span class="hljs-comment">// 使用依赖注入</span>
+<span class="hljs-keyword">type</span> Service <span class="hljs-keyword">struct</span> &#123;
+    repository *Repository
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewService</span><span class="hljs-params">(repository *Repository)</span> *<span class="hljs-title">Service</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;Service&#123;
+        repository: repository, <span class="hljs-comment">// Repository从外部注入</span>
+    &#125;
+&#125;</code></pre>
+<p>依赖注入的好处包括：</p>
+<ul>
+<li>代码解耦，提高可维护性</li>
+<li>便于单元测试，可以轻松注入mock对象</li>
+<li>提高代码可读性，依赖关系一目了然</li>
+</ul>
+<h3 id="🛠️-Wire-介绍"><a class="header-anchor" href="#🛠️-Wire-介绍"></a>🛠️ Wire 介绍</h3>
+<p>Wire是Google开发的一个依赖注入工具，它通过代码生成的方式来处理依赖注入，而不是在运行时使用反射。这带来了几个重要优势：</p>
+<ol>
+<li><strong>编译时检查</strong>：依赖关系在编译时验证，不会有运行时错误</li>
+<li><strong>无反射开销</strong>：生成的代码不使用反射，性能与手写代码相当</li>
+<li><strong>易于调试</strong>：生成的代码清晰易读，便于理解和调试</li>
+</ol>
+<h3 id="🚀-安装Wire"><a class="header-anchor" href="#🚀-安装Wire"></a>🚀 安装Wire</h3>
+<p>首先，我们需要安装Wire工具：</p>
+<pre><code class="hljs bash">go install github.com/google/wire/cmd/wire@latest</code></pre>
+<h3 id="🔍-Wire的基本使用"><a class="header-anchor" href="#🔍-Wire的基本使用"></a>🔍 Wire的基本使用</h3>
+<p>让我们通过一个简单的例子来了解Wire的使用方法。假设我们有以下几个组件：</p>
+<ol>
+<li>一个数据库连接</li>
+<li>一个用户仓库</li>
+<li>一个用户服务</li>
+</ol>
+<p>不使用Wire的话，我们的代码可能是这样的：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span>
+
+<span class="hljs-comment">// DB表示数据库连接</span>
+<span class="hljs-keyword">type</span> DB <span class="hljs-keyword">struct</span> &#123;
+    ConnectionString <span class="hljs-keyword">string</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewDB</span><span class="hljs-params">()</span> *<span class="hljs-title">DB</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;DB&#123;ConnectionString: <span class="hljs-string">&quot;user:password@tcp(localhost:3306)/mydb&quot;</span>&#125;
+&#125;
+
+<span class="hljs-comment">// UserRepository处理用户数据存储</span>
+<span class="hljs-keyword">type</span> UserRepository <span class="hljs-keyword">struct</span> &#123;
+    db *DB
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewUserRepository</span><span class="hljs-params">(db *DB)</span> *<span class="hljs-title">UserRepository</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;UserRepository&#123;db: db&#125;
+&#125;
+
+<span class="hljs-comment">// UserService提供用户相关的业务逻辑</span>
+<span class="hljs-keyword">type</span> UserService <span class="hljs-keyword">struct</span> &#123;
+    repo *UserRepository
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewUserService</span><span class="hljs-params">(repo *UserRepository)</span> *<span class="hljs-title">UserService</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;UserService&#123;repo: repo&#125;
+&#125;
+
+<span class="hljs-comment">// App是我们的应用程序</span>
+<span class="hljs-keyword">type</span> App <span class="hljs-keyword">struct</span> &#123;
+    userService *UserService
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewApp</span><span class="hljs-params">(userService *UserService)</span> *<span class="hljs-title">App</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;App&#123;userService: userService&#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 手动装配依赖</span>
+    db := NewDB()
+    userRepo := NewUserRepository(db)
+    userService := NewUserService(userRepo)
+    app := NewApp(userService)
+    
+    fmt.Printf(<span class="hljs-string">&quot;App created: %v\n&quot;</span>, app)
+&#125;</code></pre>
+<p>在这个例子中，我们手动创建了所有组件并将它们连接起来。现在，让我们使用Wire来自动化这个过程。</p>
+<h3 id="⚡-使用Wire重构"><a class="header-anchor" href="#⚡-使用Wire重构"></a>⚡ 使用Wire重构</h3>
+<p>首先，我们在相同包中创建一个<code>wire.go</code>文件:</p>
+<pre><code class="hljs go"><span class="hljs-comment">//+build wireinject</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;github.com/google/wire&quot;</span>
+
+<span class="hljs-comment">// InitializeApp 是我们的依赖注入函数</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">InitializeApp</span><span class="hljs-params">()</span> *<span class="hljs-title">App</span></span> &#123;
+    wire.Build(NewDB, NewUserRepository, NewUserService, NewApp)
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span> <span class="hljs-comment">// 返回值会被Wire生成的代码替换</span>
+&#125;</code></pre>
+<p>注意文件顶部的<code>//+build wireinject</code>标记。这告诉Go编译器在正常构建时忽略这个文件，但Wire工具会使用它来生成依赖注入代码。</p>
+<p>接下来，我们运行Wire工具来生成代码：</p>
+<pre><code class="hljs bash">wire</code></pre>
+<p>Wire会自动创建一个<code>wire_gen.go</code>文件，内容类似：</p>
+<pre><code class="hljs go"><span class="hljs-comment">// Code generated by Wire. DO NOT EDIT.</span>
+
+<span class="hljs-comment">//go:build !wireinject</span>
+<span class="hljs-comment">// +build !wireinject</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-comment">// InitializeApp 是我们的依赖注入函数</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">InitializeApp</span><span class="hljs-params">()</span> *<span class="hljs-title">App</span></span> &#123;
+    db := NewDB()
+    userRepository := NewUserRepository(db)
+    userService := NewUserService(userRepository)
+    app := NewApp(userService)
+    <span class="hljs-keyword">return</span> app
+&#125;</code></pre>
+<p>现在，我们可以修改<code>main.go</code>中的<code>main</code>函数，使用生成的<code>InitializeApp</code>函数：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    app := InitializeApp()
+    fmt.Printf(<span class="hljs-string">&quot;App created: %v\n&quot;</span>, app)
+&#125;</code></pre>
+<p>这就是Wire的基本用法 - 它自动确定创建对象的正确顺序，并生成必要的代码。</p>
+<h3 id="🧩-Wire的高级功能"><a class="header-anchor" href="#🧩-Wire的高级功能"></a>🧩 Wire的高级功能</h3>
+<h4 id="1-Provider-Sets"><a class="header-anchor" href="#1-Provider-Sets"></a>1. Provider Sets</h4>
+<p>在大型项目中，依赖关系可能非常复杂。Wire提供了<code>ProviderSet</code>来组织和重用依赖提供者：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">var</span> DBSet = wire.NewSet(NewDB)
+<span class="hljs-keyword">var</span> RepositorySet = wire.NewSet(NewUserRepository)
+<span class="hljs-keyword">var</span> ServiceSet = wire.NewSet(NewUserService)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">InitializeApp</span><span class="hljs-params">()</span> *<span class="hljs-title">App</span></span> &#123;
+    wire.Build(DBSet, RepositorySet, ServiceSet, NewApp)
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;</code></pre>
+<p>这种方式有助于模块化依赖配置，特别是在微服务架构中。</p>
+<h4 id="2-接口绑定"><a class="header-anchor" href="#2-接口绑定"></a>2. 接口绑定</h4>
+<p>Wire支持将具体实现绑定到接口上，这对于遵循依赖倒置原则非常有用：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> UserRepositoryInterface <span class="hljs-keyword">interface</span> &#123;
+    FindByID(id <span class="hljs-keyword">int</span>) <span class="hljs-keyword">string</span>
+&#125;
+
+<span class="hljs-comment">// 确保UserRepository实现了接口</span>
+<span class="hljs-keyword">var</span> _ UserRepositoryInterface = (*UserRepository)(<span class="hljs-literal">nil</span>)
+
+<span class="hljs-keyword">var</span> RepositorySet = wire.NewSet(
+    NewUserRepository,
+    <span class="hljs-comment">// 将UserRepository绑定到UserRepositoryInterface</span>
+    wire.Bind(<span class="hljs-built_in">new</span>(UserRepositoryInterface), <span class="hljs-built_in">new</span>(*UserRepository)),
+)</code></pre>
+<p>这样，我们就可以在UserService中依赖接口而不是具体实现：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> UserService <span class="hljs-keyword">struct</span> &#123;
+    repo UserRepositoryInterface
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewUserService</span><span class="hljs-params">(repo UserRepositoryInterface)</span> *<span class="hljs-title">UserService</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;UserService&#123;repo: repo&#125;
+&#125;</code></pre>
+<h4 id="3-值提供者"><a class="header-anchor" href="#3-值提供者"></a>3. 值提供者</h4>
+<p>除了构造函数外，Wire还支持提供常量或配置值：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ProvideConnectionString</span><span class="hljs-params">()</span> <span class="hljs-title">string</span></span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;user:password@tcp(localhost:3306)/mydb&quot;</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewDB</span><span class="hljs-params">(connectionString <span class="hljs-keyword">string</span>)</span> *<span class="hljs-title">DB</span></span> &#123;
+    <span class="hljs-keyword">return</span> &amp;DB&#123;ConnectionString: connectionString&#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">InitializeApp</span><span class="hljs-params">()</span> *<span class="hljs-title">App</span></span> &#123;
+    wire.Build(
+        ProvideConnectionString,
+        NewDB,
+        <span class="hljs-comment">// ...其他提供者</span>
+    )
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;</code></pre>
+<h4 id="4-清理函数"><a class="header-anchor" href="#4-清理函数"></a>4. 清理函数</h4>
+<p>某些资源在应用程序关闭时需要释放。Wire支持返回清理函数：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewDB</span><span class="hljs-params">()</span> <span class="hljs-params">(*DB, <span class="hljs-keyword">func</span>()</span>, <span class="hljs-title">error</span>)</span> &#123;
+    db := &amp;DB&#123;ConnectionString: <span class="hljs-string">&quot;...&quot;</span>&#125;
+    
+    <span class="hljs-comment">// 返回清理函数</span>
+    cleanup := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        fmt.Println(<span class="hljs-string">&quot;Closing database connection...&quot;</span>)
+        <span class="hljs-comment">// 关闭连接的代码</span>
+    &#125;
+    
+    <span class="hljs-keyword">return</span> db, cleanup, <span class="hljs-literal">nil</span>
+&#125;</code></pre>
+<p>Wire会自动收集和调用这些清理函数。</p>
+<h3 id="📝-Wire在实际项目中的应用"><a class="header-anchor" href="#📝-Wire在实际项目中的应用"></a>📝 Wire在实际项目中的应用</h3>
+<p>在实际项目中，我们通常会按照以下方式组织代码：</p>
+<ol>
+<li><strong>分层结构</strong>：将代码分为数据访问层、业务逻辑层和表示层</li>
+<li><strong>每层定义自己的Provider Set</strong>：便于模块化和替换</li>
+<li><strong>在入口点组合Provider Sets</strong>：通常是<code>main</code>包或命令包</li>
+</ol>
+<p>例如，一个典型的Web应用依赖图可能是这样的：</p>
+<pre><code class="hljs">App
+ ├── HTTP服务器
+ │    └── 路由器
+ │         └── 控制器
+ │              └── 服务
+ │                   └── 仓库
+ │                        └── 数据库
+ └── 配置</code></pre>
+<p>使用Wire，我们可以轻松管理这些依赖：</p>
+<pre><code class="hljs go"><span class="hljs-comment">// config/wire.go</span>
+<span class="hljs-keyword">package</span> config
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;github.com/google/wire&quot;</span>
+
+<span class="hljs-keyword">var</span> ConfigSet = wire.NewSet(
+    ProvideConfig,
+    ProvideDBConfig,
+    <span class="hljs-comment">// ...其他配置提供者</span>
+)
+
+<span class="hljs-comment">// repository/wire.go</span>
+<span class="hljs-keyword">package</span> repository
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;github.com/google/wire&quot;</span>
+
+<span class="hljs-keyword">var</span> RepositorySet = wire.NewSet(
+    NewUserRepository,
+    NewProductRepository,
+    <span class="hljs-comment">// ...其他仓库</span>
+)
+
+<span class="hljs-comment">// service/wire.go</span>
+<span class="hljs-keyword">package</span> service
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;github.com/google/wire&quot;</span>
+
+<span class="hljs-keyword">var</span> ServiceSet = wire.NewSet(
+    NewUserService,
+    NewProductService,
+    <span class="hljs-comment">// ...其他服务</span>
+)
+
+<span class="hljs-comment">// main.go 或 cmd/server/main.go</span>
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">&quot;myapp/config&quot;</span>
+    <span class="hljs-string">&quot;myapp/repository&quot;</span>
+    <span class="hljs-string">&quot;myapp/service&quot;</span>
+    <span class="hljs-comment">// ...</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">InitializeApp</span><span class="hljs-params">()</span> *<span class="hljs-title">App</span></span> &#123;
+    wire.Build(
+        config.ConfigSet,
+        repository.RepositorySet,
+        service.ServiceSet,
+        <span class="hljs-comment">// ...</span>
+        NewApp,
+    )
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;</code></pre>
+<h3 id="🔧-测试中的依赖注入"><a class="header-anchor" href="#🔧-测试中的依赖注入"></a>🔧 测试中的依赖注入</h3>
+<p>Wire的一个主要优势是便于测试。我们可以轻松地注入mock对象：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestUserService</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+    <span class="hljs-comment">// 创建仓库的mock</span>
+    mockRepo := &amp;MockUserRepository&#123;&#125;
+    mockRepo.On(<span class="hljs-string">&quot;FindByID&quot;</span>, <span class="hljs-number">1</span>).Return(<span class="hljs-string">&quot;test user&quot;</span>)
+    
+    <span class="hljs-comment">// 注入mock到服务</span>
+    service := NewUserService(mockRepo)
+    
+    <span class="hljs-comment">// 测试服务</span>
+    result := service.GetUserByID(<span class="hljs-number">1</span>)
+    assert.Equal(t, <span class="hljs-string">&quot;test user&quot;</span>, result)
+&#125;</code></pre>
+<h3 id="👍-最佳实践"><a class="header-anchor" href="#👍-最佳实践"></a>👍 最佳实践</h3>
+<ol>
+<li><strong>保持提供者函数简单</strong>：每个函数只负责创建一个组件</li>
+<li><strong>使用接口而非具体类型</strong>：遵循依赖倒置原则</li>
+<li><strong>模块化Provider Sets</strong>：按功能或模块组织依赖</li>
+<li><strong>处理错误</strong>：提供者函数应返回错误，而不是在内部处理</li>
+<li><strong>避免全局状态</strong>：所有依赖都应通过参数传递</li>
+<li><strong>提供清晰的文档</strong>：说明每个组件的作用和依赖关系</li>
+</ol>
+<h3 id="📋-总结"><a class="header-anchor" href="#📋-总结"></a>📋 总结</h3>
+<p>Wire提供了一种编译时依赖注入的解决方案，它既保持了Go语言的简洁性，又解决了大型应用中的依赖管理问题。使用Wire，我们可以：</p>
+<ul>
+<li>自动管理复杂的依赖关系</li>
+<li>编写更模块化、可测试的代码</li>
+<li>避免运行时反射带来的性能开销</li>
+<li>在编译时捕获依赖配置错误</li>
+</ul>
+<p>随着应用程序规模的增长，依赖注入变得越来越重要。Wire是Go语言生态系统中的一个宝贵工具，可以帮助我们构建更加健壮和可维护的应用程序。</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/">Golang</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/golang/">golang</a>
+                    
+                      <a class="hover-with-bg" href="/tags/wire/">wire</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/">依赖注入</a>
+                    
+                      <a class="hover-with-bg" href="/tags/DI/">DI</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/04/02/golang-%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">golang 函数式编程实践</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/15/golang-%E5%88%87%E7%89%87%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BC%98%E5%8C%96%E6%8A%80%E5%B7%A7/">
+                        <span class="hidden-mobile">golang 切片底层原理与优化技巧</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2024/03/28/golang-使用wire进行依赖注入/';
+          this.page.identifier = '/2024/03/28/golang-使用wire进行依赖注入/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

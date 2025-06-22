@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>golang 高级并发模式详解 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                golang 高级并发模式详解
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2024-01-30 16:45">
+      2024年1月30日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      62
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="🔄-golang-高级并发模式详解"><a class="header-anchor" href="#🔄-golang-高级并发模式详解"></a>🔄 golang 高级并发模式详解</h2>
+<p>Go语言因其出色的并发支持而广受欢迎，通过goroutine和channel，Go提供了一种简洁而强大的并发编程模型。在实际开发中，我们常常需要使用一些高级并发模式来解决复杂的并发问题。本文将详细介绍Go语言中常用的高级并发模式，帮助你更好地掌握Go的并发编程。</p>
+<h3 id="📚-基础回顾"><a class="header-anchor" href="#📚-基础回顾"></a>📚 基础回顾</h3>
+<p>在深入高级并发模式之前，让我们先简要回顾Go并发的基础概念：</p>
+<h4 id="Goroutine"><a class="header-anchor" href="#Goroutine"></a>Goroutine</h4>
+<p>Goroutine是Go语言中的轻量级线程，由Go运行时管理。创建一个goroutine非常简单：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 在新的goroutine中执行的代码</span>
+    fmt.Println(<span class="hljs-string">&quot;Hello from goroutine!&quot;</span>)
+&#125;()</code></pre>
+<h4 id="Channel"><a class="header-anchor" href="#Channel"></a>Channel</h4>
+<p>Channel是goroutine之间通信的管道，用于在goroutine之间传递数据：</p>
+<pre><code class="hljs go"><span class="hljs-comment">// 创建一个无缓冲channel</span>
+ch := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+
+<span class="hljs-comment">// 发送数据</span>
+<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+    ch &lt;- <span class="hljs-number">42</span>
+&#125;()
+
+<span class="hljs-comment">// 接收数据</span>
+value := &lt;-ch
+fmt.Println(value) <span class="hljs-comment">// 输出: 42</span></code></pre>
+<h4 id="Select语句"><a class="header-anchor" href="#Select语句"></a>Select语句</h4>
+<p>Select语句用于同时监听多个channel的操作：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">select</span> &#123;
+<span class="hljs-keyword">case</span> v := &lt;-ch1:
+    fmt.Println(<span class="hljs-string">&quot;Received from ch1:&quot;</span>, v)
+<span class="hljs-keyword">case</span> ch2 &lt;- <span class="hljs-number">42</span>:
+    fmt.Println(<span class="hljs-string">&quot;Sent to ch2&quot;</span>)
+<span class="hljs-keyword">case</span> &lt;-time.After(<span class="hljs-number">1</span> * time.Second):
+    fmt.Println(<span class="hljs-string">&quot;Timeout&quot;</span>)
+&#125;</code></pre>
+<h3 id="🚀-Worker-Pool模式"><a class="header-anchor" href="#🚀-Worker-Pool模式"></a>🚀 Worker Pool模式</h3>
+<p>Worker Pool（工作池）是一种常见的并发模式，用于限制并发执行的goroutine数量，避免资源耗尽。</p>
+<h4 id="实现原理"><a class="header-anchor" href="#实现原理"></a>实现原理</h4>
+<ol>
+<li>创建固定数量的worker goroutine</li>
+<li>这些worker从任务队列中获取任务并执行</li>
+<li>当所有任务完成后，关闭结果channel</li>
+</ol>
+<h4 id="示例代码"><a class="header-anchor" href="#示例代码"></a>示例代码</h4>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">WorkerPool</span><span class="hljs-params">(numWorkers <span class="hljs-keyword">int</span>, tasks []Task, timeout time.Duration)</span> <span class="hljs-params">([]Result, error)</span></span> &#123;
+    tasksCh := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> Task, <span class="hljs-built_in">len</span>(tasks))
+    resultsCh := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> Result, <span class="hljs-built_in">len</span>(tasks))
+    
+    <span class="hljs-comment">// 启动固定数量的worker</span>
+    <span class="hljs-keyword">var</span> wg sync.WaitGroup
+    wg.Add(numWorkers)
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; numWorkers; i++ &#123;
+        <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(workerID <span class="hljs-keyword">int</span>)</span></span> &#123;
+            <span class="hljs-keyword">defer</span> wg.Done()
+            <span class="hljs-keyword">for</span> task := <span class="hljs-keyword">range</span> tasksCh &#123;
+                result := process(workerID, task)
+                resultsCh &lt;- result
+            &#125;
+        &#125;(i)
+    &#125;
+    
+    <span class="hljs-comment">// 发送任务到任务channel</span>
+    <span class="hljs-keyword">for</span> _, task := <span class="hljs-keyword">range</span> tasks &#123;
+        tasksCh &lt;- task
+    &#125;
+    <span class="hljs-built_in">close</span>(tasksCh) <span class="hljs-comment">// 关闭任务channel，表示没有更多任务</span>
+    
+    <span class="hljs-comment">// 等待所有worker完成并关闭结果channel</span>
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        wg.Wait()
+        <span class="hljs-built_in">close</span>(resultsCh)
+    &#125;()
+    
+    <span class="hljs-comment">// 收集结果</span>
+    <span class="hljs-keyword">var</span> results []Result
+    <span class="hljs-keyword">for</span> result := <span class="hljs-keyword">range</span> resultsCh &#123;
+        results = <span class="hljs-built_in">append</span>(results, result)
+    &#125;
+    
+    <span class="hljs-keyword">return</span> results, <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">process</span><span class="hljs-params">(workerID <span class="hljs-keyword">int</span>, task Task)</span> <span class="hljs-title">Result</span></span> &#123;
+    fmt.Printf(<span class="hljs-string">&quot;Worker %d processing task %v\n&quot;</span>, workerID, task)
+    <span class="hljs-comment">// 处理任务的逻辑</span>
+    time.Sleep(<span class="hljs-number">100</span> * time.Millisecond) <span class="hljs-comment">// 模拟处理时间</span>
+    <span class="hljs-keyword">return</span> Result&#123;TaskID: task.ID, WorkerID: workerID&#125;
+&#125;</code></pre>
+<h4 id="带超时的Worker-Pool"><a class="header-anchor" href="#带超时的Worker-Pool"></a>带超时的Worker Pool</h4>
+<p>在实际应用中，我们通常需要为Worker Pool添加超时机制：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">WorkerPoolWithTimeout</span><span class="hljs-params">(numWorkers <span class="hljs-keyword">int</span>, tasks []Task, timeout time.Duration)</span> <span class="hljs-params">([]Result, error)</span></span> &#123;
+    tasksCh := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> Task, <span class="hljs-built_in">len</span>(tasks))
+    resultsCh := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> Result, <span class="hljs-built_in">len</span>(tasks))
+    
+    ctx, cancel := context.WithTimeout(context.Background(), timeout)
+    <span class="hljs-keyword">defer</span> cancel()
+    
+    <span class="hljs-comment">// 启动固定数量的worker</span>
+    <span class="hljs-keyword">var</span> wg sync.WaitGroup
+    wg.Add(numWorkers)
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; numWorkers; i++ &#123;
+        <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(workerID <span class="hljs-keyword">int</span>)</span></span> &#123;
+            <span class="hljs-keyword">defer</span> wg.Done()
+            <span class="hljs-keyword">for</span> &#123;
+                <span class="hljs-keyword">select</span> &#123;
+                <span class="hljs-keyword">case</span> task, ok := &lt;-tasksCh:
+                    <span class="hljs-keyword">if</span> !ok &#123;
+                        <span class="hljs-keyword">return</span> <span class="hljs-comment">// tasksCh已关闭，退出</span>
+                    &#125;
+                    result := process(workerID, task)
+                    
+                    <span class="hljs-comment">// 发送结果，但需要处理ctx取消的情况</span>
+                    <span class="hljs-keyword">select</span> &#123;
+                    <span class="hljs-keyword">case</span> resultsCh &lt;- result:
+                        <span class="hljs-comment">// 结果成功发送</span>
+                    <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+                        <span class="hljs-keyword">return</span> <span class="hljs-comment">// 上下文已取消，退出</span>
+                    &#125;
+                    
+                <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+                    <span class="hljs-keyword">return</span> <span class="hljs-comment">// 上下文已取消，退出</span>
+                &#125;
+            &#125;
+        &#125;(i)
+    &#125;
+    
+    <span class="hljs-comment">// 发送任务到任务channel</span>
+    <span class="hljs-keyword">for</span> _, task := <span class="hljs-keyword">range</span> tasks &#123;
+        <span class="hljs-keyword">select</span> &#123;
+        <span class="hljs-keyword">case</span> tasksCh &lt;- task:
+            <span class="hljs-comment">// 任务成功发送</span>
+        <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+            <span class="hljs-built_in">close</span>(tasksCh) <span class="hljs-comment">// 关闭channel，让worker退出</span>
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, ctx.Err()
+        &#125;
+    &#125;
+    <span class="hljs-built_in">close</span>(tasksCh) <span class="hljs-comment">// 关闭任务channel，表示没有更多任务</span>
+    
+    <span class="hljs-comment">// 等待所有worker完成或超时</span>
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        wg.Wait()
+        <span class="hljs-built_in">close</span>(resultsCh)
+    &#125;()
+    
+    <span class="hljs-comment">// 收集结果</span>
+    <span class="hljs-keyword">var</span> results []Result
+    <span class="hljs-keyword">for</span> &#123;
+        <span class="hljs-keyword">select</span> &#123;
+        <span class="hljs-keyword">case</span> result, ok := &lt;-resultsCh:
+            <span class="hljs-keyword">if</span> !ok &#123;
+                <span class="hljs-comment">// resultsCh已关闭，所有结果已收集</span>
+                <span class="hljs-keyword">return</span> results, <span class="hljs-literal">nil</span>
+            &#125;
+            results = <span class="hljs-built_in">append</span>(results, result)
+        <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+            <span class="hljs-keyword">return</span> results, ctx.Err()
+        &#125;
+    &#125;
+&#125;</code></pre>
+<h3 id="🔄-Pipeline模式"><a class="header-anchor" href="#🔄-Pipeline模式"></a>🔄 Pipeline模式</h3>
+<p>Pipeline（管道）模式是一种将数据从一个处理阶段传递到下一个处理阶段的并发模式。每个阶段可以由一个或多个goroutine组成，通过channel连接各个阶段。</p>
+<h4 id="实现原理-2"><a class="header-anchor" href="#实现原理-2"></a>实现原理</h4>
+<ol>
+<li>每个处理阶段接收上一阶段的输出作为输入</li>
+<li>每个阶段并行处理数据，并将结果发送到下一阶段</li>
+<li>当第一个阶段完成时，它会关闭输出channel，触发下一阶段的结束，以此类推</li>
+</ol>
+<h4 id="示例代码-2"><a class="header-anchor" href="#示例代码-2"></a>示例代码</h4>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">generator</span><span class="hljs-params">(nums ...<span class="hljs-keyword">int</span>)</span> &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+    out := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(out)
+        <span class="hljs-keyword">for</span> _, n := <span class="hljs-keyword">range</span> nums &#123;
+            out &lt;- n
+        &#125;
+    &#125;()
+    <span class="hljs-keyword">return</span> out
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">square</span><span class="hljs-params">(in &lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)</span> &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+    out := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(out)
+        <span class="hljs-keyword">for</span> n := <span class="hljs-keyword">range</span> in &#123;
+            out &lt;- n * n
+        &#125;
+    &#125;()
+    <span class="hljs-keyword">return</span> out
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">filter</span><span class="hljs-params">(in &lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>, f <span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">bool</span>) &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+    out := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(out)
+        <span class="hljs-keyword">for</span> n := <span class="hljs-keyword">range</span> in &#123;
+            <span class="hljs-keyword">if</span> f(n) &#123;
+                out &lt;- n
+            &#125;
+        &#125;
+    &#125;()
+    <span class="hljs-keyword">return</span> out
+&#125;
+
+<span class="hljs-comment">// 使用示例</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 创建一个包含1-10的数字生成器</span>
+    nums := generator(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>, <span class="hljs-number">10</span>)
+    
+    <span class="hljs-comment">// 对数字进行平方</span>
+    squares := square(nums)
+    
+    <span class="hljs-comment">// 过滤出大于30的结果</span>
+    results := filter(squares, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">bool</span></span> &#123;
+        <span class="hljs-keyword">return</span> n &gt; <span class="hljs-number">30</span>
+    &#125;)
+    
+    <span class="hljs-comment">// 打印结果</span>
+    <span class="hljs-keyword">for</span> result := <span class="hljs-keyword">range</span> results &#123;
+        fmt.Println(result)
+    &#125;
+&#125;</code></pre>
+<h4 id="带错误处理的Pipeline"><a class="header-anchor" href="#带错误处理的Pipeline"></a>带错误处理的Pipeline</h4>
+<p>在实际应用中，Pipeline的各个阶段可能会产生错误，我们需要妥善处理这些错误：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Result <span class="hljs-keyword">struct</span> &#123;
+    Value <span class="hljs-keyword">int</span>
+    Err   error
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">generatorWithError</span><span class="hljs-params">(nums ...<span class="hljs-keyword">int</span>)</span> &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">Result</span></span> &#123;
+    out := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> Result)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(out)
+        <span class="hljs-keyword">for</span> _, n := <span class="hljs-keyword">range</span> nums &#123;
+            <span class="hljs-keyword">if</span> n &lt; <span class="hljs-number">0</span> &#123;
+                out &lt;- Result&#123;Err: fmt.Errorf(<span class="hljs-string">&quot;negative number: %d&quot;</span>, n)&#125;
+                <span class="hljs-keyword">return</span>
+            &#125;
+            out &lt;- Result&#123;Value: n&#125;
+        &#125;
+    &#125;()
+    <span class="hljs-keyword">return</span> out
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">squareWithError</span><span class="hljs-params">(in &lt;-<span class="hljs-keyword">chan</span> Result)</span> &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">Result</span></span> &#123;
+    out := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> Result)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(out)
+        <span class="hljs-keyword">for</span> r := <span class="hljs-keyword">range</span> in &#123;
+            <span class="hljs-keyword">if</span> r.Err != <span class="hljs-literal">nil</span> &#123;
+                out &lt;- r <span class="hljs-comment">// 传递错误</span>
+                <span class="hljs-keyword">continue</span>
+            &#125;
+            
+            <span class="hljs-comment">// 处理值</span>
+            <span class="hljs-keyword">if</span> r.Value &gt; <span class="hljs-number">100</span> &#123;
+                out &lt;- Result&#123;Err: fmt.Errorf(<span class="hljs-string">&quot;value too large: %d&quot;</span>, r.Value)&#125;
+                <span class="hljs-keyword">continue</span>
+            &#125;
+            out &lt;- Result&#123;Value: r.Value * r.Value&#125;
+        &#125;
+    &#125;()
+    <span class="hljs-keyword">return</span> out
+&#125;
+
+<span class="hljs-comment">// 使用示例</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    results := squareWithError(generatorWithError(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">-3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>))
+    
+    <span class="hljs-keyword">for</span> r := <span class="hljs-keyword">range</span> results &#123;
+        <span class="hljs-keyword">if</span> r.Err != <span class="hljs-literal">nil</span> &#123;
+            fmt.Println(<span class="hljs-string">&quot;Error:&quot;</span>, r.Err)
+            <span class="hljs-keyword">break</span>
+        &#125;
+        fmt.Println(<span class="hljs-string">&quot;Result:&quot;</span>, r.Value)
+    &#125;
+&#125;</code></pre>
+<h3 id="🔀-Fan-Out-Fan-In模式"><a class="header-anchor" href="#🔀-Fan-Out-Fan-In模式"></a>🔀 Fan-Out, Fan-In模式</h3>
+<p>Fan-Out, Fan-In是一种将工作分散到多个goroutine（Fan-Out），然后收集结果（Fan-In）的并发模式。这种模式特别适合CPU密集型任务。</p>
+<h4 id="实现原理-3"><a class="header-anchor" href="#实现原理-3"></a>实现原理</h4>
+<ol>
+<li><strong>Fan-Out</strong>：将输入数据分配给多个goroutine处理</li>
+<li><strong>Fan-In</strong>：将多个goroutine的输出合并到一个channel</li>
+</ol>
+<h4 id="示例代码-3"><a class="header-anchor" href="#示例代码-3"></a>示例代码</h4>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fanOut</span><span class="hljs-params">(in &lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>, n <span class="hljs-keyword">int</span>, f <span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span>) []&lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+    <span class="hljs-comment">// 创建n个输出channel</span>
+    outs := <span class="hljs-built_in">make</span>([]&lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>, n)
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; n; i++ &#123;
+        outs[i] = processChannel(in, f)
+    &#125;
+    <span class="hljs-keyword">return</span> outs
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">processChannel</span><span class="hljs-params">(in &lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>, f <span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span>) &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+    out := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(out)
+        <span class="hljs-keyword">for</span> v := <span class="hljs-keyword">range</span> in &#123;
+            out &lt;- f(v)
+        &#125;
+    &#125;()
+    <span class="hljs-keyword">return</span> out
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fanIn</span><span class="hljs-params">(channels []&lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)</span> &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+    out := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+    <span class="hljs-keyword">var</span> wg sync.WaitGroup
+    
+    <span class="hljs-comment">// 为每个输入channel启动一个goroutine</span>
+    wg.Add(<span class="hljs-built_in">len</span>(channels))
+    <span class="hljs-keyword">for</span> _, ch := <span class="hljs-keyword">range</span> channels &#123;
+        <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(c &lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)</span></span> &#123;
+            <span class="hljs-keyword">defer</span> wg.Done()
+            <span class="hljs-keyword">for</span> v := <span class="hljs-keyword">range</span> c &#123;
+                out &lt;- v
+            &#125;
+        &#125;(ch)
+    &#125;
+    
+    <span class="hljs-comment">// 当所有输入channel关闭后，关闭输出channel</span>
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        wg.Wait()
+        <span class="hljs-built_in">close</span>(out)
+    &#125;()
+    
+    <span class="hljs-keyword">return</span> out
+&#125;
+
+<span class="hljs-comment">// 使用示例</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 创建输入channel</span>
+    in := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(in)
+        <span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">10</span>; i++ &#123;
+            in &lt;- i
+        &#125;
+    &#125;()
+    
+    <span class="hljs-comment">// 定义处理函数（计算平方）</span>
+    square := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(x <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+        time.Sleep(<span class="hljs-number">100</span> * time.Millisecond) <span class="hljs-comment">// 模拟耗时操作</span>
+        <span class="hljs-keyword">return</span> x * x
+    &#125;
+    
+    <span class="hljs-comment">// Fan-Out到4个goroutine</span>
+    channels := fanOut(in, <span class="hljs-number">4</span>, square)
+    
+    <span class="hljs-comment">// Fan-In结果</span>
+    out := fanIn(channels)
+    
+    <span class="hljs-comment">// 打印结果</span>
+    <span class="hljs-keyword">for</span> result := <span class="hljs-keyword">range</span> out &#123;
+        fmt.Println(result)
+    &#125;
+&#125;</code></pre>
+<h4 id="使用context控制Fan-Out-Fan-In"><a class="header-anchor" href="#使用context控制Fan-Out-Fan-In"></a>使用context控制Fan-Out, Fan-In</h4>
+<p>在实际应用中，我们可能需要取消或设置超时：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fanOutWithContext</span><span class="hljs-params">(ctx context.Context, in &lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>, n <span class="hljs-keyword">int</span>, f <span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span>) []&lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+    outs := <span class="hljs-built_in">make</span>([]&lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>, n)
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; n; i++ &#123;
+        outs[i] = processChannelWithContext(ctx, in, f)
+    &#125;
+    <span class="hljs-keyword">return</span> outs
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">processChannelWithContext</span><span class="hljs-params">(ctx context.Context, in &lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>, f <span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span>) &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+    out := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(out)
+        <span class="hljs-keyword">for</span> &#123;
+            <span class="hljs-keyword">select</span> &#123;
+            <span class="hljs-keyword">case</span> v, ok := &lt;-in:
+                <span class="hljs-keyword">if</span> !ok &#123;
+                    <span class="hljs-keyword">return</span>
+                &#125;
+                result := f(v)
+                <span class="hljs-keyword">select</span> &#123;
+                <span class="hljs-keyword">case</span> out &lt;- result:
+                    <span class="hljs-comment">// 成功发送</span>
+                <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+                    <span class="hljs-keyword">return</span>
+                &#125;
+            <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+                <span class="hljs-keyword">return</span>
+            &#125;
+        &#125;
+    &#125;()
+    <span class="hljs-keyword">return</span> out
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fanInWithContext</span><span class="hljs-params">(ctx context.Context, channels []&lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)</span> &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+    out := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+    <span class="hljs-keyword">var</span> wg sync.WaitGroup
+    
+    <span class="hljs-comment">// 为每个输入channel启动一个goroutine</span>
+    wg.Add(<span class="hljs-built_in">len</span>(channels))
+    <span class="hljs-keyword">for</span> _, ch := <span class="hljs-keyword">range</span> channels &#123;
+        <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(c &lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)</span></span> &#123;
+            <span class="hljs-keyword">defer</span> wg.Done()
+            <span class="hljs-keyword">for</span> &#123;
+                <span class="hljs-keyword">select</span> &#123;
+                <span class="hljs-keyword">case</span> v, ok := &lt;-c:
+                    <span class="hljs-keyword">if</span> !ok &#123;
+                        <span class="hljs-keyword">return</span>
+                    &#125;
+                    <span class="hljs-keyword">select</span> &#123;
+                    <span class="hljs-keyword">case</span> out &lt;- v:
+                        <span class="hljs-comment">// 成功发送</span>
+                    <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+                        <span class="hljs-keyword">return</span>
+                    &#125;
+                <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+                    <span class="hljs-keyword">return</span>
+                &#125;
+            &#125;
+        &#125;(ch)
+    &#125;
+    
+    <span class="hljs-comment">// 当所有输入channel关闭或上下文取消时，关闭输出channel</span>
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        wg.Wait()
+        <span class="hljs-built_in">close</span>(out)
+    &#125;()
+    
+    <span class="hljs-keyword">return</span> out
+&#125;
+
+<span class="hljs-comment">// 使用示例</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 创建带超时的上下文</span>
+    ctx, cancel := context.WithTimeout(context.Background(), <span class="hljs-number">2</span>*time.Second)
+    <span class="hljs-keyword">defer</span> cancel()
+    
+    <span class="hljs-comment">// 创建输入channel</span>
+    in := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(in)
+        <span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">10</span>; i++ &#123;
+            <span class="hljs-keyword">select</span> &#123;
+            <span class="hljs-keyword">case</span> in &lt;- i:
+                <span class="hljs-comment">// 成功发送</span>
+            <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+                <span class="hljs-keyword">return</span>
+            &#125;
+        &#125;
+    &#125;()
+    
+    <span class="hljs-comment">// 定义处理函数</span>
+    square := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(x <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+        time.Sleep(<span class="hljs-number">100</span> * time.Millisecond) <span class="hljs-comment">// 模拟耗时操作</span>
+        <span class="hljs-keyword">return</span> x * x
+    &#125;
+    
+    <span class="hljs-comment">// Fan-Out到4个goroutine</span>
+    channels := fanOutWithContext(ctx, in, <span class="hljs-number">4</span>, square)
+    
+    <span class="hljs-comment">// Fan-In结果</span>
+    out := fanInWithContext(ctx, channels)
+    
+    <span class="hljs-comment">// 打印结果</span>
+    <span class="hljs-keyword">for</span> result := <span class="hljs-keyword">range</span> out &#123;
+        fmt.Println(result)
+    &#125;
+&#125;</code></pre>
+<h3 id="🔒-并发控制模式"><a class="header-anchor" href="#🔒-并发控制模式"></a>🔒 并发控制模式</h3>
+<p>在处理并发时，我们常常需要控制goroutine的行为，例如限制并发数量、等待所有goroutine完成等。</p>
+<h4 id="使用semaphore限制并发数量"><a class="header-anchor" href="#使用semaphore限制并发数量"></a>使用semaphore限制并发数量</h4>
+<p>虽然Worker Pool也可以限制并发数量，但有时我们需要更灵活的方式：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;golang.org/x/sync/semaphore&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">limitConcurrency</span><span class="hljs-params">(urls []<span class="hljs-keyword">string</span>, concurrencyLimit <span class="hljs-keyword">int64</span>)</span> []<span class="hljs-title">Result</span></span> &#123;
+    sem := semaphore.NewWeighted(concurrencyLimit)
+    ctx := context.Background()
+    
+    <span class="hljs-keyword">var</span> results []Result
+    <span class="hljs-keyword">var</span> mu sync.Mutex <span class="hljs-comment">// 保护results</span>
+    
+    <span class="hljs-keyword">var</span> wg sync.WaitGroup
+    <span class="hljs-keyword">for</span> _, url := <span class="hljs-keyword">range</span> urls &#123;
+        wg.Add(<span class="hljs-number">1</span>)
+        <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(url <span class="hljs-keyword">string</span>)</span></span> &#123;
+            <span class="hljs-keyword">defer</span> wg.Done()
+            
+            <span class="hljs-comment">// 获取信号量</span>
+            <span class="hljs-keyword">if</span> err := sem.Acquire(ctx, <span class="hljs-number">1</span>); err != <span class="hljs-literal">nil</span> &#123;
+                fmt.Printf(<span class="hljs-string">&quot;Failed to acquire semaphore: %v\n&quot;</span>, err)
+                <span class="hljs-keyword">return</span>
+            &#125;
+            <span class="hljs-keyword">defer</span> sem.Release(<span class="hljs-number">1</span>)
+            
+            <span class="hljs-comment">// 执行HTTP请求</span>
+            result := fetchURL(url)
+            
+            <span class="hljs-comment">// 安全地添加结果</span>
+            mu.Lock()
+            results = <span class="hljs-built_in">append</span>(results, result)
+            mu.Unlock()
+        &#125;(url)
+    &#125;
+    
+    wg.Wait()
+    <span class="hljs-keyword">return</span> results
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fetchURL</span><span class="hljs-params">(url <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">Result</span></span> &#123;
+    <span class="hljs-comment">// 模拟HTTP请求</span>
+    time.Sleep(<span class="hljs-number">100</span> * time.Millisecond)
+    <span class="hljs-keyword">return</span> Result&#123;URL: url, Status: <span class="hljs-string">&quot;OK&quot;</span>&#125;
+&#125;</code></pre>
+<h4 id="使用errgroup进行错误处理和取消"><a class="header-anchor" href="#使用errgroup进行错误处理和取消"></a>使用errgroup进行错误处理和取消</h4>
+<p><code>golang.org/x/sync/errgroup</code>包提供了一种优雅的方式来处理goroutine组中的错误：</p>
+<pre><code class="hljs go"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;golang.org/x/sync/errgroup&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fetchAllURLs</span><span class="hljs-params">(urls []<span class="hljs-keyword">string</span>)</span> <span class="hljs-params">([]Result, error)</span></span> &#123;
+    <span class="hljs-keyword">var</span> results []Result
+    <span class="hljs-keyword">var</span> mu sync.Mutex
+    
+    g, ctx := errgroup.WithContext(context.Background())
+    
+    <span class="hljs-keyword">for</span> _, url := <span class="hljs-keyword">range</span> urls &#123;
+        url := url <span class="hljs-comment">// 创建副本，避免闭包问题</span>
+        g.Go(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">error</span></span> &#123;
+            result, err := fetchURLWithContext(ctx, url)
+            <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+                <span class="hljs-keyword">return</span> err <span class="hljs-comment">// 返回错误会导致其他goroutine被取消</span>
+            &#125;
+            
+            mu.Lock()
+            results = <span class="hljs-built_in">append</span>(results, result)
+            mu.Unlock()
+            
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+        &#125;)
+    &#125;
+    
+    <span class="hljs-comment">// 等待所有goroutine完成或有一个返回错误</span>
+    <span class="hljs-keyword">if</span> err := g.Wait(); err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+    &#125;
+    
+    <span class="hljs-keyword">return</span> results, <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fetchURLWithContext</span><span class="hljs-params">(ctx context.Context, url <span class="hljs-keyword">string</span>)</span> <span class="hljs-params">(Result, error)</span></span> &#123;
+    <span class="hljs-comment">// 创建一个可取消的HTTP请求</span>
+    req, err := http.NewRequestWithContext(ctx, <span class="hljs-string">&quot;GET&quot;</span>, url, <span class="hljs-literal">nil</span>)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> Result&#123;&#125;, err
+    &#125;
+    
+    resp, err := http.DefaultClient.Do(req)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> Result&#123;&#125;, err
+    &#125;
+    <span class="hljs-keyword">defer</span> resp.Body.Close()
+    
+    <span class="hljs-comment">// 处理响应...</span>
+    <span class="hljs-keyword">return</span> Result&#123;URL: url, Status: resp.Status&#125;, <span class="hljs-literal">nil</span>
+&#125;</code></pre>
+<h3 id="🔁-超时和取消模式"><a class="header-anchor" href="#🔁-超时和取消模式"></a>🔁 超时和取消模式</h3>
+<p>在并发程序中，合理处理超时和取消操作是非常重要的，可以避免资源泄露。</p>
+<h4 id="超时模式"><a class="header-anchor" href="#超时模式"></a>超时模式</h4>
+<p>使用<code>context.WithTimeout</code>或<code>time.After</code>实现超时控制：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">operationWithTimeout</span><span class="hljs-params">(timeout time.Duration)</span> <span class="hljs-params">(Result, error)</span></span> &#123;
+    ctx, cancel := context.WithTimeout(context.Background(), timeout)
+    <span class="hljs-keyword">defer</span> cancel()
+    
+    resultCh := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> Result, <span class="hljs-number">1</span>)
+    errCh := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> error, <span class="hljs-number">1</span>)
+    
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        result, err := performOperation()
+        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+            errCh &lt;- err
+            <span class="hljs-keyword">return</span>
+        &#125;
+        resultCh &lt;- result
+    &#125;()
+    
+    <span class="hljs-keyword">select</span> &#123;
+    <span class="hljs-keyword">case</span> result := &lt;-resultCh:
+        <span class="hljs-keyword">return</span> result, <span class="hljs-literal">nil</span>
+    <span class="hljs-keyword">case</span> err := &lt;-errCh:
+        <span class="hljs-keyword">return</span> Result&#123;&#125;, err
+    <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+        <span class="hljs-keyword">return</span> Result&#123;&#125;, ctx.Err()
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">performOperation</span><span class="hljs-params">()</span> <span class="hljs-params">(Result, error)</span></span> &#123;
+    <span class="hljs-comment">// 模拟耗时操作</span>
+    time.Sleep(<span class="hljs-number">200</span> * time.Millisecond)
+    <span class="hljs-keyword">return</span> Result&#123;Value: <span class="hljs-number">42</span>&#125;, <span class="hljs-literal">nil</span>
+&#125;</code></pre>
+<h4 id="取消模式"><a class="header-anchor" href="#取消模式"></a>取消模式</h4>
+<p>使用<code>context.WithCancel</code>实现取消操作：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">operationWithCancel</span><span class="hljs-params">()</span></span> &#123;
+    ctx, cancel := context.WithCancel(context.Background())
+    
+    <span class="hljs-comment">// 启动工作goroutine</span>
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">for</span> &#123;
+            <span class="hljs-keyword">select</span> &#123;
+            <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+                fmt.Println(<span class="hljs-string">&quot;Worker: Received cancel signal, stopping&quot;</span>)
+                <span class="hljs-keyword">return</span>
+            <span class="hljs-keyword">default</span>:
+                fmt.Println(<span class="hljs-string">&quot;Worker: Working...&quot;</span>)
+                time.Sleep(<span class="hljs-number">100</span> * time.Millisecond)
+            &#125;
+        &#125;
+    &#125;()
+    
+    <span class="hljs-comment">// 让工作goroutine运行一段时间</span>
+    time.Sleep(<span class="hljs-number">500</span> * time.Millisecond)
+    
+    <span class="hljs-comment">// 发送取消信号</span>
+    fmt.Println(<span class="hljs-string">&quot;Main: Sending cancel signal&quot;</span>)
+    cancel()
+    
+    <span class="hljs-comment">// 给工作goroutine时间退出</span>
+    time.Sleep(<span class="hljs-number">100</span> * time.Millisecond)
+    fmt.Println(<span class="hljs-string">&quot;Main: Done&quot;</span>)
+&#125;</code></pre>
+<h3 id="🔄-优雅退出模式"><a class="header-anchor" href="#🔄-优雅退出模式"></a>🔄 优雅退出模式</h3>
+<p>在实际应用中，特别是服务器程序，我们需要确保程序可以优雅地退出，不会丢失数据或留下资源泄露。</p>
+<h4 id="使用信号处理实现优雅退出"><a class="header-anchor" href="#使用信号处理实现优雅退出"></a>使用信号处理实现优雅退出</h4>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 创建一个用于接收系统信号的channel</span>
+    sigs := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> os.Signal, <span class="hljs-number">1</span>)
+    signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+    
+    <span class="hljs-comment">// 创建一个用于通知程序退出的channel</span>
+    done := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">bool</span>, <span class="hljs-number">1</span>)
+    
+    <span class="hljs-comment">// 启动服务</span>
+    server := startServer()
+    
+    <span class="hljs-comment">// 处理信号</span>
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        sig := &lt;-sigs
+        fmt.Printf(<span class="hljs-string">&quot;Received signal: %s\n&quot;</span>, sig)
+        
+        <span class="hljs-comment">// 优雅关闭服务</span>
+        fmt.Println(<span class="hljs-string">&quot;Shutting down server...&quot;</span>)
+        ctx, cancel := context.WithTimeout(context.Background(), <span class="hljs-number">30</span>*time.Second)
+        <span class="hljs-keyword">defer</span> cancel()
+        
+        <span class="hljs-keyword">if</span> err := server.Shutdown(ctx); err != <span class="hljs-literal">nil</span> &#123;
+            fmt.Printf(<span class="hljs-string">&quot;Server shutdown error: %v\n&quot;</span>, err)
+        &#125;
+        
+        done &lt;- <span class="hljs-literal">true</span>
+    &#125;()
+    
+    fmt.Println(<span class="hljs-string">&quot;Server started, press CTRL+C to stop&quot;</span>)
+    &lt;-done
+    fmt.Println(<span class="hljs-string">&quot;Server stopped&quot;</span>)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">startServer</span><span class="hljs-params">()</span> *<span class="hljs-title">http</span>.<span class="hljs-title">Server</span></span> &#123;
+    router := http.NewServeMux()
+    router.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
+        time.Sleep(<span class="hljs-number">100</span> * time.Millisecond) <span class="hljs-comment">// 模拟处理时间</span>
+        fmt.Fprintf(w, <span class="hljs-string">&quot;Hello, World!&quot;</span>)
+    &#125;)
+    
+    server := &amp;http.Server&#123;
+        Addr:    <span class="hljs-string">&quot;:8080&quot;</span>,
+        Handler: router,
+    &#125;
+    
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-keyword">if</span> err := server.ListenAndServe(); err != http.ErrServerClosed &#123;
+            fmt.Printf(<span class="hljs-string">&quot;Server error: %v\n&quot;</span>, err)
+        &#125;
+    &#125;()
+    
+    <span class="hljs-keyword">return</span> server
+&#125;</code></pre>
+<h3 id="📊-并发模式性能对比"><a class="header-anchor" href="#📊-并发模式性能对比"></a>📊 并发模式性能对比</h3>
+<p>不同的并发模式适用于不同的场景，下面是一些常见并发模式的性能对比：</p>
+<table>
+<thead>
+<tr>
+<th>并发模式</th>
+<th>CPU密集型任务</th>
+<th>IO密集型任务</th>
+<th>内存占用</th>
+<th>实现复杂度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>单goroutine</td>
+<td>低</td>
+<td>低</td>
+<td>低</td>
+<td>低</td>
+</tr>
+<tr>
+<td>无限制goroutine</td>
+<td>高（直到CPU饱和）</td>
+<td>中（可能受系统限制）</td>
+<td>高</td>
+<td>低</td>
+</tr>
+<tr>
+<td>Worker Pool</td>
+<td>中（可控）</td>
+<td>高</td>
+<td>中</td>
+<td>中</td>
+</tr>
+<tr>
+<td>Pipeline</td>
+<td>中</td>
+<td>高</td>
+<td>中</td>
+<td>中</td>
+</tr>
+<tr>
+<td>Fan-Out, Fan-In</td>
+<td>高</td>
+<td>高</td>
+<td>中</td>
+<td>高</td>
+</tr>
+</tbody>
+</table>
+<h3 id="🧪-并发模式测试技巧"><a class="header-anchor" href="#🧪-并发模式测试技巧"></a>🧪 并发模式测试技巧</h3>
+<p>测试并发代码是一项挑战，以下是一些有用的技巧：</p>
+<h4 id="使用race-detector"><a class="header-anchor" href="#使用race-detector"></a>使用race detector</h4>
+<p>Go内置了race detector，可以帮助检测数据竞争：</p>
+<pre><code class="hljs bash">go <span class="hljs-built_in">test</span> -race ./...</code></pre>
+<h4 id="使用超时控制测试"><a class="header-anchor" href="#使用超时控制测试"></a>使用超时控制测试</h4>
+<p>避免测试因为死锁或其他并发问题而无限挂起：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestWorkerPool</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+    t.Parallel() <span class="hljs-comment">// 允许并行测试</span>
+    
+    <span class="hljs-comment">// 设置测试超时</span>
+    ctx, cancel := context.WithTimeout(context.Background(), <span class="hljs-number">5</span>*time.Second)
+    <span class="hljs-keyword">defer</span> cancel()
+    
+    done := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">struct</span>&#123;&#125;)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        <span class="hljs-comment">// 执行测试逻辑</span>
+        results, err := WorkerPool(<span class="hljs-number">5</span>, generateTasks(<span class="hljs-number">100</span>), <span class="hljs-number">3</span>*time.Second)
+        assert.NoError(t, err)
+        assert.Len(t, results, <span class="hljs-number">100</span>)
+        
+        <span class="hljs-built_in">close</span>(done)
+    &#125;()
+    
+    <span class="hljs-keyword">select</span> &#123;
+    <span class="hljs-keyword">case</span> &lt;-done:
+        <span class="hljs-comment">// 测试成功完成</span>
+    <span class="hljs-keyword">case</span> &lt;-ctx.Done():
+        t.Fatal(<span class="hljs-string">&quot;Test timed out&quot;</span>)
+    &#125;
+&#125;</code></pre>
+<h4 id="使用deterministic测试"><a class="header-anchor" href="#使用deterministic测试"></a>使用deterministic测试</h4>
+<p>对于并发代码，可以使用确定性测试方法，例如使用channel来控制goroutine的执行顺序：</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestPipeline</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+    <span class="hljs-comment">// 创建控制channel</span>
+    proceed := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">struct</span>&#123;&#125;)
+    
+    <span class="hljs-comment">// 创建一个受控的生成器</span>
+    gen := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+        out := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+        <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+            <span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(out)
+            <span class="hljs-comment">// 等待信号再继续</span>
+            &lt;-proceed
+            out &lt;- <span class="hljs-number">1</span>
+            &lt;-proceed
+            out &lt;- <span class="hljs-number">2</span>
+            &lt;-proceed
+            out &lt;- <span class="hljs-number">3</span>
+        &#125;()
+        <span class="hljs-keyword">return</span> out
+    &#125;
+    
+    <span class="hljs-comment">// 创建一个受控的处理器</span>
+    process := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(in &lt;-<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)</span> &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+        out := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+        <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+            <span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(out)
+            <span class="hljs-keyword">for</span> n := <span class="hljs-keyword">range</span> in &#123;
+                <span class="hljs-comment">// 等待信号再继续</span>
+                &lt;-proceed
+                out &lt;- n * <span class="hljs-number">2</span>
+            &#125;
+        &#125;()
+        <span class="hljs-keyword">return</span> out
+    &#125;
+    
+    <span class="hljs-comment">// 启动pipeline</span>
+    nums := gen()
+    doubled := process(nums)
+    
+    <span class="hljs-comment">// 控制执行顺序并验证结果</span>
+    proceed &lt;- <span class="hljs-keyword">struct</span>&#123;&#125;&#123;&#125; <span class="hljs-comment">// 让生成器产生1</span>
+    proceed &lt;- <span class="hljs-keyword">struct</span>&#123;&#125;&#123;&#125; <span class="hljs-comment">// 让处理器处理1</span>
+    assert.Equal(t, <span class="hljs-number">2</span>, &lt;-doubled)
+    
+    proceed &lt;- <span class="hljs-keyword">struct</span>&#123;&#125;&#123;&#125; <span class="hljs-comment">// 让生成器产生2</span>
+    proceed &lt;- <span class="hljs-keyword">struct</span>&#123;&#125;&#123;&#125; <span class="hljs-comment">// 让处理器处理2</span>
+    assert.Equal(t, <span class="hljs-number">4</span>, &lt;-doubled)
+    
+    proceed &lt;- <span class="hljs-keyword">struct</span>&#123;&#125;&#123;&#125; <span class="hljs-comment">// 让生成器产生3</span>
+    proceed &lt;- <span class="hljs-keyword">struct</span>&#123;&#125;&#123;&#125; <span class="hljs-comment">// 让处理器处理3</span>
+    assert.Equal(t, <span class="hljs-number">6</span>, &lt;-doubled)
+&#125;</code></pre>
+<h3 id="📝-总结"><a class="header-anchor" href="#📝-总结"></a>📝 总结</h3>
+<p>Go语言提供了强大而灵活的并发原语，使得实现各种并发模式变得相对简单。本文介绍的高级并发模式可以帮助你解决实际开发中的复杂并发问题：</p>
+<ol>
+<li><strong>Worker Pool模式</strong>：限制并发数量，避免资源耗尽</li>
+<li><strong>Pipeline模式</strong>：将数据处理分为多个阶段，每个阶段并行执行</li>
+<li><strong>Fan-Out, Fan-In模式</strong>：将工作分散到多个goroutine，然后收集结果</li>
+<li><strong>并发控制模式</strong>：使用semaphore或errgroup控制goroutine的行为</li>
+<li><strong>超时和取消模式</strong>：优雅地处理超时和取消操作</li>
+<li><strong>优雅退出模式</strong>：确保程序可以安全地退出，不会丢失数据或留下资源泄露</li>
+</ol>
+<p>选择合适的并发模式取决于你的具体需求，如任务类型（CPU密集型或IO密集型）、内存限制、错误处理策略等。在实际应用中，你可能需要组合多种模式来构建高效、可靠的并发系统。</p>
+<p>记住，并发编程虽然强大，但也充满挑战。始终关注数据竞争、死锁、资源泄露等问题，并使用Go提供的工具（如race detector）来帮助检测这些问题。通过实践和经验积累，你将能够熟练掌握这些高级并发模式，编写出高效、健壮的Go程序。</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/">Golang</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/golang/">golang</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%B9%B6%E5%8F%91/">并发</a>
+                    
+                      <a class="hover-with-bg" href="/tags/goroutine/">goroutine</a>
+                    
+                      <a class="hover-with-bg" href="/tags/channel/">channel</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/02/08/kubernetes-pod%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E4%B8%8E%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">kubernetes pod资源管理与调度策略</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2024/01/22/golang-%E7%8E%B0%E4%BB%A3%E5%8C%96%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">
+                        <span class="hidden-mobile">golang 现代化错误处理最佳实践</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2024/01/30/golang-高级并发模式详解/';
+          this.page.identifier = '/2024/01/30/golang-高级并发模式详解/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

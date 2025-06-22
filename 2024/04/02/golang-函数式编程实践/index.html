@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>golang 函数式编程实践 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                golang 函数式编程实践
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2024-04-02 09:45">
+      2024年4月2日 上午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.6k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      56
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="🧩-golang-函数式编程实践"><a class="header-anchor" href="#🧩-golang-函数式编程实践"></a>🧩 golang 函数式编程实践</h2>
+<p>虽然Go语言主要是命令式和面向对象的编程语言，但它也支持许多函数式编程的特性和模式。函数式编程强调使用函数作为主要的构建块，避免状态变化和可变数据。本文将探讨如何在Go中应用函数式编程的思想和技术，以编写更简洁、更可维护的代码。</p>
+<h3 id="📚-函数式编程基础"><a class="header-anchor" href="#📚-函数式编程基础"></a>📚 函数式编程基础</h3>
+<p>函数式编程基于以下核心概念：</p>
+<ol>
+<li><strong>一等公民函数</strong>：函数可以作为值传递、赋值给变量、作为参数传递给其他函数，或作为返回值</li>
+<li><strong>纯函数</strong>：函数的输出仅由输入决定，没有副作用</li>
+<li><strong>不可变性</strong>：一旦创建，数据不应被修改</li>
+<li><strong>高阶函数</strong>：接受函数作为参数或返回函数的函数</li>
+<li><strong>闭包</strong>：捕获外部作用域变量的函数</li>
+</ol>
+<p>Go语言原生支持一等公民函数、高阶函数和闭包，这使得我们可以在Go中应用许多函数式编程技术。</p>
+<h3 id="🧠-高阶函数"><a class="header-anchor" href="#🧠-高阶函数"></a>🧠 高阶函数</h3>
+<p>高阶函数是函数式编程的核心概念之一，它接受函数作为参数或返回函数作为结果。在Go中，我们可以轻松定义和使用高阶函数。</p>
+<h4 id="函数作为参数"><a class="header-anchor" href="#函数作为参数"></a>函数作为参数</h4>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">applyToEach</span><span class="hljs-params">(numbers []<span class="hljs-keyword">int</span>, f <span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span>) []<span class="hljs-title">int</span></span> &#123;
+    result := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-built_in">len</span>(numbers))
+    <span class="hljs-keyword">for</span> i, n := <span class="hljs-keyword">range</span> numbers &#123;
+        result[i] = f(n)
+    &#125;
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">double</span><span class="hljs-params">(n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+    <span class="hljs-keyword">return</span> n * <span class="hljs-number">2</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">square</span><span class="hljs-params">(n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+    <span class="hljs-keyword">return</span> n * n
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    numbers := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;
+    
+    <span class="hljs-comment">// 将每个元素翻倍</span>
+    doubled := applyToEach(numbers, double)
+    fmt.Println(doubled) <span class="hljs-comment">// [2 4 6 8 10]</span>
+    
+    <span class="hljs-comment">// 将每个元素平方</span>
+    squared := applyToEach(numbers, square)
+    fmt.Println(squared) <span class="hljs-comment">// [1 4 9 16 25]</span>
+&#125;</code></pre>
+<h4 id="函数作为返回值"><a class="header-anchor" href="#函数作为返回值"></a>函数作为返回值</h4>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">multiplier</span><span class="hljs-params">(factor <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+        <span class="hljs-keyword">return</span> n * factor
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    double := multiplier(<span class="hljs-number">2</span>)
+    triple := multiplier(<span class="hljs-number">3</span>)
+    
+    fmt.Println(double(<span class="hljs-number">5</span>))  <span class="hljs-comment">// 10</span>
+    fmt.Println(triple(<span class="hljs-number">5</span>))  <span class="hljs-comment">// 15</span>
+&#125;</code></pre>
+<h3 id="🔄-常用函数式操作"><a class="header-anchor" href="#🔄-常用函数式操作"></a>🔄 常用函数式操作</h3>
+<p>函数式编程中有一些常见的操作，如map、filter和reduce。虽然Go标准库没有直接提供这些函数，但我们可以轻松实现它们。</p>
+<h4 id="Map"><a class="header-anchor" href="#Map"></a>Map</h4>
+<p>Map操作将一个函数应用于集合中的每个元素，生成一个新的集合。</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Map</span><span class="hljs-params">(vs []<span class="hljs-keyword">int</span>, f <span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span>) []<span class="hljs-title">int</span></span> &#123;
+    result := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-built_in">len</span>(vs))
+    <span class="hljs-keyword">for</span> i, v := <span class="hljs-keyword">range</span> vs &#123;
+        result[i] = f(v)
+    &#125;
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-comment">// 泛型版本（Go 1.18+）</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">MapGeneric</span>[<span class="hljs-title">T</span>, <span class="hljs-title">U</span> <span class="hljs-title">any</span>]<span class="hljs-params">(vs []T, f <span class="hljs-keyword">func</span>(T)</span> <span class="hljs-title">U</span>) []<span class="hljs-title">U</span></span> &#123;
+    result := <span class="hljs-built_in">make</span>([]U, <span class="hljs-built_in">len</span>(vs))
+    <span class="hljs-keyword">for</span> i, v := <span class="hljs-keyword">range</span> vs &#123;
+        result[i] = f(v)
+    &#125;
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    numbers := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;
+    
+    squared := Map(numbers, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+        <span class="hljs-keyword">return</span> n * n
+    &#125;)
+    
+    fmt.Println(squared) <span class="hljs-comment">// [1 4 9 16 25]</span>
+    
+    <span class="hljs-comment">// 使用泛型版本</span>
+    doubled := MapGeneric(numbers, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+        <span class="hljs-keyword">return</span> n * <span class="hljs-number">2</span>
+    &#125;)
+    
+    fmt.Println(doubled) <span class="hljs-comment">// [2 4 6 8 10]</span>
+    
+    <span class="hljs-comment">// 将int转换为string</span>
+    strNumbers := MapGeneric(numbers, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">string</span></span> &#123;
+        <span class="hljs-keyword">return</span> strconv.Itoa(n)
+    &#125;)
+    
+    fmt.Println(strNumbers) <span class="hljs-comment">// [&quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; &quot;5&quot;]</span>
+&#125;</code></pre>
+<h4 id="Filter"><a class="header-anchor" href="#Filter"></a>Filter</h4>
+<p>Filter操作从集合中选择满足特定条件的元素。</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Filter</span><span class="hljs-params">(vs []<span class="hljs-keyword">int</span>, f <span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">bool</span>) []<span class="hljs-title">int</span></span> &#123;
+    result := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>)
+    <span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> vs &#123;
+        <span class="hljs-keyword">if</span> f(v) &#123;
+            result = <span class="hljs-built_in">append</span>(result, v)
+        &#125;
+    &#125;
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-comment">// 泛型版本（Go 1.18+）</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">FilterGeneric</span>[<span class="hljs-title">T</span> <span class="hljs-title">any</span>]<span class="hljs-params">(vs []T, f <span class="hljs-keyword">func</span>(T)</span> <span class="hljs-title">bool</span>) []<span class="hljs-title">T</span></span> &#123;
+    result := <span class="hljs-built_in">make</span>([]T, <span class="hljs-number">0</span>)
+    <span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> vs &#123;
+        <span class="hljs-keyword">if</span> f(v) &#123;
+            result = <span class="hljs-built_in">append</span>(result, v)
+        &#125;
+    &#125;
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    numbers := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>, <span class="hljs-number">10</span>&#125;
+    
+    <span class="hljs-comment">// 筛选偶数</span>
+    evens := Filter(numbers, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">bool</span></span> &#123;
+        <span class="hljs-keyword">return</span> n%<span class="hljs-number">2</span> == <span class="hljs-number">0</span>
+    &#125;)
+    
+    fmt.Println(evens) <span class="hljs-comment">// [2 4 6 8 10]</span>
+    
+    <span class="hljs-comment">// 筛选大于5的数</span>
+    greaterThanFive := FilterGeneric(numbers, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">bool</span></span> &#123;
+        <span class="hljs-keyword">return</span> n &gt; <span class="hljs-number">5</span>
+    &#125;)
+    
+    fmt.Println(greaterThanFive) <span class="hljs-comment">// [6 7 8 9 10]</span>
+&#125;</code></pre>
+<h4 id="Reduce"><a class="header-anchor" href="#Reduce"></a>Reduce</h4>
+<p>Reduce操作将集合中的元素组合成单个值。</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Reduce</span><span class="hljs-params">(vs []<span class="hljs-keyword">int</span>, f <span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>, <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span>, <span class="hljs-title">initial</span> <span class="hljs-title">int</span>) <span class="hljs-title">int</span></span> &#123;
+    result := initial
+    <span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> vs &#123;
+        result = f(result, v)
+    &#125;
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-comment">// 泛型版本（Go 1.18+）</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ReduceGeneric</span>[<span class="hljs-title">T</span>, <span class="hljs-title">U</span> <span class="hljs-title">any</span>]<span class="hljs-params">(vs []T, f <span class="hljs-keyword">func</span>(U, T)</span> <span class="hljs-title">U</span>, <span class="hljs-title">initial</span> <span class="hljs-title">U</span>) <span class="hljs-title">U</span></span> &#123;
+    result := initial
+    <span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> vs &#123;
+        result = f(result, v)
+    &#125;
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    numbers := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;
+    
+    <span class="hljs-comment">// 计算总和</span>
+    sum := Reduce(numbers, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(acc, n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+        <span class="hljs-keyword">return</span> acc + n
+    &#125;, <span class="hljs-number">0</span>)
+    
+    fmt.Println(sum) <span class="hljs-comment">// 15</span>
+    
+    <span class="hljs-comment">// 计算乘积</span>
+    product := ReduceGeneric(numbers, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(acc, n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+        <span class="hljs-keyword">return</span> acc * n
+    &#125;, <span class="hljs-number">1</span>)
+    
+    fmt.Println(product) <span class="hljs-comment">// 120</span>
+    
+    <span class="hljs-comment">// 将数字数组转换为字符串</span>
+    str := ReduceGeneric(numbers, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(acc <span class="hljs-keyword">string</span>, n <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">string</span></span> &#123;
+        <span class="hljs-keyword">if</span> acc == <span class="hljs-string">&quot;&quot;</span> &#123;
+            <span class="hljs-keyword">return</span> strconv.Itoa(n)
+        &#125;
+        <span class="hljs-keyword">return</span> acc + <span class="hljs-string">&quot;, &quot;</span> + strconv.Itoa(n)
+    &#125;, <span class="hljs-string">&quot;&quot;</span>)
+    
+    fmt.Println(str) <span class="hljs-comment">// &quot;1, 2, 3, 4, 5&quot;</span>
+&#125;</code></pre>
+<h3 id="📦-闭包与柯里化"><a class="header-anchor" href="#📦-闭包与柯里化"></a>📦 闭包与柯里化</h3>
+<p>闭包是引用了外部作用域变量的函数。在Go中，闭包可以捕获并使用定义它们的函数中的变量。</p>
+<h4 id="简单闭包"><a class="header-anchor" href="#简单闭包"></a>简单闭包</h4>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">adder</span><span class="hljs-params">()</span> <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+    sum := <span class="hljs-number">0</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(x <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+        sum += x
+        <span class="hljs-keyword">return</span> sum
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    pos, neg := adder(), adder()
+    
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;
+        fmt.Println(pos(i), neg(<span class="hljs-number">-2</span>*i))
+    &#125;
+    <span class="hljs-comment">// 输出：</span>
+    <span class="hljs-comment">// 0 0</span>
+    <span class="hljs-comment">// 1 -2</span>
+    <span class="hljs-comment">// 3 -6</span>
+    <span class="hljs-comment">// 6 -12</span>
+    <span class="hljs-comment">// 10 -20</span>
+    <span class="hljs-comment">// 15 -30</span>
+    <span class="hljs-comment">// 21 -42</span>
+    <span class="hljs-comment">// 28 -56</span>
+    <span class="hljs-comment">// 36 -72</span>
+    <span class="hljs-comment">// 45 -90</span>
+&#125;</code></pre>
+<h4 id="柯里化"><a class="header-anchor" href="#柯里化"></a>柯里化</h4>
+<p>柯里化是将接受多个参数的函数转换为一系列接受单个参数的函数的技术。</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">curry</span><span class="hljs-params">(f <span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>, <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span>) <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(a <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(b <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+            <span class="hljs-keyword">return</span> f(a, b)
+        &#125;
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">add</span><span class="hljs-params">(a, b <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+    <span class="hljs-keyword">return</span> a + b
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    curriedAdd := curry(add)
+    add5 := curriedAdd(<span class="hljs-number">5</span>)
+    add10 := curriedAdd(<span class="hljs-number">10</span>)
+    
+    fmt.Println(add5(<span class="hljs-number">3</span>))  <span class="hljs-comment">// 8</span>
+    fmt.Println(add10(<span class="hljs-number">3</span>)) <span class="hljs-comment">// 13</span>
+&#125;</code></pre>
+<h3 id="🧬-函数组合"><a class="header-anchor" href="#🧬-函数组合"></a>🧬 函数组合</h3>
+<p>函数组合是将多个函数组合成一个新函数的技术。</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">compose</span><span class="hljs-params">(f, g <span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span>) <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(x <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+        <span class="hljs-keyword">return</span> f(g(x))
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">double</span><span class="hljs-params">(x <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+    <span class="hljs-keyword">return</span> x * <span class="hljs-number">2</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">square</span><span class="hljs-params">(x <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;
+    <span class="hljs-keyword">return</span> x * x
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 先平方再翻倍</span>
+    squareThenDouble := compose(double, square)
+    
+    <span class="hljs-comment">// 先翻倍再平方</span>
+    doubleThenSquare := compose(square, double)
+    
+    fmt.Println(squareThenDouble(<span class="hljs-number">3</span>)) <span class="hljs-comment">// double(square(3)) = double(9) = 18</span>
+    fmt.Println(doubleThenSquare(<span class="hljs-number">3</span>)) <span class="hljs-comment">// square(double(3)) = square(6) = 36</span>
+&#125;</code></pre>
+<h3 id="🔄-管道模式"><a class="header-anchor" href="#🔄-管道模式"></a>🔄 管道模式</h3>
+<p>管道模式是一种函数式编程技术，它将数据通过一系列转换函数&quot;管道&quot;传递。</p>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">pipeline</span><span class="hljs-params">(input <span class="hljs-keyword">int</span>, transforms ...<span class="hljs-keyword">func</span>(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span>) <span class="hljs-title">int</span></span> &#123;
+    result := input
+    <span class="hljs-keyword">for</span> _, transform := <span class="hljs-keyword">range</span> transforms &#123;
+        result = transform(result)
+    &#125;
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 定义一些转换函数</span>
+    add1 := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(x <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123; <span class="hljs-keyword">return</span> x + <span class="hljs-number">1</span> &#125;
+    double := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(x <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123; <span class="hljs-keyword">return</span> x * <span class="hljs-number">2</span> &#125;
+    square := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(x <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123; <span class="hljs-keyword">return</span> x * x &#125;
+    
+    <span class="hljs-comment">// 创建管道：先加1，再翻倍，最后平方</span>
+    result := pipeline(<span class="hljs-number">3</span>, add1, double, square)
+    fmt.Println(result) <span class="hljs-comment">// square(double(add1(3))) = square(double(4)) = square(8) = 64</span>
+&#125;</code></pre>
+<h3 id="🧩-Option模式"><a class="header-anchor" href="#🧩-Option模式"></a>🧩 Option模式</h3>
+<p>Option模式是一种函数式方法，用于配置对象或函数。它使用高阶函数来设置选项。</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Server <span class="hljs-keyword">struct</span> &#123;
+    host    <span class="hljs-keyword">string</span>
+    port    <span class="hljs-keyword">int</span>
+    timeout time.Duration
+    maxConn <span class="hljs-keyword">int</span>
+&#125;
+
+<span class="hljs-keyword">type</span> ServerOption <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(*Server)</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">WithHost</span><span class="hljs-params">(host <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">ServerOption</span></span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(s *Server)</span></span> &#123;
+        s.host = host
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">WithPort</span><span class="hljs-params">(port <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">ServerOption</span></span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(s *Server)</span></span> &#123;
+        s.port = port
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">WithTimeout</span><span class="hljs-params">(timeout time.Duration)</span> <span class="hljs-title">ServerOption</span></span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(s *Server)</span></span> &#123;
+        s.timeout = timeout
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">WithMaxConn</span><span class="hljs-params">(maxConn <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">ServerOption</span></span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(s *Server)</span></span> &#123;
+        s.maxConn = maxConn
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewServer</span><span class="hljs-params">(options ...ServerOption)</span> *<span class="hljs-title">Server</span></span> &#123;
+    <span class="hljs-comment">// 默认值</span>
+    server := &amp;Server&#123;
+        host:    <span class="hljs-string">&quot;localhost&quot;</span>,
+        port:    <span class="hljs-number">8080</span>,
+        timeout: <span class="hljs-number">30</span> * time.Second,
+        maxConn: <span class="hljs-number">100</span>,
+    &#125;
+    
+    <span class="hljs-comment">// 应用选项</span>
+    <span class="hljs-keyword">for</span> _, option := <span class="hljs-keyword">range</span> options &#123;
+        option(server)
+    &#125;
+    
+    <span class="hljs-keyword">return</span> server
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 使用默认值创建服务器</span>
+    server1 := NewServer()
+    
+    <span class="hljs-comment">// 自定义服务器配置</span>
+    server2 := NewServer(
+        WithHost(<span class="hljs-string">&quot;example.com&quot;</span>),
+        WithPort(<span class="hljs-number">9000</span>),
+        WithTimeout(<span class="hljs-number">60</span> * time.Second),
+    )
+    
+    fmt.Printf(<span class="hljs-string">&quot;Server 1: %+v\n&quot;</span>, server1)
+    fmt.Printf(<span class="hljs-string">&quot;Server 2: %+v\n&quot;</span>, server2)
+&#125;</code></pre>
+<h3 id="🔍-惰性求值"><a class="header-anchor" href="#🔍-惰性求值"></a>🔍 惰性求值</h3>
+<p>惰性求值是一种延迟计算结果直到需要时才执行的技术。在Go中，我们可以使用闭包和通道来实现惰性求值。</p>
+<h4 id="使用闭包实现惰性求值"><a class="header-anchor" href="#使用闭包实现惰性求值"></a>使用闭包实现惰性求值</h4>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">lazyEval</span><span class="hljs-params">(f <span class="hljs-keyword">func</span>()</span> <span class="hljs-title">int</span>) <span class="hljs-title">func</span><span class="hljs-params">()</span> <span class="hljs-title">int</span></span> &#123;
+    <span class="hljs-keyword">var</span> result <span class="hljs-keyword">int</span>
+    <span class="hljs-keyword">var</span> computed <span class="hljs-keyword">bool</span>
+    
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">int</span></span> &#123;
+        <span class="hljs-keyword">if</span> !computed &#123;
+            result = f()
+            computed = <span class="hljs-literal">true</span>
+        &#125;
+        <span class="hljs-keyword">return</span> result
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">expensiveComputation</span><span class="hljs-params">()</span> <span class="hljs-title">int</span></span> &#123;
+    fmt.Println(<span class="hljs-string">&quot;Performing expensive computation...&quot;</span>)
+    time.Sleep(<span class="hljs-number">2</span> * time.Second)
+    <span class="hljs-keyword">return</span> <span class="hljs-number">42</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    lazy := lazyEval(expensiveComputation)
+    
+    fmt.Println(<span class="hljs-string">&quot;Lazy function created, but not executed yet&quot;</span>)
+    
+    <span class="hljs-comment">// 只有在第一次调用时才会执行expensiveComputation</span>
+    fmt.Println(<span class="hljs-string">&quot;First call:&quot;</span>, lazy())
+    fmt.Println(<span class="hljs-string">&quot;Second call:&quot;</span>, lazy())
+    fmt.Println(<span class="hljs-string">&quot;Third call:&quot;</span>, lazy())
+&#125;</code></pre>
+<h4 id="使用通道实现无限序列"><a class="header-anchor" href="#使用通道实现无限序列"></a>使用通道实现无限序列</h4>
+<pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fibonacci</span><span class="hljs-params">()</span> &lt;-<span class="hljs-title">chan</span> <span class="hljs-title">int</span></span> &#123;
+    c := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)
+    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+        a, b := <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
+        <span class="hljs-keyword">for</span> &#123;
+            c &lt;- a
+            a, b = b, a+b
+        &#125;
+    &#125;()
+    <span class="hljs-keyword">return</span> c
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    fib := fibonacci()
+    
+    <span class="hljs-comment">// 获取前10个斐波那契数</span>
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;
+        fmt.Println(&lt;-fib)
+    &#125;
+&#125;</code></pre>
+<h3 id="🛡️-错误处理模式"><a class="header-anchor" href="#🛡️-错误处理模式"></a>🛡️ 错误处理模式</h3>
+<p>函数式编程中的错误处理通常使用特殊类型（如Maybe或Either）来表示可能的错误。在Go中，我们可以模拟这些模式。</p>
+<h4 id="Result类型"><a class="header-anchor" href="#Result类型"></a>Result类型</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Result <span class="hljs-keyword">struct</span> &#123;
+    Value <span class="hljs-keyword">interface</span>&#123;&#125;
+    Error error
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">SafeDivide</span><span class="hljs-params">(a, b <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">Result</span></span> &#123;
+    <span class="hljs-keyword">if</span> b == <span class="hljs-number">0</span> &#123;
+        <span class="hljs-keyword">return</span> Result&#123;Error: errors.New(<span class="hljs-string">&quot;division by zero&quot;</span>)&#125;
+    &#125;
+    <span class="hljs-keyword">return</span> Result&#123;Value: a / b&#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Process</span><span class="hljs-params">(r Result, f <span class="hljs-keyword">func</span>(<span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">Result</span>) <span class="hljs-title">Result</span></span> &#123;
+    <span class="hljs-keyword">if</span> r.Error != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> r
+    &#125;
+    <span class="hljs-keyword">return</span> f(r.Value)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 成功的计算</span>
+    result1 := SafeDivide(<span class="hljs-number">10</span>, <span class="hljs-number">2</span>)
+    result1 = Process(result1, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(v <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">Result</span></span> &#123;
+        <span class="hljs-keyword">return</span> Result&#123;Value: v.(<span class="hljs-keyword">int</span>) * <span class="hljs-number">2</span>&#125;
+    &#125;)
+    
+    <span class="hljs-comment">// 失败的计算</span>
+    result2 := SafeDivide(<span class="hljs-number">10</span>, <span class="hljs-number">0</span>)
+    result2 = Process(result2, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(v <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">Result</span></span> &#123;
+        <span class="hljs-keyword">return</span> Result&#123;Value: v.(<span class="hljs-keyword">int</span>) * <span class="hljs-number">2</span>&#125;
+    &#125;)
+    
+    fmt.Printf(<span class="hljs-string">&quot;Result 1: %+v\n&quot;</span>, result1) <span class="hljs-comment">// Result 1: &#123;Value:10 Error:&lt;nil&gt;&#125;</span>
+    fmt.Printf(<span class="hljs-string">&quot;Result 2: %+v\n&quot;</span>, result2) <span class="hljs-comment">// Result 2: &#123;Value:&lt;nil&gt; Error:division by zero&#125;</span>
+&#125;</code></pre>
+<h4 id="使用泛型实现Maybe模式（Go-1-18-）"><a class="header-anchor" href="#使用泛型实现Maybe模式（Go-1-18-）"></a>使用泛型实现Maybe模式（Go 1.18+）</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Maybe[T any] <span class="hljs-keyword">struct</span> &#123;
+    value *T
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Just</span>[<span class="hljs-title">T</span> <span class="hljs-title">any</span>]<span class="hljs-params">(value T)</span> <span class="hljs-title">Maybe</span>[<span class="hljs-title">T</span>]</span> &#123;
+    <span class="hljs-keyword">return</span> Maybe[T]&#123;value: &amp;value&#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Nothing</span>[<span class="hljs-title">T</span> <span class="hljs-title">any</span>]<span class="hljs-params">()</span> <span class="hljs-title">Maybe</span>[<span class="hljs-title">T</span>]</span> &#123;
+    <span class="hljs-keyword">return</span> Maybe[T]&#123;value: <span class="hljs-literal">nil</span>&#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m Maybe[T])</span> <span class="hljs-title">IsJust</span><span class="hljs-params">()</span> <span class="hljs-title">bool</span></span> &#123;
+    <span class="hljs-keyword">return</span> m.value != <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m Maybe[T])</span> <span class="hljs-title">IsNothing</span><span class="hljs-params">()</span> <span class="hljs-title">bool</span></span> &#123;
+    <span class="hljs-keyword">return</span> m.value == <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m Maybe[T])</span> <span class="hljs-title">GetOrElse</span><span class="hljs-params">(defaultValue T)</span> <span class="hljs-title">T</span></span> &#123;
+    <span class="hljs-keyword">if</span> m.IsJust() &#123;
+        <span class="hljs-keyword">return</span> *m.value
+    &#125;
+    <span class="hljs-keyword">return</span> defaultValue
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m Maybe[T])</span> <span class="hljs-title">Map</span>[<span class="hljs-title">U</span> <span class="hljs-title">any</span>]<span class="hljs-params">(f <span class="hljs-keyword">func</span>(T)</span> <span class="hljs-title">U</span>) <span class="hljs-title">Maybe</span>[<span class="hljs-title">U</span>]</span> &#123;
+    <span class="hljs-keyword">if</span> m.IsNothing() &#123;
+        <span class="hljs-keyword">return</span> Nothing[U]()
+    &#125;
+    <span class="hljs-keyword">return</span> Just(f(*m.value))
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m Maybe[T])</span> <span class="hljs-title">FlatMap</span>[<span class="hljs-title">U</span> <span class="hljs-title">any</span>]<span class="hljs-params">(f <span class="hljs-keyword">func</span>(T)</span> <span class="hljs-title">Maybe</span>[<span class="hljs-title">U</span>]) <span class="hljs-title">Maybe</span>[<span class="hljs-title">U</span>]</span> &#123;
+    <span class="hljs-keyword">if</span> m.IsNothing() &#123;
+        <span class="hljs-keyword">return</span> Nothing[U]()
+    &#125;
+    <span class="hljs-keyword">return</span> f(*m.value)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">SafeDivide</span><span class="hljs-params">(a, b <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">Maybe</span>[<span class="hljs-title">int</span>]</span> &#123;
+    <span class="hljs-keyword">if</span> b == <span class="hljs-number">0</span> &#123;
+        <span class="hljs-keyword">return</span> Nothing[<span class="hljs-keyword">int</span>]()
+    &#125;
+    <span class="hljs-keyword">return</span> Just(a / b)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    <span class="hljs-comment">// 成功的计算</span>
+    result1 := SafeDivide(<span class="hljs-number">10</span>, <span class="hljs-number">2</span>).
+        Map(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(v <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123; <span class="hljs-keyword">return</span> v * <span class="hljs-number">2</span> &#125;).
+        Map(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(v <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123; <span class="hljs-keyword">return</span> v + <span class="hljs-number">1</span> &#125;)
+    
+    <span class="hljs-comment">// 失败的计算</span>
+    result2 := SafeDivide(<span class="hljs-number">10</span>, <span class="hljs-number">0</span>).
+        Map(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(v <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123; <span class="hljs-keyword">return</span> v * <span class="hljs-number">2</span> &#125;).
+        Map(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(v <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123; <span class="hljs-keyword">return</span> v + <span class="hljs-number">1</span> &#125;)
+    
+    fmt.Println(<span class="hljs-string">&quot;Result 1:&quot;</span>, result1.GetOrElse(<span class="hljs-number">0</span>)) <span class="hljs-comment">// Result 1: 11</span>
+    fmt.Println(<span class="hljs-string">&quot;Result 2:&quot;</span>, result2.GetOrElse(<span class="hljs-number">0</span>)) <span class="hljs-comment">// Result 2: 0</span>
+&#125;</code></pre>
+<h3 id="🧪-实际应用案例"><a class="header-anchor" href="#🧪-实际应用案例"></a>🧪 实际应用案例</h3>
+<p>让我们看一些在实际项目中应用函数式编程的例子。</p>
+<h4 id="数据处理管道"><a class="header-anchor" href="#数据处理管道"></a>数据处理管道</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> User <span class="hljs-keyword">struct</span> &#123;
+    ID       <span class="hljs-keyword">int</span>
+    Name     <span class="hljs-keyword">string</span>
+    Email    <span class="hljs-keyword">string</span>
+    Age      <span class="hljs-keyword">int</span>
+    IsActive <span class="hljs-keyword">bool</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    users := []User&#123;
+        &#123;<span class="hljs-number">1</span>, <span class="hljs-string">&quot;Alice&quot;</span>, <span class="hljs-string">&quot;alice@example.com&quot;</span>, <span class="hljs-number">25</span>, <span class="hljs-literal">true</span>&#125;,
+        &#123;<span class="hljs-number">2</span>, <span class="hljs-string">&quot;Bob&quot;</span>, <span class="hljs-string">&quot;bob@example.com&quot;</span>, <span class="hljs-number">30</span>, <span class="hljs-literal">false</span>&#125;,
+        &#123;<span class="hljs-number">3</span>, <span class="hljs-string">&quot;Charlie&quot;</span>, <span class="hljs-string">&quot;charlie@example.com&quot;</span>, <span class="hljs-number">35</span>, <span class="hljs-literal">true</span>&#125;,
+        &#123;<span class="hljs-number">4</span>, <span class="hljs-string">&quot;Dave&quot;</span>, <span class="hljs-string">&quot;dave@example.com&quot;</span>, <span class="hljs-number">40</span>, <span class="hljs-literal">true</span>&#125;,
+        &#123;<span class="hljs-number">5</span>, <span class="hljs-string">&quot;Eve&quot;</span>, <span class="hljs-string">&quot;eve@example.com&quot;</span>, <span class="hljs-number">45</span>, <span class="hljs-literal">false</span>&#125;,
+    &#125;
+    
+    <span class="hljs-comment">// 创建一个数据处理管道：</span>
+    <span class="hljs-comment">// 1. 筛选活跃用户</span>
+    <span class="hljs-comment">// 2. 筛选年龄大于30的用户</span>
+    <span class="hljs-comment">// 3. 提取用户名</span>
+    <span class="hljs-comment">// 4. 将用户名转换为大写</span>
+    
+    activeUsers := FilterGeneric(users, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(u User)</span> <span class="hljs-title">bool</span></span> &#123;
+        <span class="hljs-keyword">return</span> u.IsActive
+    &#125;)
+    
+    olderUsers := FilterGeneric(activeUsers, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(u User)</span> <span class="hljs-title">bool</span></span> &#123;
+        <span class="hljs-keyword">return</span> u.Age &gt; <span class="hljs-number">30</span>
+    &#125;)
+    
+    names := MapGeneric(olderUsers, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(u User)</span> <span class="hljs-title">string</span></span> &#123;
+        <span class="hljs-keyword">return</span> u.Name
+    &#125;)
+    
+    upperNames := MapGeneric(names, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(name <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">string</span></span> &#123;
+        <span class="hljs-keyword">return</span> strings.ToUpper(name)
+    &#125;)
+    
+    fmt.Println(upperNames) <span class="hljs-comment">// [CHARLIE DAVE]</span>
+    
+    <span class="hljs-comment">// 使用管道模式简化上述代码</span>
+    result := Pipe(users,
+        FilterUsers(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(u User)</span> <span class="hljs-title">bool</span></span> &#123; <span class="hljs-keyword">return</span> u.IsActive &#125;),
+        FilterUsers(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(u User)</span> <span class="hljs-title">bool</span></span> &#123; <span class="hljs-keyword">return</span> u.Age &gt; <span class="hljs-number">30</span> &#125;),
+        MapToStrings(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(u User)</span> <span class="hljs-title">string</span></span> &#123; <span class="hljs-keyword">return</span> u.Name &#125;),
+        MapStrings(strings.ToUpper),
+    )
+    
+    fmt.Println(result) <span class="hljs-comment">// [CHARLIE DAVE]</span>
+&#125;
+
+<span class="hljs-comment">// 管道函数</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Pipe</span><span class="hljs-params">(input <span class="hljs-keyword">interface</span>&#123;&#125;, transforms ...<span class="hljs-keyword">func</span>(<span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">interface</span></span>&#123;&#125;) <span class="hljs-keyword">interface</span>&#123;&#125; &#123;
+    result := input
+    <span class="hljs-keyword">for</span> _, transform := <span class="hljs-keyword">range</span> transforms &#123;
+        result = transform(result)
+    &#125;
+    <span class="hljs-keyword">return</span> result
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">FilterUsers</span><span class="hljs-params">(predicate <span class="hljs-keyword">func</span>(User)</span> <span class="hljs-title">bool</span>) <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(input <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+        users := input.([]User)
+        <span class="hljs-keyword">return</span> FilterGeneric(users, predicate)
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">MapToStrings</span><span class="hljs-params">(mapper <span class="hljs-keyword">func</span>(User)</span> <span class="hljs-title">string</span>) <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(input <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+        users := input.([]User)
+        <span class="hljs-keyword">return</span> MapGeneric(users, mapper)
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">MapStrings</span><span class="hljs-params">(mapper <span class="hljs-keyword">func</span>(<span class="hljs-keyword">string</span>)</span> <span class="hljs-title">string</span>) <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(input <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">interface</span></span>&#123;&#125; &#123;
+        strings := input.([]<span class="hljs-keyword">string</span>)
+        <span class="hljs-keyword">return</span> MapGeneric(strings, mapper)
+    &#125;
+&#125;</code></pre>
+<h4 id="Web中间件"><a class="header-anchor" href="#Web中间件"></a>Web中间件</h4>
+<p>函数式编程非常适合实现Web中间件。</p>
+<pre><code class="hljs go"><span class="hljs-keyword">type</span> Handler <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(http.ResponseWriter, *http.Request)</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Middleware</span><span class="hljs-params">(h Handler, middlewares ...<span class="hljs-keyword">func</span>(Handler)</span> <span class="hljs-title">Handler</span>) <span class="hljs-title">Handler</span></span> &#123;
+    <span class="hljs-keyword">for</span> _, middleware := <span class="hljs-keyword">range</span> middlewares &#123;
+        h = middleware(h)
+    &#125;
+    <span class="hljs-keyword">return</span> h
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Logging</span><span class="hljs-params">(next Handler)</span> <span class="hljs-title">Handler</span></span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
+        start := time.Now()
+        next(w, r)
+        log.Printf(<span class="hljs-string">&quot;%s %s %v&quot;</span>, r.Method, r.URL.Path, time.Since(start))
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Auth</span><span class="hljs-params">(next Handler)</span> <span class="hljs-title">Handler</span></span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
+        token := r.Header.Get(<span class="hljs-string">&quot;Authorization&quot;</span>)
+        <span class="hljs-keyword">if</span> token == <span class="hljs-string">&quot;&quot;</span> &#123;
+            http.Error(w, <span class="hljs-string">&quot;Unauthorized&quot;</span>, http.StatusUnauthorized)
+            <span class="hljs-keyword">return</span>
+        &#125;
+        next(w, r)
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">HelloHandler</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
+    fmt.Fprintln(w, <span class="hljs-string">&quot;Hello, world!&quot;</span>)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    handler := Middleware(HelloHandler, Logging, Auth)
+    http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
+        handler(w, r)
+    &#125;)
+    http.ListenAndServe(<span class="hljs-string">&quot;:8080&quot;</span>, <span class="hljs-literal">nil</span>)
+&#125;</code></pre>
+<h3 id="📝-最佳实践与注意事项"><a class="header-anchor" href="#📝-最佳实践与注意事项"></a>📝 最佳实践与注意事项</h3>
+<p>在Go中应用函数式编程时，有一些最佳实践和注意事项：</p>
+<h4 id="优点"><a class="header-anchor" href="#优点"></a>优点</h4>
+<ol>
+<li><strong>代码简洁</strong>：函数式编程可以减少样板代码，使逻辑更清晰</li>
+<li><strong>可组合性</strong>：函数可以轻松组合，创建更复杂的行为</li>
+<li><strong>可测试性</strong>：纯函数易于测试，因为它们没有副作用</li>
+<li><strong>并发安全</strong>：不可变数据和纯函数天然并发安全</li>
+</ol>
+<h4 id="缺点"><a class="header-anchor" href="#缺点"></a>缺点</h4>
+<ol>
+<li><strong>性能开销</strong>：过度使用闭包和高阶函数可能导致额外的内存分配和性能开销</li>
+<li><strong>可读性</strong>：对不熟悉函数式编程的开发者来说，代码可能难以理解</li>
+<li><strong>Go的限制</strong>：Go不是专为函数式编程设计的，缺少一些函数式语言的特性</li>
+</ol>
+<h4 id="最佳实践"><a class="header-anchor" href="#最佳实践"></a>最佳实践</h4>
+<ol>
+<li><strong>平衡使用</strong>：将函数式编程与Go的其他范式结合使用</li>
+<li><strong>保持简单</strong>：避免过度复杂的函数组合</li>
+<li><strong>考虑性能</strong>：在性能关键的路径上谨慎使用高阶函数</li>
+<li><strong>利用泛型</strong>：在Go 1.18+中，利用泛型使函数式代码更类型安全</li>
+</ol>
+<h3 id="📝-总结"><a class="header-anchor" href="#📝-总结"></a>📝 总结</h3>
+<p>虽然Go不是一门函数式编程语言，但它提供了足够的特性来支持函数式编程风格。通过合理使用高阶函数、闭包、不可变数据和组合，我们可以在Go中实现许多函数式编程的模式和技术。</p>
+<p>函数式编程可以帮助我们编写更简洁、更可维护、更易于测试的代码。然而，重要的是要平衡使用函数式风格和Go的其他范式，以充分利用语言的优势。</p>
+<p>在实际项目中，函数式编程特别适合于数据转换、错误处理、配置管理和中间件等场景。通过掌握本文介绍的函数式编程技术，你可以在Go项目中应用这些强大的概念，提高代码质量和开发效率。</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/">Golang</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/golang/">golang</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/">函数式编程</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0/">高阶函数</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%97%AD%E5%8C%85/">闭包</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/04/15/golang-%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84RPC%E6%A1%86%E6%9E%B6/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">golang 实现一个简单的RPC框架</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/28/golang-%E4%BD%BF%E7%94%A8wire%E8%BF%9B%E8%A1%8C%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/">
+                        <span class="hidden-mobile">golang 使用wire进行依赖注入</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2024/04/02/golang-函数式编程实践/';
+          this.page.identifier = '/2024/04/02/golang-函数式编程实践/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

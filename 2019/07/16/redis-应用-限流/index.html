@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>Redis 应用-限流 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                Redis 应用-限流
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2019-07-16 15:47">
+      2019年7月16日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.9k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      25
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <p>在高并发场景下有三把利器保护系统：缓存、降级、和限流。缓存的目的是提升系统的访问你速度和增大系统能处理的容量；降级是当服务出问题或影响到核心流程的性能则需要暂时屏蔽掉。而有些场景则需要限制并发请求量，如秒杀、抢购、发帖、评论、恶意爬虫等。 限流算法<br>
+常见的限流算法有：计数器，漏桶、令牌桶。</p>
+<h3 id="计数器"><a class="header-anchor" href="#计数器"></a>计数器</h3>
+<p>顾名思义就是来一个记一个，然后判断在有限时间窗口内的数量是否超过限制即可</p>
+<pre><code class="hljs php"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isActionAllowed</span>(<span class="hljs-params">$userId, $action, $period, $maxCount</span>) </span>
+<span class="hljs-function"></span>&#123;
+    $redis = <span class="hljs-keyword">new</span> Redis();
+    $redis-&gt;connect(<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-number">6379</span>);
+    $key = sprintf(<span class="hljs-string">&#x27;hist:%s:%s&#x27;</span>, $userId, $action);
+    $now = msectime();   <span class="hljs-comment"># 毫秒时间戳</span>
+
+    $pipe=$redis-&gt;multi(Redis::PIPELINE); <span class="hljs-comment">//使用管道提升性能</span>
+    $pipe-&gt;zadd($key, $now, $now); <span class="hljs-comment">//value 和 score 都使用毫秒时间戳</span>
+    $pipe-&gt;zremrangebyscore($key, <span class="hljs-number">0</span>, $now - $period); <span class="hljs-comment">//移除时间窗口之前的行为记录，剩下的都是时间窗口内的</span>
+    $pipe-&gt;zcard($key);  <span class="hljs-comment">//获取窗口内的行为数量</span>
+    $pipe-&gt;expire($key, $period + <span class="hljs-number">1</span>);  <span class="hljs-comment">//多加一秒过期时间</span>
+    $replies = $pipe-&gt;exec();
+    <span class="hljs-keyword">return</span> $replies[<span class="hljs-number">2</span>] &lt;= $maxCount;
+&#125;
+<span class="hljs-keyword">for</span> ($i=<span class="hljs-number">0</span>; $i&lt;<span class="hljs-number">20</span>; $i++)&#123;
+    var_dump(isActionAllowed(<span class="hljs-string">&quot;110&quot;</span>, <span class="hljs-string">&quot;reply&quot;</span>, <span class="hljs-number">60</span>*<span class="hljs-number">1000</span>, <span class="hljs-number">5</span>)); <span class="hljs-comment">//执行可以发现只有前5次是通过的</span>
+&#125;
+
+<span class="hljs-comment">//返回当前的毫秒时间戳</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">msectime</span>(<span class="hljs-params"></span>) </span>&#123;
+    <span class="hljs-keyword">list</span>($msec, $sec) = explode(<span class="hljs-string">&#x27; &#x27;</span>, microtime());
+    $msectime = (<span class="hljs-keyword">float</span>)sprintf(<span class="hljs-string">&#x27;%.0f&#x27;</span>, (floatval($msec) + floatval($sec)) * <span class="hljs-number">1000</span>);
+    <span class="hljs-keyword">return</span> $msectime;
+ &#125;</code></pre>
+<h3 id="漏桶"><a class="header-anchor" href="#漏桶"></a>漏桶</h3>
+<p>漏桶 (Leaky Bucket) 算法思路很简单，水 (请求) 先进入到漏桶里，漏桶以一定的速度出水 (接口有响应速率), 当水流入速度过大会直接溢出 (访问频率超过接口响应速率), 然后就拒绝请求，可以看出漏桶算法能强行限制数据的传输速率。示意图如下:<br>
+<a target="_blank" rel="noopener" href="https://cdn.learnku.com/uploads/images/201907/05/4878/lIhEKQ2rsK.jpeg!large"></a><a target="_blank" rel="noopener" href="https://cdn.learnku.com/uploads/images/201907/05/4878/lIhEKQ2rsK.jpeg!large"><img src="https://cdn.learnku.com/uploads/images/201907/05/4878/lIhEKQ2rsK.jpeg!large" srcset="/img/loading.gif" alt="image"></a> 具体代码实现如下</p>
+<pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Funnel</span> </span>&#123;
+
+    <span class="hljs-keyword">private</span> $capacity;
+    <span class="hljs-keyword">private</span> $leakingRate;
+    <span class="hljs-keyword">private</span> $leftQuote;
+    <span class="hljs-keyword">private</span> $leakingTs;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span>(<span class="hljs-params">$capacity, $leakingRate</span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">$this</span>-&gt;capacity = $capacity;    <span class="hljs-comment">//漏斗容量</span>
+        <span class="hljs-keyword">$this</span>-&gt;leakingRate = $leakingRate;<span class="hljs-comment">//漏斗流水速率</span>
+        <span class="hljs-keyword">$this</span>-&gt;leftQuote = $capacity; <span class="hljs-comment">//漏斗剩余空间</span>
+        <span class="hljs-keyword">$this</span>-&gt;leakingTs = time(); <span class="hljs-comment">//上一次漏水时间</span>
+    &#125;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">makeSpace</span>(<span class="hljs-params"></span>)</span>
+<span class="hljs-function">    </span>&#123;
+        $now = time();
+        $deltaTs = $now-<span class="hljs-keyword">$this</span>-&gt;leakingTs; <span class="hljs-comment">//距离上一次漏水过去了多久</span>
+        $deltaQuota = $deltaTs * <span class="hljs-keyword">$this</span>-&gt;leakingRate; <span class="hljs-comment">//可腾出的空间</span>
+        <span class="hljs-keyword">if</span>($deltaQuota &lt; <span class="hljs-number">1</span>) &#123;  
+            <span class="hljs-keyword">return</span>;
+        &#125;
+        <span class="hljs-keyword">$this</span>-&gt;leftQuote += $deltaQuota;   <span class="hljs-comment">//增加剩余空间</span>
+        <span class="hljs-keyword">$this</span>-&gt;leakingTs = time();         <span class="hljs-comment">//记录漏水时间</span>
+        <span class="hljs-keyword">if</span>(<span class="hljs-keyword">$this</span>-&gt;leftQuota &gt; <span class="hljs-keyword">$this</span>-&gt;capacaty)&#123;
+            <span class="hljs-keyword">$this</span>-&gt;leftQuote = <span class="hljs-keyword">$this</span>-&gt;capacity;
+        &#125;
+    &#125;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">watering</span>(<span class="hljs-params">$quota</span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">$this</span>-&gt;makeSpace(); <span class="hljs-comment">//漏水操作</span>
+        <span class="hljs-keyword">if</span>(<span class="hljs-keyword">$this</span>-&gt;leftQuote &gt;= $quota) &#123;
+            <span class="hljs-keyword">$this</span>-&gt;leftQuote -= $quota;
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    &#125;
+&#125;
+
+$funnels = [];
+<span class="hljs-keyword">global</span> $funnel;
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isActionAllowed</span>(<span class="hljs-params">$userId, $action, $capacity, $leakingRate</span>)</span>
+<span class="hljs-function"></span>&#123;
+    $key = sprintf(<span class="hljs-string">&quot;%s:%s&quot;</span>, $userId, $action);
+    $funnel = $GLOBALS[<span class="hljs-string">&#x27;funnel&#x27;</span>][$key] ?? <span class="hljs-string">&#x27;&#x27;</span>;
+    <span class="hljs-keyword">if</span> (!$funnel) &#123;
+        $funnel  = <span class="hljs-keyword">new</span> Funnel($capacity, $leakingRate);
+        $GLOBALS[<span class="hljs-string">&#x27;funnel&#x27;</span>][$key] = $funnel;
+    &#125;
+    <span class="hljs-keyword">return</span> $funnel-&gt;watering(<span class="hljs-number">1</span>);
+&#125;
+
+<span class="hljs-keyword">for</span> ($i=<span class="hljs-number">0</span>; $i&lt;<span class="hljs-number">20</span>; $i++)&#123;
+    var_dump(isActionAllowed(<span class="hljs-string">&quot;110&quot;</span>, <span class="hljs-string">&quot;reply&quot;</span>, <span class="hljs-number">15</span>, <span class="hljs-number">0.5</span>)); <span class="hljs-comment">//执行可以发现只有前15次是通过的</span>
+&#125;</code></pre>
+<p>核心逻辑就是 makeSpace，在每次灌水前调用以触发漏水，给漏斗腾出空间。<br>
+funnels 我们可以利用 Redis 中的 hash 结构来存储对应字段，灌水时将字段取出进行逻辑运算后再存入 hash 结构中即可完成一次行为频度的检测。但这有个问题就是整个过程的原子性无法保证，意味着要用锁来控制，但如果加锁失败，就要重试或者放弃，这回导致性能下降和影响用户体验，同时代码复杂度也升高了，此时 Redis 提供了一个插件，Redis-Cell 出现了。</p>
+<h5 id="Redis-Cell"><a class="header-anchor" href="#Redis-Cell"></a>Redis-Cell</h5>
+<p>Redis 4.0 提供了一个限流 Redis 模块，名称为 redis-cell，该模块提供漏斗算法，并提供原子的限流指令。 该模块只有一条指令 cl.throttle，其参数和返回值比较复杂。</p>
+<pre><code class="hljs shell"><span class="hljs-meta">&gt;</span><span class="bash"> cl.throttle tom:reply 14 30 60 1</span>
+1) (integer) 0    # 0表示允许，1表示拒绝
+2) (integer) 15    # 漏斗容量capacity
+3) (integer) 14    # 漏斗剩余空间left_quota
+4) (integer) -1    # 如果拒绝了，需要多长时间后再重试，单位秒
+5) (integer) 2    # 多长时间后，漏斗完全空出来，单位秒</code></pre>
+<p>该指令意思为，允许用户 tom 的 reply 行为的频率为每 60s 最多 30 次，漏斗初始容量为 15（因为是从 0 开始计数，到 14 为 15 个），默认每个行为占据的空间为 1（可选参数）。<br>
+如果被拒绝，取返回数组的第四个值进行 sleep 即可作为重试时间，也可以异步定时任务来重试。</p>
+<h3 id="令牌桶"><a class="header-anchor" href="#令牌桶"></a>令牌桶</h3>
+<p>令牌桶算法 (Token Bucket) 和 Leaky Bucket 效果一样但方向相反的算法，更加容易理解。随着时间流逝，系统会按恒定 1/QPS 时间间隔 (如果 QPS=100, 则间隔是 10ms) 往桶里加入 Token (想象和漏洞漏水相反，有个水龙头在不断的加水), 如果桶已经满了就不再加了。新请求来临时，会各自拿走一个 Token, 如果没有 Token 可拿了就阻塞或者拒绝服务. 令牌桶的另外一个好处是可以方便的改变速度。一旦需要提高速率，则按需提高放入桶中的令牌的速率。一般会定时 (比如 100 毫秒) 往桶中增加一定数量的令牌，有些变种算法则实时的计算应该增加的令牌的数量. 具体实现可参考 <a target="_blank" rel="noopener" href="https://blog.csdn.net/fdipzone/article/details/79352685">php 基于 redis 使用令牌桶算法实现流量控制</a></p>
+<pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TrafficShaper</span></span>
+<span class="hljs-class"></span>&#123; 
+    <span class="hljs-keyword">private</span> $_config; <span class="hljs-comment">// redis设定</span>
+    <span class="hljs-keyword">private</span> $_redis;  <span class="hljs-comment">// redis对象</span>
+    <span class="hljs-keyword">private</span> $_queue;  <span class="hljs-comment">// 令牌桶</span>
+    <span class="hljs-keyword">private</span> $_max;    <span class="hljs-comment">// 最大令牌数</span>
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * 初始化</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@param</span> Array $config redis连接设定</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span>(<span class="hljs-params">$config, $queue, $max</span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">$this</span>-&gt;_config = $config;
+        <span class="hljs-keyword">$this</span>-&gt;_queue = $queue;
+        <span class="hljs-keyword">$this</span>-&gt;_max = $max;
+        <span class="hljs-keyword">$this</span>-&gt;_redis = <span class="hljs-keyword">$this</span>-&gt;connect();
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * 加入令牌</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@param</span> Int $num 加入的令牌数量</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@return</span> Int 加入的数量</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">add</span>(<span class="hljs-params">$num = <span class="hljs-number">0</span></span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-comment">// 当前剩余令牌数</span>
+        $curnum = intval(<span class="hljs-keyword">$this</span>-&gt;_redis-&gt;lSize(<span class="hljs-keyword">$this</span>-&gt;_queue));
+        <span class="hljs-comment">// 最大令牌数</span>
+        $maxnum = intval(<span class="hljs-keyword">$this</span>-&gt;_max);
+        <span class="hljs-comment">// 计算最大可加入的令牌数量，不能超过最大令牌数</span>
+        $num = $maxnum &gt;= $curnum + $num ? $num : $maxnum - $curnum;
+        <span class="hljs-comment">// 加入令牌</span>
+        <span class="hljs-keyword">if</span> ($num &gt; <span class="hljs-number">0</span>) &#123;
+            $token = array_fill(<span class="hljs-number">0</span>, $num, <span class="hljs-number">1</span>);
+            <span class="hljs-keyword">$this</span>-&gt;_redis-&gt;lPush(<span class="hljs-keyword">$this</span>-&gt;_queue, ...$token);
+            <span class="hljs-keyword">return</span> $num;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * 获取令牌</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@return</span> Boolean</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">get</span>(<span class="hljs-params"></span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;_redis-&gt;rPop(<span class="hljs-keyword">$this</span>-&gt;_queue) ? <span class="hljs-literal">true</span> : <span class="hljs-literal">false</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * 重设令牌桶，填满令牌</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reset</span>(<span class="hljs-params"></span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">$this</span>-&gt;_redis-&gt;delete(<span class="hljs-keyword">$this</span>-&gt;_queue);
+        <span class="hljs-keyword">$this</span>-&gt;add(<span class="hljs-keyword">$this</span>-&gt;_max);
+    &#125;
+
+    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">connect</span>(<span class="hljs-params"></span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">try</span> &#123;
+            $redis = <span class="hljs-keyword">new</span> Redis();
+            $redis-&gt;connect(<span class="hljs-keyword">$this</span>-&gt;_config[<span class="hljs-string">&#x27;host&#x27;</span>], <span class="hljs-keyword">$this</span>-&gt;_config[<span class="hljs-string">&#x27;port&#x27;</span>], <span class="hljs-keyword">$this</span>-&gt;_config[<span class="hljs-string">&#x27;timeout&#x27;</span>], <span class="hljs-keyword">$this</span>-&gt;_config[<span class="hljs-string">&#x27;reserved&#x27;</span>], <span class="hljs-keyword">$this</span>-&gt;_config[<span class="hljs-string">&#x27;retry_interval&#x27;</span>]);
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">empty</span>(<span class="hljs-keyword">$this</span>-&gt;_config[<span class="hljs-string">&#x27;auth&#x27;</span>])) &#123;
+                $redis-&gt;auth(<span class="hljs-keyword">$this</span>-&gt;_config[<span class="hljs-string">&#x27;auth&#x27;</span>]);
+            &#125;
+            $redis-&gt;select(<span class="hljs-keyword">$this</span>-&gt;_config[<span class="hljs-string">&#x27;index&#x27;</span>]);
+        &#125; <span class="hljs-keyword">catch</span> (\RedisException $e) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Exception</span>($e-&gt;getMessage());
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+        &#125;
+        <span class="hljs-keyword">return</span> $redis;
+    &#125;
+&#125; 
+
+$config = <span class="hljs-keyword">array</span>(
+    <span class="hljs-string">&#x27;host&#x27;</span> =&gt; <span class="hljs-string">&#x27;localhost&#x27;</span>,
+    <span class="hljs-string">&#x27;port&#x27;</span> =&gt; <span class="hljs-number">6379</span>,
+    <span class="hljs-string">&#x27;index&#x27;</span> =&gt; <span class="hljs-number">0</span>,
+    <span class="hljs-string">&#x27;auth&#x27;</span> =&gt; <span class="hljs-string">&#x27;&#x27;</span>,
+    <span class="hljs-string">&#x27;timeout&#x27;</span> =&gt; <span class="hljs-number">1</span>,
+    <span class="hljs-string">&#x27;reserved&#x27;</span> =&gt; <span class="hljs-literal">NULL</span>,
+    <span class="hljs-string">&#x27;retry_interval&#x27;</span> =&gt; <span class="hljs-number">100</span>,
+);
+<span class="hljs-comment">// 令牌桶容器</span>
+$queue = <span class="hljs-string">&#x27;mycontainer&#x27;</span>;
+ <span class="hljs-comment">// 最大令牌数</span>
+$max = <span class="hljs-number">5</span>;
+<span class="hljs-comment">// 创建TrafficShaper对象</span>
+$oTrafficShaper = <span class="hljs-keyword">new</span> TrafficShaper($config, $queue, $max);
+<span class="hljs-comment">// 重设令牌桶，填满令牌</span>
+$oTrafficShaper-&gt;reset();
+<span class="hljs-comment">// 循环获取令牌，令牌桶内只有5个令牌，因此最后3次获取失败</span>
+<span class="hljs-keyword">for</span> ($i = <span class="hljs-number">0</span>; $i &lt; <span class="hljs-number">8</span>; $i++) &#123;
+    var_dump($oTrafficShaper-&gt;get());
+&#125;
+<span class="hljs-comment">// 加入10个令牌，最大令牌为5，因此只能加入5个</span>
+$add_num = $oTrafficShaper-&gt;add(<span class="hljs-number">10</span>);
+var_dump($add_num);
+<span class="hljs-comment">// 循环获取令牌，令牌桶内只有5个令牌，因此最后1次获取失败</span>
+<span class="hljs-keyword">for</span> ($i = <span class="hljs-number">0</span>; $i &lt; <span class="hljs-number">6</span>; $i++) &#123;
+    var_dump($oTrafficShaper-&gt;get());
+&#125;
+<span class="hljs-meta">?&gt;</span></code></pre>
+<p>文章转自：<a target="_blank" rel="noopener" href="https://learnku.com/articles/30822" title="https://learnku.com/articles/30822">https://learnku.com/articles/30822</a></p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/redis/">redis</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95/">限流算法</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/07/18/cgi%E3%80%81fastcgi%E5%92%8Cphp-fpm%E5%85%B3%E7%B3%BB%E5%9B%BE%E8%A7%A3/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CGI、FastCGI和PHP-FPM关系图解</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2019/06/14/select%E3%80%81poll%E3%80%81epoll/">
+                        <span class="hidden-mobile">select、poll、epoll</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2019/07/16/redis-应用-限流/';
+          this.page.identifier = '/2019/07/16/redis-应用-限流/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

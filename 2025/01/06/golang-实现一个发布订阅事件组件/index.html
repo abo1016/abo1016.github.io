@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>golang 实现一个发布订阅事件组件 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                golang 实现一个发布订阅事件组件
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2025-01-06 17:26">
+      2025年1月6日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.4k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      23
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="golang-实现一个发布订阅时间组件"><a class="header-anchor" href="#golang-实现一个发布订阅时间组件"></a>golang 实现一个发布订阅时间组件</h2>
+<h3 id="🎈老规矩，实现思路"><a class="header-anchor" href="#🎈老规矩，实现思路"></a>🎈老规矩，实现思路</h3>
+<ul>
+<li>实现一个广播器，主要有订阅通道 <code>channel</code> 和 发布订阅事件 <code>publish()</code> 广播事件发送 <code>send()</code>组成</li>
+<li>使用 <code>sync</code>包管理事件映射关系<code>map</code></li>
+<li>使用互斥锁 <code>sync.Mutex</code> 检查广播器状态和订阅者的优雅关闭退出</li>
+<li>广播消息通过广播器 <code>channel</code> 分发到各个订阅者（<code>channel</code>）</li>
+</ul>
+<h3 id="📃具体实现代码"><a class="header-anchor" href="#📃具体实现代码"></a>📃具体实现代码</h3>
+<h4 id="事件枚举"><a class="header-anchor" href="#事件枚举"></a>事件枚举</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> event
+
+<span class="hljs-keyword">const</span> (
+	<span class="hljs-comment">// ConfigChangeEvent 配置变更事件</span>
+	ConfigChangeEvent = <span class="hljs-string">&quot;config-change&quot;</span>
+)
+
+<span class="hljs-comment">// Events 事件</span>
+<span class="hljs-keyword">var</span> Events = []<span class="hljs-keyword">string</span>&#123;
+	ConfigChangeEvent,
+&#125;
+</code></pre>
+<h4 id="主要逻辑"><a class="header-anchor" href="#主要逻辑"></a>主要逻辑</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> event
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;errors&quot;</span>
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;sync&quot;</span>
+	<span class="hljs-string">&quot;time&quot;</span>
+
+	<span class="hljs-string">&quot;gitlab.com/bopop/tool&quot;</span>
+	<span class="hljs-string">&quot;gitlab.com/bopop/log&quot;</span>
+)
+
+<span class="hljs-comment">// Broadcast 广播器接口</span>
+<span class="hljs-keyword">type</span> Broadcast <span class="hljs-keyword">interface</span> &#123;
+	publish()
+	Subscribe(<span class="hljs-keyword">chan</span>&lt;- any)
+	Send(any)
+	Close()
+&#125;
+
+<span class="hljs-comment">// Broadcaster 广播器</span>
+<span class="hljs-keyword">type</span> Broadcaster <span class="hljs-keyword">struct</span> &#123;
+	subscribers []<span class="hljs-keyword">chan</span>&lt;- any
+	broadcast   <span class="hljs-keyword">chan</span> any
+	mux         sync.Mutex
+	eventName   <span class="hljs-keyword">string</span>
+	closeChan   <span class="hljs-keyword">chan</span> <span class="hljs-keyword">struct</span>&#123;&#125;
+	closed      <span class="hljs-keyword">bool</span>
+&#125;
+
+<span class="hljs-comment">// BroadcasterMap 广播器映射</span>
+<span class="hljs-keyword">var</span> BroadcasterMap sync.Map
+
+<span class="hljs-comment">// NewBroadcaster 创建一个新的 Broadcaster</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewBroadcaster</span><span class="hljs-params">(event <span class="hljs-keyword">string</span>)</span> *<span class="hljs-title">Broadcaster</span></span> &#123;
+	<span class="hljs-keyword">if</span> !tool.InSlice(event, Events) &#123;
+		log.ErrorP(fmt.Sprintf(<span class="hljs-string">&quot;invalid event: %s&quot;</span>, event))
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+	&#125;
+
+	<span class="hljs-keyword">if</span> _, exist := BroadcasterMap.Load(event); exist &#123;
+		log.ErrorP(fmt.Sprintf(<span class="hljs-string">&quot;event %s already exists&quot;</span>, event))
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+	&#125;
+
+	b := &amp;Broadcaster&#123;
+		subscribers: <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">chan</span>&lt;- any, <span class="hljs-number">0</span>),
+		broadcast:   <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> any),
+		eventName:   event,
+		closeChan:   <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">struct</span>&#123;&#125;),
+		closed:      <span class="hljs-literal">false</span>,
+	&#125;
+	BroadcasterMap.Store(event, b)
+	b.publish() <span class="hljs-comment">// 自动开始发布</span>
+	<span class="hljs-keyword">return</span> b
+&#125;
+
+<span class="hljs-comment">// Close 停止广播并关闭所有订阅者通道</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(b *Broadcaster)</span> <span class="hljs-title">Close</span><span class="hljs-params">()</span></span> &#123;
+	<span class="hljs-keyword">if</span> nilObjReturn(b) != <span class="hljs-literal">nil</span> &#123;
+		<span class="hljs-keyword">return</span>
+	&#125;
+	b.mux.Lock()
+	<span class="hljs-keyword">defer</span> b.mux.Unlock()
+	<span class="hljs-keyword">if</span> !b.closed &#123;
+		b.closed = <span class="hljs-literal">true</span>
+		<span class="hljs-built_in">close</span>(b.closeChan) <span class="hljs-comment">// 向goroutine发出关闭信号</span>
+		<span class="hljs-keyword">for</span> _, sub := <span class="hljs-keyword">range</span> b.subscribers &#123;
+			<span class="hljs-built_in">close</span>(sub) <span class="hljs-comment">// 主动关闭所有订阅者通道</span>
+		&#125;
+		BroadcasterMap.Delete(b.eventName)                     <span class="hljs-comment">// 从map中移除</span>
+		log.InfoP(fmt.Sprintf(<span class="hljs-string">&quot;closed %s event&quot;</span>, b.eventName)) <span class="hljs-comment">// nolint:gosimple</span>
+	&#125;
+&#125;
+
+<span class="hljs-comment">// CloseAll 关闭所有事件广播和订阅者</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CloseAll</span><span class="hljs-params">()</span></span> &#123;
+	BroadcasterMap.Range(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(key, value <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">bool</span></span> &#123;
+		value.(*Broadcaster).Close()
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+	&#125;)
+
+	log.InfoP(<span class="hljs-string">&quot;closed all events&quot;</span>)
+&#125;
+
+<span class="hljs-comment">// GetBroadcaster 获取一个 Broadcaster</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">GetBroadcaster</span><span class="hljs-params">(event <span class="hljs-keyword">string</span>)</span> *<span class="hljs-title">Broadcaster</span></span> &#123;
+	<span class="hljs-keyword">if</span> v, ok := BroadcasterMap.Load(event); ok &#123;
+		<span class="hljs-keyword">return</span> v.(*Broadcaster)
+	&#125;
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;
+
+<span class="hljs-comment">// publish 发布订阅事件</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(b *Broadcaster)</span> <span class="hljs-title">publish</span><span class="hljs-params">()</span></span> &#123;
+	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+		<span class="hljs-keyword">for</span> &#123;
+			<span class="hljs-keyword">select</span> &#123;
+			<span class="hljs-keyword">case</span> msg, ok := &lt;-b.broadcast:
+				<span class="hljs-keyword">if</span> !ok &#123;
+					<span class="hljs-keyword">return</span> <span class="hljs-comment">// 如果 broadcast 被关闭，结束 goroutine</span>
+				&#125;
+				<span class="hljs-comment">// 发送消息到订阅者</span>
+				b.mux.Lock()
+				<span class="hljs-keyword">for</span> _, sub := <span class="hljs-keyword">range</span> b.subscribers &#123;
+					sub &lt;- msg
+				&#125;
+				b.mux.Unlock()
+			<span class="hljs-keyword">case</span> &lt;-b.closeChan:
+				<span class="hljs-keyword">return</span> <span class="hljs-comment">// 收到关闭信号，结束 goroutine</span>
+			&#125;
+		&#125;
+	&#125;()
+	<span class="hljs-comment">// 给一个 100ms 的延时，保证发布事件 goroutine 已经启动</span>
+	time.Sleep(<span class="hljs-number">100</span> * time.Millisecond)
+	log.InfoP(fmt.Sprintf(<span class="hljs-string">&quot;publish event: %v&quot;</span>, b.eventName)) <span class="hljs-comment">// nolint:gosimple</span>
+&#125;
+
+<span class="hljs-comment">// Subscribe 注册一个订阅者的通道</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(b *Broadcaster)</span> <span class="hljs-title">Subscribe</span><span class="hljs-params">(sub <span class="hljs-keyword">chan</span>&lt;- any)</span></span> &#123;
+	<span class="hljs-keyword">if</span> err := nilObjReturn(b); err != <span class="hljs-literal">nil</span> &#123;
+		<span class="hljs-keyword">return</span>
+	&#125;
+	b.mux.Lock()
+	<span class="hljs-keyword">defer</span> b.mux.Unlock()
+	<span class="hljs-keyword">if</span> b.closed &#123;
+		errStr := fmt.Sprintf(<span class="hljs-string">&quot;attempt to subscribe to closed broadcaster: %v&quot;</span>, b.eventName)
+		log.InfoP(errStr)
+		sub &lt;- errors.New(errStr)
+		<span class="hljs-built_in">close</span>(sub)
+		<span class="hljs-keyword">return</span>
+	&#125;
+	b.subscribers = <span class="hljs-built_in">append</span>(b.subscribers, sub)
+&#125;
+
+<span class="hljs-comment">// Send 广播一个消息给所有订阅者</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(b *Broadcaster)</span> <span class="hljs-title">Send</span><span class="hljs-params">(msg any)</span></span> &#123;
+	<span class="hljs-keyword">if</span> err := nilObjReturn(b); err != <span class="hljs-literal">nil</span> &#123;
+		<span class="hljs-keyword">return</span>
+	&#125;
+	b.mux.Lock()
+	subCount := <span class="hljs-built_in">len</span>(b.subscribers)
+	closed := b.closed
+	b.mux.Unlock()
+
+	<span class="hljs-keyword">if</span> closed &#123;
+		log.InfoP(fmt.Sprintf(<span class="hljs-string">&quot;broadcast to closed event: %v&quot;</span>, b.eventName)) <span class="hljs-comment">// nolint:gosimple</span>
+		<span class="hljs-keyword">return</span>
+	&#125;
+
+	<span class="hljs-keyword">if</span> subCount == <span class="hljs-number">0</span> &#123;
+		log.InfoP(fmt.Sprintf(<span class="hljs-string">&quot;no subscribers for event: %v&quot;</span>, b.eventName)) <span class="hljs-comment">// nolint:gosimple</span>
+		<span class="hljs-keyword">return</span>
+	&#125;
+
+	<span class="hljs-keyword">select</span> &#123;
+	<span class="hljs-keyword">case</span> b.broadcast &lt;- msg:
+		<span class="hljs-comment">// 消息发送成功</span>
+	<span class="hljs-keyword">default</span>:
+		<span class="hljs-comment">// 通道已满，记录警告</span>
+		log.InfoP(fmt.Sprintf(<span class="hljs-string">&quot;broadcast channel is full for event %v&quot;</span>, b.eventName)) <span class="hljs-comment">// nolint:gosimple</span>
+	&#125;
+&#125;
+
+<span class="hljs-comment">// nilObjReturn 检查 Broadcaster 是否为 nil</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">nilObjReturn</span><span class="hljs-params">(b *Broadcaster)</span> <span class="hljs-params">(err error)</span></span> &#123;
+	<span class="hljs-keyword">if</span> b == <span class="hljs-literal">nil</span> &#123;
+		errStr := <span class="hljs-string">&quot;called on nil broadcaster&quot;</span>
+		log.InfoP(errStr)
+		<span class="hljs-keyword">return</span> errors.New(errStr)
+	&#125;
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;
+</code></pre>
+<h4 id="自测"><a class="header-anchor" href="#自测"></a>自测</h4>
+<pre><code class="hljs go"><span class="hljs-keyword">package</span> event_test
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;testing&quot;</span>
+	<span class="hljs-string">&quot;time&quot;</span>
+
+	<span class="hljs-string">&quot;gitlab.com/bopop/event&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestBroadcaster</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-comment">// 创建Broadcaster</span>
+	event.Events = <span class="hljs-built_in">append</span>(event.Events, <span class="hljs-string">&quot;testEvent&quot;</span>)
+	b := event.NewBroadcaster(<span class="hljs-string">&quot;testEvent&quot;</span>)
+
+	<span class="hljs-comment">// 创建订阅者通道并订阅</span>
+	sub := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> any)
+	b.Subscribe(sub)
+
+	<span class="hljs-comment">// 发送消息</span>
+	msg := <span class="hljs-string">&quot;hello world&quot;</span>
+	b.Send(msg)
+
+	<span class="hljs-comment">// 从订阅者通道中获取消息</span>
+	<span class="hljs-keyword">select</span> &#123;
+	<span class="hljs-keyword">case</span> receivedMsg := &lt;-sub:
+		<span class="hljs-keyword">if</span> receivedMsg != msg &#123;
+			t.Errorf(<span class="hljs-string">&quot;expected message &#x27;%v&#x27;, got &#x27;%v&#x27;&quot;</span>, msg, receivedMsg)
+		&#125;
+	<span class="hljs-keyword">case</span> &lt;-time.After(<span class="hljs-number">1</span> * time.Second):
+		t.Fatal(<span class="hljs-string">&quot;did not receive message in time&quot;</span>)
+	&#125;
+
+	<span class="hljs-comment">// 测试关闭</span>
+	b.Close()
+
+	<span class="hljs-comment">// 尝试监听关闭的通道，确保通道已关闭</span>
+	_, ok := &lt;-sub
+	<span class="hljs-keyword">if</span> ok &#123;
+		t.Errorf(<span class="hljs-string">&quot;expected closed channel, but it&#x27;s still open&quot;</span>)
+	&#125;
+
+	<span class="hljs-comment">// 再次订阅并确认错误返回</span>
+	sub2 := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> any, <span class="hljs-number">1</span>)
+	b.Subscribe(sub2)
+	receivedError, ok := &lt;-sub2
+	<span class="hljs-keyword">if</span> !ok &#123;
+		t.Errorf(<span class="hljs-string">&quot;expected error on subscribing to closed broadcaster, but channel is open&quot;</span>)
+	&#125;
+	<span class="hljs-keyword">if</span> receivedError == <span class="hljs-literal">nil</span> &#123;
+		t.Errorf(<span class="hljs-string">&quot;expected error on subscribing to closed broadcaster, but got nil&quot;</span>)
+	&#125;
+&#125;
+
+<span class="hljs-comment">// 测试关闭所有 Broadcaster</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestCloseAll</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-comment">// 创建两个Broadcaster</span>
+	event.Events = <span class="hljs-built_in">append</span>(event.Events, <span class="hljs-string">&quot;testEvent1&quot;</span>, <span class="hljs-string">&quot;testEvent2&quot;</span>)
+	b1 := event.NewBroadcaster(<span class="hljs-string">&quot;testEvent1&quot;</span>)
+	b2 := event.NewBroadcaster(<span class="hljs-string">&quot;testEvent2&quot;</span>)
+
+	<span class="hljs-comment">// 创建订阅者并订阅</span>
+	sub1 := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> any, <span class="hljs-number">1</span>)
+	sub2 := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> any, <span class="hljs-number">1</span>)
+
+	b1.Subscribe(sub1)
+	b2.Subscribe(sub2)
+
+	<span class="hljs-comment">// 使用CloseAll关闭所有Broadcaster</span>
+	event.CloseAll()
+
+	<span class="hljs-comment">// 确认所有订阅者通道已关闭</span>
+	_, ok := &lt;-sub1
+	<span class="hljs-keyword">if</span> ok &#123;
+		t.Errorf(<span class="hljs-string">&quot;expected closed channel for Broadcaster 1, but it&#x27;s still open&quot;</span>)
+	&#125;
+
+	_, ok = &lt;-sub2
+	<span class="hljs-keyword">if</span> ok &#123;
+		t.Errorf(<span class="hljs-string">&quot;expected closed channel for Broadcaster 2, but it&#x27;s still open&quot;</span>)
+	&#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestBroadcastToMultipleSubscribers</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-comment">// 创建一个新的Broadcaster</span>
+	event.Events = <span class="hljs-built_in">append</span>(event.Events, <span class="hljs-string">&quot;multiSubEvent&quot;</span>)
+	b := event.NewBroadcaster(<span class="hljs-string">&quot;multiSubEvent&quot;</span>)
+	<span class="hljs-comment">// 创建多个订阅者并订阅</span>
+	subscriberCount := <span class="hljs-number">3</span>
+	subscribers := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">chan</span> any, subscriberCount)
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; subscriberCount; i++ &#123;
+		subscribers[i] = <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> any, <span class="hljs-number">1</span>) <span class="hljs-comment">// Buffer to prevent blocking</span>
+		b.Subscribe(subscribers[i])
+	&#125;
+
+	<span class="hljs-comment">// 发送消息</span>
+	expectedMsg := <span class="hljs-string">&quot;broadcast message&quot;</span>
+	b.Send(expectedMsg)
+
+	<span class="hljs-comment">// 确认所有订阅者都收到了消息</span>
+	<span class="hljs-keyword">for</span> i, sub := <span class="hljs-keyword">range</span> subscribers &#123;
+		<span class="hljs-keyword">select</span> &#123;
+		<span class="hljs-keyword">case</span> msg := &lt;-sub:
+			<span class="hljs-keyword">if</span> msg != expectedMsg &#123;
+				t.Errorf(<span class="hljs-string">&quot;subscriber %d received wrong message: got %v, want %v&quot;</span>, i, msg, expectedMsg)
+			&#125;
+		<span class="hljs-keyword">case</span> &lt;-time.After(<span class="hljs-number">1</span> * time.Second):
+			t.Fatalf(<span class="hljs-string">&quot;subscriber %d did not receive message in time&quot;</span>, i)
+		&#125;
+	&#125;
+
+	<span class="hljs-comment">// 清理：关闭Broadcaster和所有订阅者通道</span>
+	b.Close()
+	<span class="hljs-keyword">for</span> _, sub := <span class="hljs-keyword">range</span> subscribers &#123;
+		_, ok := &lt;-sub
+		<span class="hljs-keyword">if</span> ok &#123;
+			t.Errorf(<span class="hljs-string">&quot;expected closed channel for subscriber, but it&#x27;s still open&quot;</span>)
+		&#125;
+	&#125;
+&#125;
+
+</code></pre>
+<p><strong>同样的，咱们的注释这块还是比较给力的，应该能看懂的</strong>😜</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/goalng%E3%80%81%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E3%80%81event/">goalng、发布订阅、event</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/01/18/%E5%9F%BA%E4%BA%8EGo%E8%AF%AD%E8%A8%80%E6%9E%84%E5%BB%BA%E9%AB%98%E6%80%A7%E8%83%BD%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">🔄 基于Go语言构建高性能微服务架构</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2024/12/27/DevOps%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E4%B8%8E%E9%83%A8%E7%BD%B2%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">
+                        <span class="hidden-mobile">🚀 DevOps自动化测试与部署最佳实践</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2025/01/06/golang-实现一个发布订阅事件组件/';
+          this.page.identifier = '/2025/01/06/golang-实现一个发布订阅事件组件/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

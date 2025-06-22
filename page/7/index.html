@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 100vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels-code.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                
+              
+            </span>
+
+            
+          </div>
+
+          
+            <div class="scroll-down-bar">
+              <i class="iconfont icon-arrowdown"></i>
+            </div>
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-md">
+        <div class="py-5" id="board"
+          style=margin-top:0>
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/12/27/%E8%BF%9C%E7%A8%8B%E5%BC%80%E6%9C%BA%E8%AE%BF%E9%97%AE%E5%AE%B6%E9%87%8C%E7%9A%84pc/">远程开机&amp;访问家里的PC</a>
+
+      <a href="/2018/12/27/%E8%BF%9C%E7%A8%8B%E5%BC%80%E6%9C%BA%E8%AE%BF%E9%97%AE%E5%AE%B6%E9%87%8C%E7%9A%84pc/" class="index-excerpt">
+        
+        
+          
+        
+        <div>最近搞了个公网ip，想起了现在的电脑都支持WOL(wake on lan)网络唤醒，于是就折腾了一下。
+
+公网ip的话，我这边是电信的刚开始也是没有公网ip的，后来联系客服（我是在微信公众号中间联系的，电话应该也是一样）说要一个公网ip，然后客户就派单给了师傅，第二天就好了。
+由于电信给的公网ip是动态的，就只要超过48小时或者路由器重新拨号ip就变了。所以我们需要ddns域名来解析ip，我使用的</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-12-27
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%BD%91%E7%BB%9C/">网络</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E8%BF%9C%E7%A8%8B/">远程</a>
+            
+              <a href="/tags/pc/">pc</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/12/21/%E8%AE%B0%E4%B8%80%E6%AC%A1docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85fecshop/">记一次docker部署安装fecshop</a>
+
+      <a href="/2018/12/21/%E8%AE%B0%E4%B8%80%E6%AC%A1docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85fecshop/" class="index-excerpt">
+        
+        
+          
+        
+        <div>最近公司需要在自有app中嵌入一个商城，在结合实际情况调研后选择了开源的商城项**fecshop**。
+
+Fecshop，是由Terry从2015年初开始，一直坚持到今天的开源电商项目，非商业化运作，是真正 开源的电商系统， 遵循BSD-3-Clause开源协议。
+
+Fecshop 全称为Fancy ECommerce Shop，是基于php Yii2框架之上开发的一款优秀的开源电商系统， 遵循B</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-12-21
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/docker/">docker</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/docker/">docker</a>
+            
+              <a href="/tags/fecshop/">fecshop</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/12/03/%E6%89%B9%E9%87%8F%E6%9F%A5%E8%AF%A2ip%E5%9C%B0%E5%9D%80%E5%BD%92%E5%B1%9E%E5%9C%B0-%E8%84%9A%E6%9C%AC/">批量查询IP地址归属地 脚本</a>
+
+      <a href="/2018/12/03/%E6%89%B9%E9%87%8F%E6%9F%A5%E8%AF%A2ip%E5%9C%B0%E5%9D%80%E5%BD%92%E5%B1%9E%E5%9C%B0-%E8%84%9A%E6%9C%AC/" class="index-excerpt">
+        
+        
+          
+        
+        <div>
+最近需要从服务器日志中获取请求ip的来源地，所以写了以下shell脚本
+
+#!/bin/bash
+count=`cat $1|wc -l`
+n=1
+cat $1 | while read m
+do
+ip=`echo $m | awk &#x27;&#123;print $4&#125;&#x27;`
+addr=`curl -s https://ip.cn/index.php?ip=$&#123;</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-12-03
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/linux/">linux</a>
+            
+              <a href="/categories/linux/shell/">shell</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%89%B9%E9%87%8Fip/">批量ip</a>
+            
+              <a href="/tags/%E8%84%9A%E6%9C%AC/">脚本</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/11/15/jwt/">JWT</a>
+
+      <a href="/2018/11/15/jwt/" class="index-excerpt">
+        
+        
+          
+        
+        <div>JWT：Json Web Token
+跨域身份认证有多种方式，JWT将用户信息加密到token里，服务器不保存任何用户信息。服务器通过使用保存的密钥验证token的正确性，只要正确即通过验证。 在互联网服务器的交互中离不开验证，此次对接Google assistant 智能家居Api时，使用的身份验证方式，我选择的就是JWT。 首先，我们来看最普遍的web服务器用户验证流程。
+
+用户发送用户名和密</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-11-15
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%BD%91%E7%BB%9C/">网络</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/jwt/">jwt</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/10/26/golang-%E6%96%B0%E6%89%8B%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B8%A9%E7%9A%84-50-%E4%B8%AA%E5%9D%91-%E8%BD%AC%EF%BC%9Asf/">Golang 新手可能会踩的 50 个坑  转：sf</a>
+
+      <a href="/2018/10/26/golang-%E6%96%B0%E6%89%8B%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B8%A9%E7%9A%84-50-%E4%B8%AA%E5%9D%91-%E8%BD%AC%EF%BC%9Asf/" class="index-excerpt">
+        
+        
+          
+        
+        <div>Go 是一门简单有趣的编程语言，与其他语言一样，在使用时不免会遇到很多坑，不过它们大多不是 Go 本身的设计缺陷。如果你刚从其他语言转到 Go，那这篇文章里的坑多半会踩到。
+地址：
+https://segmentfault.com/a/1190000013739000
+</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-10-26
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Golang/">Golang</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E8%B8%A9%E5%9D%91/">踩坑</a>
+            
+              <a href="/tags/Golang/">Golang</a>
+            
+              <a href="/tags/%E5%85%A5%E9%97%A8/">入门</a>
+            
+              <a href="/tags/%E6%96%B0%E6%89%8B/">新手</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/10/13/%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E4%B8%80%E4%B8%AA%E6%95%B0%E6%98%AF%E5%90%A6%E5%9C%A840%E4%BA%BF%E4%B8%AA%E6%95%B4%E6%95%B0%E4%B8%AD%EF%BC%9F/">如何判断一个数是否在40亿个整数中？</a>
+
+      <a href="/2018/10/13/%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E4%B8%80%E4%B8%AA%E6%95%B0%E6%98%AF%E5%90%A6%E5%9C%A840%E4%BA%BF%E4%B8%AA%E6%95%B4%E6%95%B0%E4%B8%AD%EF%BC%9F/" class="index-excerpt">
+        
+        
+          
+        
+        <div>转至公众号（java后端技术）
+https://mp.weixin.qq.com/s/sPA2Pw5vDo_9isMy3fuE4A
+</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-10-13
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/java/">java</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/40%E4%BA%BF/">40亿</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/09/28/github-%E4%B8%8A%E4%B8%80%E4%B8%AA%E8%89%AF%E5%BF%83%E7%9A%84pc%E8%BD%AF%E4%BB%B6%E6%8E%A8%E8%8D%90%E9%A1%B9%E7%9B%AE/">github 上一个良心的PC软件推荐项目</a>
+
+      <a href="/2018/09/28/github-%E4%B8%8A%E4%B8%80%E4%B8%AA%E8%89%AF%E5%BF%83%E7%9A%84pc%E8%BD%AF%E4%BB%B6%E6%8E%A8%E8%8D%90%E9%A1%B9%E7%9B%AE/" class="index-excerpt">
+        
+        
+          
+        
+        <div>国内流氓软件是如此的多，以至于我们随便安装一家大厂的软件，不知不觉的它会给你带来全家。其实国内外有很多优秀的windows软件开发者，他们做出好用的软件，并没有病毒和广告。无意间在git上发现这个项目，mark一下。。
+💻 An awesome &amp; curated list of best applications and tools for Windows.
+
+
+项目地址: https</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-09-28
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/gihub/">gihub</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Github/">Github</a>
+            
+              <a href="/tags/awesome/">awesome</a>
+            
+              <a href="/tags/%E9%A1%B9%E7%9B%AE%E6%8E%A8%E8%8D%90/">项目推荐</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/09/28/php%E4%B8%AD%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E7%B3%BB%E7%BB%9F%E5%B8%B8%E9%87%8F/">php中最常用的系统常量</a>
+
+      <a href="/2018/09/28/php%E4%B8%AD%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E7%B3%BB%E7%BB%9F%E5%B8%B8%E9%87%8F/" class="index-excerpt">
+        
+        
+          
+        
+        <div>系统常量
+
+
+FILE 当前PHP文件的相对路径
+
+
+LINE 当前PHP文件中所在的行号
+
+
+FUNCTION 当前函数名，只对函数内调用起作用
+
+
+CLASS 当前类名，只对类起作用
+
+
+PHP_VERSION 当前使用的PHP版本号
+
+
+PHP_OS 当前PHP环境的运行操作系统
+
+
+TRUE 与true一样
+
+
+FALSE 与false一样
+
+
+M_PI 圆周率常量值
+
+
+M_E 科学常数</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-09-28
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/PHP/">PHP</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/php%E5%86%85%E7%BD%AE%E5%B8%B8%E9%87%8F/">php内置常量</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/09/19/308/">百度doueros 智能家居技能开发总结</a>
+
+      <a href="/2018/09/19/308/" class="index-excerpt">
+        
+        
+          
+        
+        <div>百度doueros 智能家居技能开发总结
+
+dueros官方文档
+
+
+开发准备工作
+
+
+oauth2.0 授权
+
+此次开发搭建的oauth2.0 server 使用的是github作者 bshaffer 提供的 OAuth2 Server PHP框架。官方文档地址
+
+oauth2.0 工作原理简要图解
+
+ 授权目的：授权DuerOS将识别后的控制指令，发给开发者的服务器或设备云。 授权内容说明 授</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-09-19
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E6%99%BA%E8%83%BD%E8%AF%AD%E9%9F%B3/">智能语音</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%99%BE%E5%BA%A6/">百度</a>
+            
+              <a href="/tags/dueros/">dueros</a>
+            
+              <a href="/tags/%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85/">智能家居</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/09/14/%E8%BD%AC%EF%BC%9Aphp%E5%8D%8F%E7%A8%8B%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B%E8%AF%A6%E8%A7%A3/">PHP并发IO编程之路</a>
+
+      <a href="/2018/09/14/%E8%BD%AC%EF%BC%9Aphp%E5%8D%8F%E7%A8%8B%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B%E8%AF%A6%E8%A7%A3/" class="index-excerpt">
+        
+        
+          
+        
+        <div>并发 IO 问题一直是服务器端编程中的技术难题，从最早的同步阻塞直接 Fork 进程，到 Worker 进程池/线程池，到现在的异步IO、协程。PHP 程序员因为有强大的 LAMP 框架，对这类底层方面的知识知之甚少，本文目的就是详细介绍 PHP 进行并发 IO 编程的各种尝试，最后再介绍 Swoole 的使用，深入浅出全面解析并发 IO 问题。
+多进程/多线程同步阻塞
+最早的服务器端程序都是通过</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-09-14
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/PHP/">PHP</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%8D%8F%E7%A8%8B/">协程</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <a class="extend prev" rel="prev" href="/page/6/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/8/"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+  
+  <script>
+    for (ele of document.getElementById("pagination").getElementsByTagName("a")) {
+      ele.href += '#board';
+    }
+  </script>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

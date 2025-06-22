@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>RTSP协议 - Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                RTSP协议
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2019-05-13 21:53">
+      2019年5月13日 晚上
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      877 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      11
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <p>最近公司有个需求，对接alexa 平台的camera skill。就是将ipc的视频流放到智能带屏音箱上播放出来，这个需求看似好像比较简单其实坑的一匹😭 首先我们具备的基础条件是：</p>
+<ul>
+<li>公司的ipc没有公网网卡，视频流只能在局域网中播放。</li>
+<li>现有ipc是为server模式，并且只接受被动请求，不会主动推rtsp流。</li>
+<li>Amazon alexa 平台硬性要求所有的rtsp流需要进行亚马逊认证的CA TLS: <img src="https://blog.wenboo.top/wp-content/uploads/2019/05/eb6f877c69981e9482f4a7ae50d72880.png" srcset="/img/loading.gif" alt=""></li>
+</ul>
+<h4 id="面临的问题"><a class="header-anchor" href="#面临的问题"></a>面临的问题</h4>
+<p>局域网的rtsp流无法进行CA认证的TLS加密 2. 就算搭建拉砖推流服务器再加密，但是局域网的ip行拉取。</p>
+<h4 id="解决方案"><a class="header-anchor" href="#解决方案"></a>解决方案</h4>
+<ol>
+<li>搭建rtsp流转发服务器，公司现有ipc不具备推流条件（舍弃）</li>
+<li>在alexa skill store 有看到一家解决方案 <strong>Monocle</strong></li>
+</ol>
+<blockquote>
+<p><img src="https://blog.wenboo.top/wp-content/uploads/2019/05/3b7c79a670f8fe4fffd295ee1833a13f.png" srcset="/img/loading.gif" alt=""></p>
+</blockquote>
+<p>他们通过认证网关的形式来达到目的，但是具体的实现不知。下一步得先学习下RTSP协议的内容 <a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc2326" title="RFC 2326">RFC 2326</a>。</p>
+<blockquote>
+<p>从RTSP协议文档中我们可以看到，RTSP具备和HTTP类似的重定向功能(redirect 3xx)</p>
+</blockquote>
+<p>`A redirect request informs the client that it must connect to another server location. It contains the mandatory header Location, which indicates that the client should issue requests for that URL. It may contain the parameter Range, which indicates when the redirection takes effect. If the client wants to continue to send or receive media for this URI, the client MUST issue a TEARDOWN request for the current session and a SETUP for the new session at the designated host. This example request redirects traffic for this URI to the new server at the given play time:</p>
+<pre><code class="hljs apache"><span class="hljs-attribute">S</span>-&gt;C: REDIRECT rtsp://example.com/fizzle/foo RTSP/<span class="hljs-number">1</span>.<span class="hljs-number">0</span>
+      <span class="hljs-attribute">CSeq</span>: <span class="hljs-number">732</span>
+      <span class="hljs-attribute">Location</span>: rtsp://bigserver.com:<span class="hljs-number">8001</span>
+      <span class="hljs-attribute">Range</span>: clock=<span class="hljs-number">19960213</span>T<span class="hljs-number">143205</span>Z-`</code></pre>
+<p><strong>我猜想Monocle的实现方法应该就是利用了这一个特性</strong> 开始去网上找轮子，github ，Google，百度搜了个遍基本没有现成的轮子。这个方法用的人应该非常少，著名的RTSP开源项目Live555也没有实现这个标准特性。 所以我又开始学习Live555的源码（从没写过C++的，表示这真的是在难为我啊~~~)想通过修改源码来实现这个功能。 <img src="https://blog.wenboo.top/wp-content/uploads/2019/05/d4a9763c42ee32ebfe4b6d44bd036a2c.png" srcset="/img/loading.gif" alt=""> 不过目前离我的猜想已经很近了，现在通过抓包可以清晰的看到了RTSP协议的交互过程。 C表示RTSP客户端, S表示RTSP服务端</p>
+<ol>
+<li>
+<p><strong>第一步：查询服务器端可用方法</strong></p>
+</li>
+<li>
+<p>C-&gt;S: OPTION request //询问S有哪些方法可用 1. S-&gt;C: OPTION response //S回应信息的public头字段中包括提供的所有可用方法</p>
+</li>
+<li>
+<p><strong>第二步：得到媒体描述信息</strong></p>
+</li>
+<li>
+<p>C-&gt;S: DESCRIBE request //要求得到S提供的媒体描述信息 2. S-&gt;C: DESCRIBE response //S回应媒体描述信息，一般是sdp信息</p>
+</li>
+<li>
+<p><strong>第三步：建立****RTSP****会话</strong></p>
+</li>
+<li>
+<p>C-&gt;S: SETUP request //通过Transport头字段列出可接受的传输选项，请求S建立会话 3. S-&gt;C: SETUP response //S建立会话，通过Transport头字段返回选择的具体转输选项，并返回建立的Session ID;</p>
+</li>
+<li>
+<p><strong>第四步：请求开始传送数据</strong></p>
+</li>
+<li>
+<p>C-&gt;S: PLAY request //C请求S开始发送数据 4. S-&gt;C: PLAY response //S回应该请求的信息</p>
+</li>
+<li>
+<p><strong>第五步：</strong> ******数据传送播放中**</p>
+</li>
+</ol>
+<p>S-&gt;C: 发送流媒体数据 // 通过RTP协议传送数据</p>
+<ol start="6">
+<li>
+<p><strong>第六步：关闭会话，退出</strong></p>
+</li>
+<li>
+<p>C-&gt;S: TEARDOWN request //C请求关闭会话 6. S-&gt;C: TEARDOWN response //S回应该请求</p>
+</li>
+</ol>
+<p><img src="https://blog.wenboo.top/wp-content/uploads/2019/05/f73b01c1e1d5a8fac285228863196c78.png" srcset="/img/loading.gif" alt=""> <img src="https://blog.wenboo.top/wp-content/uploads/2019/05/49f4629698a5327a89a2d973207bd66d.png" srcset="/img/loading.gif" alt=""></p>
+<p>可以修改通过修改SETUP Phase当中的交互返回来实现。</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C/">网络</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/rtsp/">rtsp</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/05/23/stunnel/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Stunnel</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2019/05/08/http1-0%E3%80%81http1-1%E3%80%81http2-0/">
+                        <span class="hidden-mobile">http1.0、http1.1、http2.0</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      function loadDisqus() {
+        var disqus_config = function () {
+          this.page.url = 'https://blog.bopop.sbs/2019/05/13/rtsp协议/';
+          this.page.identifier = '/2019/05/13/rtsp协议/';
+        };
+        (function () {
+          var d = document,
+            s = d.createElement('script');
+          s.src = '//' + '' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      }
+      createObserver(loadDisqus, 'disqus_thread');
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

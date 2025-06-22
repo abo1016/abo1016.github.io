@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 100vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels-code.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                
+              
+            </span>
+
+            
+          </div>
+
+          
+            <div class="scroll-down-bar">
+              <i class="iconfont icon-arrowdown"></i>
+            </div>
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-md">
+        <div class="py-5" id="board"
+          style=margin-top:0>
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/09/13/php%E7%9A%84%E8%BF%87%E6%BB%A4%E5%99%A8%E5%87%BD%E6%95%B0/">PHP的过滤器函数</a>
+
+      <a href="/2018/09/13/php%E7%9A%84%E8%BF%87%E6%BB%A4%E5%99%A8%E5%87%BD%E6%95%B0/" class="index-excerpt">
+        
+        
+          
+        
+        <div>PHP中很屌但经常被各种忽略的过滤器函数 PHP其实自带一些功能强大的函数，在我们实现某个逻辑或功能时，经常不会用PHP自带的好用的函数，而大多时候都是选择绕远路的方法自己去实现。
+先拉两个出来遛遛
+1. filter_has_var 判断$_GET中是否有某个字段参数通常的写法
+if(isset($_GET[“name”])  //或者post参数、或者cookie里
+其实还可以这么写
+filt</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-09-13
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/PHP/">PHP</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/php/">php</a>
+            
+              <a href="/tags/%E8%BF%87%E6%BB%A4/">过滤</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/09/06/linux-%E4%BF%AE%E6%94%B9%E6%97%B6%E5%8C%BA%E5%92%8C%E6%97%B6%E9%97%B4/">linux 修改时区和时间</a>
+
+      <a href="/2018/09/06/linux-%E4%BF%AE%E6%94%B9%E6%97%B6%E5%8C%BA%E5%92%8C%E6%97%B6%E9%97%B4/" class="index-excerpt">
+        
+        
+          
+        
+        <div>查看时区 date -R 设置时区 tzselect 复制相应的时区文件，替换系统时区文件；或者创建链接文件 cp /usr/share/zoneinfo/$主时区/$次时区 /etc/localtime 例如：上海 cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 将当前时间和日期写入BIOS，避免重启后失效 hwclock -w
+</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-09-06
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/linux/">linux</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E4%BF%AE%E6%94%B9%E6%97%B6%E5%8C%BA%E6%97%B6%E9%97%B4/">修改时区时间</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/09/05/%E5%85%B3%E9%97%ADvirtualbox%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9A%84%E6%97%B6%E9%92%9F%E5%90%8C%E6%AD%A5/">关闭VirtualBox虚拟机的时钟同步</a>
+
+      <a href="/2018/09/05/%E5%85%B3%E9%97%ADvirtualbox%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9A%84%E6%97%B6%E9%92%9F%E5%90%8C%E6%AD%A5/" class="index-excerpt">
+        
+        
+          
+        
+        <div>使用VirtualBox作为虚拟操作系统载体，有时候我们需要主机与虚拟机时间同步一致，有时候需要两者之间时间不一致，经过整理主要存在以下两种方案。
+方案1
+
+关闭时间同步
+
+VBoxManage setextradata &lt;虚拟机名/虚拟机UUID&gt; &quot;VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled&quot;</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-09-05
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/vagrant/">vagrant</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/">虚拟机</a>
+            
+              <a href="/tags/VirtualBox/">VirtualBox</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/08/29/linux-cpu%E5%8D%A0%E7%94%A8%E7%8E%87%E7%9B%91%E6%8E%A7%E8%84%9A%E6%9C%AC/">linux cpu占用率监控脚本</a>
+
+      <a href="/2018/08/29/linux-cpu%E5%8D%A0%E7%94%A8%E7%8E%87%E7%9B%91%E6%8E%A7%E8%84%9A%E6%9C%AC/" class="index-excerpt">
+        
+        
+          
+        
+        <div>/proc/stat： 这个文件包含了所有CPU活动的信息，该文件中的所有值都是从系统启动开始累计到当前时刻。可以利用其中信息计算cpu的利用率。 cat /proc/stat  每行每个参数的意思为（以第一行为例，单位：jiffies，1jiffies=0.01秒）： user（1062726189）：从系统启动开始累计到当前时刻，用户态的CPU时间，不包含 nice值为负进程。 nice（0）</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-08-29
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/linux/">linux</a>
+            
+              <a href="/categories/linux/shell/">shell</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/linux%E8%84%9A%E6%9C%AC/">linux脚本</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/08/29/workerman-%E8%B0%83%E8%AF%95busy%E8%BF%9B%E7%A8%8B/">workerman 调试busy进程</a>
+
+      <a href="/2018/08/29/workerman-%E8%B0%83%E8%AF%95busy%E8%BF%9B%E7%A8%8B/" class="index-excerpt">
+        
+        
+          
+        
+        <div>
+使用php start.php status查看wokerman状态，进程状态为busy，明对应进程正在处理业务，正常情况下业务处理完毕对应进程会恢复为idle状态，这一般情况下不会有什么问题。若进程持续很久都没有恢复到idle状态，这说明进程业务已经出现异常。
+
+利用strace+lsof命令定位
+
+利用php start.php status命令找出busy状态的进程pid。
+
+ 图中bus</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-08-29
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/PHP/">PHP</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/workerman/">workerman</a>
+            
+              <a href="/tags/%E8%B0%83%E8%AF%95/">调试</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/08/24/%E6%BC%AB%E7%94%BB%EF%BC%9A%E4%BB%80%E4%B9%88%E6%98%AF%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%EF%BC%9F/">漫画：什么是时间复杂度？</a>
+
+      <a href="/2018/08/24/%E6%BC%AB%E7%94%BB%EF%BC%9A%E4%BB%80%E4%B9%88%E6%98%AF%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%EF%BC%9F/" class="index-excerpt">
+        
+        
+          
+        
+        <div>转至程序员小灰：什么是时间复杂度？
+</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-08-24
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/">时间复杂度</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/08/15/oauth-2-0-server-php/">OAuth 2.0 Server  PHP</a>
+
+      <a href="/2018/08/15/oauth-2-0-server-php/" class="index-excerpt">
+        
+        
+          
+        
+        <div>要求
+此库需要PHP 5.3.9+。然而，有一个稳定的版本和开发分支的PHP 5.2.x-5.3.8为好。
+安装
+该库遵循zend PSR-0标准。由于这个原因，存在许多可以自动加载此库的自动加载器，但是如果您不使用它，则可以注册OAuth2\Autoloader：
+require_once(&#x27;/path/to/oauth2-server-php/src/OAuth2/Autoloade</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-08-15
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/PHP/">PHP</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/oauth2-0/">oauth2.0</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/07/27/%E7%90%86%E8%A7%A3oauth-2-0/">理解OAuth 2.0</a>
+
+      <a href="/2018/07/27/%E7%90%86%E8%A7%A3oauth-2-0/" class="index-excerpt">
+        
+        
+          
+        
+        <div>OAuth是一个关于授权（authorization）的开放网络标准，在全世界得到广泛应用，目前的版本是2.0版。 本文对OAuth 2.0的设计思路和运行流程，做一个简明通俗的解释，主要参考材料为RFC 6749。 
+一、应用场景
+为了理解OAuth的适用场合，让我举一个假设的例子。 有一个&quot;云冲印&quot;的网站，可以将用户储存在Google的照片，冲印出来。用户为了使用该服务，必</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-07-27
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%BD%91%E7%BB%9C/">网络</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Oauth2-0/">Oauth2.0</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/07/26/php%E7%BB%86%E8%8A%82%E9%97%AE%E9%A2%98-int-0-%E5%92%8C-%E7%A9%BA%E7%9A%84%E5%8C%BA%E5%88%AB%E5%88%A4%E6%96%AD/">php细节问题  int 0  和 空的区别判断</a>
+
+      <a href="/2018/07/26/php%E7%BB%86%E8%8A%82%E9%97%AE%E9%A2%98-int-0-%E5%92%8C-%E7%A9%BA%E7%9A%84%E5%8C%BA%E5%88%AB%E5%88%A4%E6%96%AD/" class="index-excerpt">
+        
+        
+          
+        
+        <div>对0的判断
+ $cast_id = 0;
+
+var_dump(strlen($cast_id));   //1
+
+var_dump(empty($cast_id)); // true
+
+var_dump(isset($cast_id)); //true
+
+var_dump(is_null($cast_id));//false
+对空的判断
+ $cast_id = &quot;&quot;;
+
+var</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-07-26
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/PHP/">PHP</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/php/">php</a>
+            
+              <a href="/tags/%E7%A9%BA/">空</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/07/25/dueros-%E5%BC%80%E6%94%BE%E5%B9%B3%E5%8F%B0/">DuerOS 开放平台</a>
+
+      <a href="/2018/07/25/dueros-%E5%BC%80%E6%94%BE%E5%B9%B3%E5%8F%B0/" class="index-excerpt">
+        
+        
+          
+        
+        <div>公司智能家居项目下一步将要接入智能语音平台，现在人工智能语音平台比较成熟，相应的平台厂家也比较多，国内有讯飞、思必驰、DuerOS等等，国外有google的Google Assistant，Amazon的Alexa等。我们先尝试百度的DuerOS平台
+概述
+DuerOS 开放平台主要面向企业级用户及个人开发者，提供对话式操作系统能力的输出（DuerOS智能设备开放平台）及输入（DuerOS技能开放</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-07-25
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E6%99%BA%E8%83%BD%E8%AF%AD%E9%9F%B3/">智能语音</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/dueros/">dueros</a>
+            
+              <a href="/tags/%E6%96%87%E6%A1%A3/">文档</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <a class="extend prev" rel="prev" href="/page/7/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/9/"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+  
+  <script>
+    for (ele of document.getElementById("pagination").getElementsByTagName("a")) {
+      ele.href += '#board';
+    }
+  </script>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

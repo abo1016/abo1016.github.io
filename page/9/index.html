@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Bopop-logo.png">
+  <link rel="icon" type="image/png" href="/img/Bopop-logo.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="This v blog">
+  <meta name="author" content="BoDen">
+  <meta name="keywords" content="Bopop,blog,博客,PHP,Python,Golang">
+  <title>Bopop</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 5.0.2"></head>
+
+
+<body>
+  <header style="height: 100vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Bopop</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/pexels-code.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+                
+              
+            </span>
+
+            
+          </div>
+
+          
+            <div class="scroll-down-bar">
+              <i class="iconfont icon-arrowdown"></i>
+            </div>
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-md">
+        <div class="py-5" id="board"
+          style=margin-top:0>
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/07/12/cgi%E3%80%81fastcgi%E3%80%81php-fpm/">CGI、FastCGI、PHP-FPM</a>
+
+      <a href="/2018/07/12/cgi%E3%80%81fastcgi%E3%80%81php-fpm/" class="index-excerpt">
+        
+        
+          
+        
+        <div>转：文章出处
+
+CGI – common gateway interface的缩写，通常译为：通用网关接口
+
+相信多数人和我一样无法知其名而知其意，cgi它是一种协议。通过cgi协议，web server可以将动态请求和相关参数发送给专门处理动态内容的应用程序。 web服务器所处理的内容都是静态的，要想处理动态内容，需要依赖于web应用程序，如php、jsp、python、perl等。web服务器</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-07-12
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/PHP/">PHP</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/CGI/">CGI</a>
+            
+              <a href="/tags/FastCGI/">FastCGI</a>
+            
+              <a href="/tags/PHP-FPM/">PHP-FPM</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/07/11/%E5%88%AB%E5%86%8D%E4%BD%BF%E7%94%A8%E5%8F%A4%E8%80%81%E7%9A%84top%E4%BA%86-%E7%94%A8htop%E5%90%A7%EF%BC%81/">别再使用古老的top了  用htop吧！</a>
+
+      <a href="/2018/07/11/%E5%88%AB%E5%86%8D%E4%BD%BF%E7%94%A8%E5%8F%A4%E8%80%81%E7%9A%84top%E4%BA%86-%E7%94%A8htop%E5%90%A7%EF%BC%81/" class="index-excerpt">
+        
+        
+          
+        
+        <div>
+在linux系统中我们经常会使用top命令去查看进程状况，系统资源占用状况。
+
+
+
+现在我们有了更好的选择 – htop
+
+htop 是Linux系统中的一个互动的进程查看器，一个文本模式的应用程序(在控制台或者X终端中)，需要ncurses。与Linux传统的top相比，htop更加人性化。它可让用户交互式操作，支持颜色主题，可横向或纵向滚动浏览进程列表，并支持鼠标操作。 与top相比，hto</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-07-11
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/linux/">linux</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/top/">top</a>
+            
+              <a href="/tags/Htop/">Htop</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/07/10/awk-%E8%A1%8C%E5%A4%84%E7%90%86%E5%99%A8/">awk 行处理器</a>
+
+      <a href="/2018/07/10/awk-%E8%A1%8C%E5%A4%84%E7%90%86%E5%99%A8/" class="index-excerpt">
+        
+        
+          
+        
+        <div>
+linux 强大的awk命令 相比较屏幕处理的优点，在处理庞大文件时不会出现内存溢出或是处理缓慢的问题，通常用来格式化文本信息
+
+命令行
+awk [-F|-f|-v] 'BEGIN&#123;&#125; //&#123;command1; command2&#125; END&#123;&#125;' file [-F|-f|-v] 大参数，-F指定分隔符，-f调用脚本，-v定义变量 var=</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-07-10
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/linux/">linux</a>
+            
+              <a href="/categories/linux/shell/">shell</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/awk/">awk</a>
+            
+              <a href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/">命令行</a>
+            
+              <a href="/tags/linux/">linux</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/07/10/workerman%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95/">workerman压力测试</a>
+
+      <a href="/2018/07/10/workerman%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95/" class="index-excerpt">
+        
+        
+          
+        
+        <div>
+公司香港服务器wokerman 出现内存泄露问题 怀疑是否是框架自身问题
+
+压力测试脚本
+require_once &#x27;./Workerman/Autoloader.php&#x27;;
+use Workerman\Worker;
+$worker = new Worker(&#x27;tcp://0.0.0.0:1234&#x27;);
+// 进程数配置成cpu核数-1，保留一个cpu给</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-07-10
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/PHP/">PHP</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/workerman/">workerman</a>
+            
+              <a href="/tags/%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95/">压力测试</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/07/02/mysql-%E7%94%A8%E6%88%B7%E6%8E%88%E6%9D%83/">mysql 用户授权</a>
+
+      <a href="/2018/07/02/mysql-%E7%94%A8%E6%88%B7%E6%8E%88%E6%9D%83/" class="index-excerpt">
+        
+        
+          
+        
+        <div>
+新建用户
+
+CREATE USER username IDENTIFIED BY &#x27;password&#x27;;
+
+分配用户权限
+
+GRANT ALL PRIVILEGES ON *.* TO &#x27;username&#x27;@&#x27;localhost&#x27; IDENTIFIED BY &#x27;password&#x27;;
+
+撤销用户权限 重新分配
+
+EVO</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-07-02
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/mysql/">mysql</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/mysql/">mysql</a>
+            
+              <a href="/tags/%E6%9D%83%E9%99%90/">权限</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/06/27/mysql-%E5%88%86%E5%8C%BA%E8%A1%A8/">mysql 分区表</a>
+
+      <a href="/2018/06/27/mysql-%E5%88%86%E5%8C%BA%E8%A1%A8/" class="index-excerpt">
+        
+        
+          
+        
+        <div>
+mysql 分区表
+
+什么是分区表
+单表数据到了几百万甚至上千万时，会使得数据库的查询效率变得很低，有复杂的联合查询时可能会导致mysql进程挂机或宕机。此时通过分表或者分区将一张数据表中的数据分割成多份小的数据，本次要讲的是分区。
+
+
+从Mysql5.1之后，分区功能出现了，表分区就像是将一个大表分成了若干个小表，用户在执行查询的时候无需进行全表扫描，只需要对满足要求的表分区中进行查询即可，极</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-06-27
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/mysql/">mysql</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%88%86%E5%8C%BA%E8%A1%A8/">分区表</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/06/22/swoole%E5%85%A5%E9%97%A8-echo%E6%9C%8D%E5%8A%A1%E5%99%A8/">swoole入门-- Echo服务器</a>
+
+      <a href="/2018/06/22/swoole%E5%85%A5%E9%97%A8-echo%E6%9C%8D%E5%8A%A1%E5%99%A8/" class="index-excerpt">
+        
+        
+          
+        
+        <div>网络编程的 “Hello World”
+
+创建一个server.php 作为服务器程序
+
+&lt;?php
+class Server
+&#123;
+    private $serv;
+
+    public function __construct() &#123;
+        $this-&gt;serv = new swoole_server(&quot;0.0.0.0&quot;, 9</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-06-22
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/PHP/">PHP</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/swoole/">swoole</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/06/20/golang-%E6%96%B0%E7%9A%84%E7%8E%A9%E5%85%B7/">Golang --新的玩具</a>
+
+      <a href="/2018/06/20/golang-%E6%96%B0%E7%9A%84%E7%8E%A9%E5%85%B7/" class="index-excerpt">
+        
+        
+          
+        
+        <div>Golang 简介
+ Golang是Google公司在2009年发布的一款开源编程语言，在2012年早些时候发布了Go 1.0稳定版本。现在Go的开发已经是完全开放的，并且拥有一个活跃的社区。背靠Google爸爸，Golang在互联网领域发展飞快，在国内外大厂（Google、Facebook、alibaba、tencent、jd 等等）流行程度大有拳打java脚踢C++的趋势。在大数据和分布式平台</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-06-20
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Golang/">Golang</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Golang/">Golang</a>
+            
+              <a href="/tags/%E5%85%A5%E9%97%A8/">入门</a>
+            
+              <a href="/tags/%E7%8E%A9%E5%85%B7/">玩具</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/06/08/workerman-%E5%BE%88%E5%96%9C%E6%AC%A2%E7%9A%84%E4%B8%80%E4%B8%AA%E9%AB%98%E6%80%A7%E8%83%BDsocket-%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/">workerman --很喜欢的一个高性能socket 服务器框架</a>
+
+      <a href="/2018/06/08/workerman-%E5%BE%88%E5%96%9C%E6%AC%A2%E7%9A%84%E4%B8%80%E4%B8%AA%E9%AB%98%E6%80%A7%E8%83%BDsocket-%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/" class="index-excerpt">
+        
+        
+          
+        
+        <div>最近项目中一直在使用wokerman 确切的说应该是GatewayWorker（基于wokerman封装的TCP长连接应用框架）。
+GatewayWorker是基于Workerman开发的一套TCP长连接的应用框架，实现了单发、群发、广播等接口，内置了mysql类库，GatewayWorker分为Gateway进程和Worker进程，天然支持分布式部署，能够支持庞大的连接数（百万甚至千万连接级别的</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-06-08
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/PHP/">PHP</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/workerman/">workerman</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2018/05/31/%E9%80%9A%E4%BF%97%E5%8C%96-https/">通俗化 HTTPS</a>
+
+      <a href="/2018/05/31/%E9%80%9A%E4%BF%97%E5%8C%96-https/" class="index-excerpt">
+        
+        
+          
+        
+        <div>本文试图以通俗易通的方式介绍Https的工作原理，不纠结具体的术语，不考证严格的流程。我相信弄懂了原理之后，到了具体操作和实现的时候，方向就不会错，然后条条大路通罗马。阅读文本需要提前大致了解对称加密、非对称加密、信息认证等密码学知识。如果你不太了解，可以阅读Erlang发明人Joe Armstrong最近写的Cryptography Tutorial。大牛出品，通俗易懂，强力推荐。
+Https涉</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2018-05-31
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%BD%91%E7%BB%9C/">网络</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/https/">https</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <a class="extend prev" rel="prev" href="/page/8/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/10/"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+  
+  <script>
+    for (ele of document.getElementById("pagination").getElementsByTagName("a")) {
+      ele.href += '#board';
+    }
+  </script>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+    <div class="col-lg-7 mx-auto nopadding-md">
+      <div class="container custom mx-auto">
+        <img src="/img/Bopop-logo.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:220px; height:150px;">
+      </div>
+    </div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <!-- <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a> -->
+        <span>© Bopop</span>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
